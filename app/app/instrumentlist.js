@@ -344,7 +344,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 
     instruments.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "li",
-      { className: "list-group-item", onClick: this.addInstrument, key: config.trackerHost },
+      { className: "list-group-item", onClick: this.addInstrument, key: "__new" },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "a",
         { href: "#" },

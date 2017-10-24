@@ -237,66 +237,183 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 
 		}, fileName => {
 
-			console.log(fileName);
 			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
 		});
 	}
 
-	plotMPPT(data) {
+	async downloadVocJsc() {
 
-		let graph, serie;
-		graph = this.newTimeGraph();
-		graph.getLeftAxis(0).setLabel("Efficiency").setUnit("%").setSpan(0.75, 1.00).setUnitWrapper("(", ")").gridsOff().setLineAt([0]);
+		let data = await this.getVocJscData();
 
-		graph.newSerie("efficiency").setLabel("PCE").autoAxis().setYAxis(graph.getLeftAxis(0)).setLineColor("#1f1fae").setLineWidth(2).setWaveform(data.efficiency);
+		var outputfile;
 
-		graph.getLeftAxis(1).setLabel("Vmpp").setUnit("V").setSpan(0.6, 0.73).setUnitWrapper("(", ")").gridsOff().setLineAt([0]);
+		if (this.state.dl_format == "itx") {
+			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["b" /* ITXBuilder */]();
+		} else {
+			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["a" /* CSVBuilder */]();
+		}
+		console.log(data);
+		outputfile.addWaveform(data.waveVoc, {
+			waveName: "Voc",
+			waveNameX: "Time_voc_h"
+		});
 
-		graph.newSerie("Voltage").autoAxis().setYAxis(graph.getLeftAxis(1)).setLineColor("#1f8eae").setLineWidth(2).setWaveform(data.voltage);
+		outputfile.addWaveform(data.waveJsc, {
+			waveName: "Jsx",
+			waveNameX: "Time_jsc_h"
+		});
 
-		graph.getLeftAxis(2).setLabel("Jmpp").setUnit("A").setSpan(0.45, 0.58).setUnitWrapper("(", ")").gridsOff().setScientific(true).setUnitDecade(true).setLineAt([0]);
+		dialog.showSaveDialog({
 
-		graph.newSerie("Current").autoAxis().setYAxis(graph.getLeftAxis(2)).setLineColor("#1fae76").setLineWidth(2).setWaveform(data.current);
+			message: "Save the Voc and Jsc data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: "~/" + this.props.cellInfo.cellName + "_vocjsc.itx"
 
-		graph.getLeftAxis(3).setLabel("Sun").setUnit("-").setSpan(0.3, 0.43).setUnitWrapper("(", ")").gridsOff().forceMin(0).setLineAt([0]);
+		}, fileName => {
 
-		graph.newSerie("sun").autoAxis().setLabel("Sun").setYAxis(graph.getLeftAxis(3)).setLineColor("#7aae1f").setLineWidth(2).setWaveform(data.sun);
-
-		graph.getLeftAxis(4).setLabel("Humidity").setUnit("%").setSpan(0.15, 0.28).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(100).setLineAt([0]);
-
-		graph.newSerie("humidity").autoAxis().setLabel("Hum.").setYAxis(graph.getLeftAxis(4)).setLineColor("#ae9b1f").setLineWidth(2).setWaveform(data.humidity);
-
-		graph.getLeftAxis(5).setLabel("Temperature").setUnit("°C").setSpan(0.0, 0.13).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(90).setLineAt([0]);
-
-		graph.newSerie("temeprature").autoAxis().setLabel("Temp.").setYAxis(graph.getLeftAxis(5)).setLineColor("#ae441f").setLineWidth(2).setWaveform(data.temperature);
-
-		graph.makeLegend().setAutoPosition("bottom");
-		graph.updateLegend();
-		graph.draw();
-		graph.updateLegend();
-		graph.draw();
-		graph.updateLegend();
-
-		return Object(__WEBPACK_IMPORTED_MODULE_5__app_util_svgToPDF__["a" /* default */])(graph.getWrapper(), 600, 600).then(results => {
-
-			this.emptyFakeGraph();
-			return results;
+			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
 		});
 	}
 
-	newTimeGraph() {
-		let graph = new __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a(this.fakeDom);
-		graph.resize(600, 600);
-		graph.getBottomAxis().setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff();
+	async downloadIV() {
 
-		return graph;
-	}
+		let data = await this.getJVData();
 
-	emptyFakeGraph() {
-		while (this.fakeDom.firstChild) {
-			this.fakeDom.removeChild(this.fakeDom.firstChild);
+		var outputfile;
+
+		if (this.state.dl_format == "itx") {
+			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["b" /* ITXBuilder */]();
+		} else {
+			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["a" /* CSVBuilder */]();
 		}
+
+		data[0].map(data => {
+
+			if (!data.wave) {
+				return;
+			}
+
+			outputfile.addWaveform(data.wave, {
+				waveName: "Current_" + data.time_h + "h",
+				waveNameX: "Voltage_" + data.time_h + "h"
+			});
+		});
+
+		dialog.showSaveDialog({
+
+			message: "Save the JV data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: "~/" + this.props.cellInfo.cellName + "_jv.itx"
+
+		}, fileName => {
+
+			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
+		});
 	}
+
+	/*
+ 	plotMPPT( data ) {
+ 
+ 		let graph, serie;
+ 		graph = this.newTimeGraph();
+ 		graph.getLeftAxis( 0 )
+ 				.setLabel("Efficiency")
+ 				.setUnit("%")
+ 				.setSpan( 0.75, 1.00 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.setLineAt( [ 0 ] );
+ 
+ 		graph.newSerie("efficiency").setLabel("PCE").autoAxis().setYAxis( graph.getLeftAxis( 0 ) ).setLineColor("#1f1fae").setLineWidth(2).setWaveform( data.efficiency );
+ 		
+ 		graph.getLeftAxis( 1 )
+ 				.setLabel("Vmpp")
+ 				.setUnit("V")
+ 				.setSpan( 0.6, 0.73 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.setLineAt( [ 0 ] );
+ 
+ 		graph.newSerie("Voltage").autoAxis().setYAxis( graph.getLeftAxis( 1 ) ).setLineColor("#1f8eae").setLineWidth(2).setWaveform( data.voltage );
+ 		
+ 		graph.getLeftAxis( 2 )
+ 				.setLabel("Jmpp")
+ 				.setUnit("A")
+ 				.setSpan( 0.45, 0.58 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.setScientific( true )
+ 				.setUnitDecade( true )
+ 				.setLineAt( [ 0 ] );
+ 
+ 
+ 		graph.newSerie("Current").autoAxis().setYAxis( graph.getLeftAxis( 2 ) ).setLineColor("#1fae76").setLineWidth(2).setWaveform( data.current );
+ 		
+ 		graph.getLeftAxis( 3 )
+ 				.setLabel("Sun")
+ 				.setUnit("-")
+ 				.setSpan( 0.3, 0.43 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.forceMin( 0 )
+ 				.setLineAt( [ 0 ] );
+ 
+ 		graph.newSerie("sun").autoAxis().setLabel("Sun").setYAxis( graph.getLeftAxis( 3 ) ).setLineColor("#7aae1f").setLineWidth(2).setWaveform( data.sun );
+ 		
+ 		graph.getLeftAxis( 4 )
+ 				.setLabel("Humidity")
+ 				.setUnit("%")
+ 				.setSpan( 0.15, 0.28 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.forceMin( 0 )
+ 				.forceMax( 100 )
+ 				.setLineAt( [ 0 ] );
+ 
+ 		graph.newSerie("humidity").autoAxis().setLabel("Hum.").setYAxis( graph.getLeftAxis( 4 ) ).setLineColor("#ae9b1f").setLineWidth(2).setWaveform( data.humidity );
+ 		
+ 		graph.getLeftAxis( 5 )
+ 				.setLabel("Temperature")
+ 				.setUnit("°C")
+ 				.setSpan( 0.0, 0.13 )
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff()
+ 				.forceMin( 0 )
+ 				.forceMax( 90 )
+ 				.setLineAt( [ 0 ] );
+ 
+ 		graph.newSerie("temeprature").autoAxis().setLabel("Temp.").setYAxis( graph.getLeftAxis( 5 ) ).setLineColor("#ae441f").setLineWidth(2).setWaveform( data.temperature );
+ 		
+ 		graph.makeLegend().setAutoPosition( "bottom" );
+ 		graph.updateLegend();
+ 		graph.draw();
+ 		graph.updateLegend();
+ 		graph.draw();
+ 		graph.updateLegend();
+ 
+ 		return svgToPDF( graph.getWrapper(), 600, 600 ).then( results => {
+ 
+ 			this.emptyFakeGraph();
+ 			return results;
+ 		} );
+ 	}
+ 
+ 	newTimeGraph() {
+ 		let graph = new Graph( this.fakeDom );
+ 		graph.resize( 600, 600 );
+ 		graph.getBottomAxis()
+ 				.setLabel("Time")
+ 				.setUnit("h")
+ 				.setUnitWrapper("(", ")")
+ 				.gridsOff();
+ 				
+ 
+ 		return graph;
+ 	}
+ 
+ 	emptyFakeGraph() {
+ 		while( this.fakeDom.firstChild ) {
+ 			this.fakeDom.removeChild( this.fakeDom.firstChild );
+ 		}
+ 	}*/
 
 	getTrackData(getEfficiencyAtIntervals) {
 
@@ -414,13 +531,92 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 		});
 	}
 
-	downloadVocJsc() {}
+	getVocJscData(getEfficiencyAtIntervals) {
 
-	downloadIV() {}
+		var db = this.props.db.db;
+
+		let waveVoc = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+		    waveJsc = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+		    timefrom;
+
+		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])(`
+			SELECT time,efficiency FROM "${this.props.measurementName}" ORDER BY time ASC limit 1;
+			SELECT time,voc FROM "${this.props.measurementName}_voc" ORDER BY time ASC;
+			SELECT time,jsc FROM "${this.props.measurementName}_jsc" ORDER BY time ASC;`, db, this.props.db).then(async results => {
+
+			results.map((results, index) => {
+
+				if (index == 0) {
+					timefrom = new Date(results.series[0].values[0][0]);
+					return;
+				}
+
+				if (!results.series) {
+					return [];
+				}
+
+				return results.series[0].values.map(value => {
+
+					let date = new Date(value[0]),
+					    time = Math.round((date.getTime() - timefrom.getTime()) / 1000 / 3600 * 10) / 10,
+					    val = value[1];
+
+					if (index == 1) {
+						waveVoc.append(time, val);
+					} else if (index == 2) {
+						waveJsc.append(time, val);
+					}
+				});
+			});
+
+			return {
+				waveVoc: waveVoc,
+				waveJsc: waveJsc
+			};
+		});
+	}
+
+	getJVData() {
+
+		var db = this.props.db.db;
+
+		let timefrom;
+
+		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])(`
+			SELECT time,iv FROM "${this.props.measurementName}_iv" ORDER BY time ASC;`, db, this.props.db).then(async results => {
+
+			return results.map((results, index) => {
+
+				if (!results.series) {
+					return {};
+				}
+
+				if (index == 0) {
+					timefrom = new Date(results.series[0].values[0][0]);
+				}
+
+				return results.series[0].values.map(value => {
+
+					let date = new Date(value[0]),
+					    data = value[1].split(","),
+					    wave = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+
+					for (let i = 0; i < data.length; i += 2) {
+						wave.append(parseFloat(data[i].replace('"', '')), parseFloat(data[i + 1].replace('"', '')));
+					}
+
+					return {
+						wave: wave,
+						time_h: Math.round((date.getTime() - timefrom.getTime()) / 1000 / 3600 * 10) / 10
+					};
+				});
+			});
+		});
+	}
 
 	async downloadPDF() {
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("htmlReport", this.props.cellInfo, this.props.instrumentId, this.props.chanId, this.props.measurementName);
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName);
 	}
 
 	render() {
@@ -434,11 +630,16 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'h3',
 					null,
-					'Download data for channel ',
+					'Download data for device "',
 					this.props.cellInfo.cellName,
-					' ( channel ',
-					this.props.chanId,
-					' )'
+					'" ',
+					this.props.chanId && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'span',
+						null,
+						'channel ',
+						this.props.chanId,
+						' )'
+					)
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
@@ -466,11 +667,6 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 							)
 						)
 					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'h4',
-					null,
-					'Tracking data'
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
@@ -517,137 +713,56 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'form-group' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'label',
-						{ className: 'col-sm-3' },
-						'Humidity'
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'col-sm-9 checkbox' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'label',
-							null,
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'dl_track_humidity', checked: !!this.state.dl_track_humidity, onChange: this.handleInputChange })
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'form-group' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'label',
-						{ className: 'col-sm-3' },
-						'Cell temperature'
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'col-sm-9 checkbox' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'label',
-							null,
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'dl_track_celltemp', checked: !!this.state.dl_track_celltemp, onChange: this.handleInputChange })
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'form-group' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'label',
-						{ className: 'col-sm-3' },
-						'Box temperature'
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'col-sm-9 checkbox' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'label',
-							null,
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'dl_track_boxtemp', checked: !!this.state.dl_track_boxtemp, onChange: this.handleInputChange })
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'form-group' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-sm-3' }),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'col-sm-9' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'button',
-							{ className: 'btn btn-primary', type: 'button', onClick: this.downloadTrack },
-							'Download'
+							'div',
+							{ className: 'btn-group' },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadTrack },
+								'Download MPP'
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadVocJsc },
+								'Download Voc and Jsc'
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadIV },
+								'Download JV'
+							)
 						)
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'col-sm-9' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'button',
-							{ className: 'btn btn-primary', type: 'button', onClick: this.downloadPDF },
-							'Make PDF'
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'h4',
-					null,
-					'V',
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'sub',
-						null,
-						'oc'
-					),
-					' and J',
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'sub',
-						null,
-						'sc'
 					)
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'form-group' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-sm-3' }),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'col-sm-9' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'button',
-							{ className: 'btn btn-primary', type: 'button', onClick: this.downloadVocJsc },
-							'Download'
+							'div',
+							{ className: 'btn-group' },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ className: 'btn btn-success', type: 'button', onClick: this.downloadPDF },
+								'Make PDF report'
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ type: 'button', className: 'btn btn-default', name: 'update', onClick: this.close },
+								'Close'
+							)
 						)
 					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'h4',
-					null,
-					'j-V curve data'
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'form-group' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'col-sm-9' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'button',
-							{ className: 'btn btn-primary', type: 'button', onClick: this.downloadIV },
-							'Download'
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { ref: el => this.fakeDom = el })
-			),
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ className: 'btn-group pull-right' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'button',
-					{ type: 'button', className: 'btn btn-default', name: 'update', onClick: this.close },
-					'Close'
 				)
-			)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'btn-group pull-right' })
 		);
 	}
 }
@@ -851,7 +966,7 @@ module.exports = require("node-jsgraph/dist/jsgraph-es6");
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = svgToPDF;
+/* unused harmony export default */
 
 function svgToPDF(domElement, width, height) {
 

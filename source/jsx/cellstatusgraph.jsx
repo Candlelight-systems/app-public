@@ -16,9 +16,7 @@ var modes = {
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 0
-
 		}
-
 	},
 
 	default: {
@@ -68,23 +66,22 @@ class statusGraph extends GraphComponent {
 		this.serie.setLineColor( "#413ca5" );
 		this.serie.autoAxis();
 		this.serie.setLineWidth( 2 );		
-		this.serie.setLabel("PCE");
+
+		this.serie.setLabel( this.props.serieLabelLegend );
 
 		if( this.props.mode == 'sparkline' ) {
 				
-			
 			this.graph.getYAxis().turnGridsOff();
-
 			this.graph.getXAxis().hide();
 			this.graph.getYAxis().hide();
-		} else {
 
+		} else {
 
 			this.graph.getYAxis().secondaryGridOff();
 
 			this.graph.getYAxis()
-				.setLabel('Efficiency')
-				.setUnit('%')
+				.setLabel( this.props.axisLabel )
+				.setUnit( this.props.axisUnit )
 				.setUnitWrapper("(", ")");
 
 			var legend = this.graph.makeLegend();
@@ -154,7 +151,7 @@ class statusGraph extends GraphComponent {
 			this.flag1.addTransform("translate", this.graph.newPosition( { dx: "-60px", dy: "0px"} ) );
 			this.flag1.setRenderer( ( dom ) => 
 				{ 
-					ReactDOM.render( <div className="graph_tooltip"><div className="right"><span>{ this.props.flag1} { this.props.unit }</span></div></div>, dom )
+					ReactDOM.render( <div className="graph_tooltip medium"><div className="right"><span>{ this.props.flag1} { this.props.unit }</span></div></div>, dom )
 				} );
 			
 			
@@ -169,7 +166,7 @@ class statusGraph extends GraphComponent {
 			this.flag2.addTransform("translate", this.graph.newPosition( { dx: "-80px", dy: "-5px"} ) );
 			this.flag2.setRenderer( ( dom, xpos, ypos ) => 
 				{ 	
-					ReactDOM.render( <div className="graph_tooltip"><div className="top"><span>{ this.props.flag2 } { this.props.unit }</span></div></div>, dom )
+					ReactDOM.render( <div className="graph_tooltip medium"><div className="top"><span>{ this.props.flag2 } { this.props.unit }</span></div></div>, dom )
 				} );
 			
 			//this.flag2.setPosition( { x: 0, dx: "180px", dy: "-7px" } );
@@ -193,7 +190,6 @@ class statusGraph extends GraphComponent {
 			this.graph.autoscaleAxes();
 
 			if( this.serie_sun ) {
-				console.log( this.props.data_sun );
 				this.serie_sun.setWaveform( this.props.data_sun.setXScale( 1 / 3600 ) );
 			}
 
@@ -225,9 +221,20 @@ class statusGraph extends GraphComponent {
 
 		} else {
 
-
 			this.serie.setWaveform( Graph.newWaveform().setData( [] ) );
 			this.serieZone.setWaveform( Graph.newWaveform().setData( [] ) );
+
+			if( this.serie_sun ) {
+				this.serie_sun.setWaveform( Graph.newWaveform().setData( [] ) );
+			}
+
+			if( this.serie_temperature ) {
+				this.serie_temperature.setWaveform( Graph.newWaveform().setData( [] ) );
+			}
+
+			if( this.serie_humidity ) {
+				this.serie_humidity.setWaveform( Graph.newWaveform().setData( [] ) );
+			}
 
 			this.graph.draw();
 
@@ -240,6 +247,15 @@ class statusGraph extends GraphComponent {
 
 	componentWillReceiveProps( nextProps ) {
 		super.componentWillReceiveProps( nextProps );
+
+		if( nextProps.mode !== 'sparkline' ) {
+
+			this.graph.getYAxis()
+				.setLabel( nextProps.axisLabel )
+				.setUnit( nextProps.axisUnit );
+
+			this.serie.setLabel( this.props.serieLabelLegend );
+		}
 	}
 
 	shouldComponentUpdate( nextProps ) {

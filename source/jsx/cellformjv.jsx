@@ -28,7 +28,7 @@ class CellFormTracking extends React.Component {
 					<label className="col-sm-3">Starting voltage</label>
 					<div className="col-sm-9">
 						<div className="input-group">
-							<span className="input-group-addon"><label><input type="checkbox" name="iv_autostart" id="iv_autostart" onClick={this.handleInputChange} checked={this.props.iv_autostart} />&nbsp;V<sub>oc</sub></label></span>
+							<span className="input-group-addon"><label><input type="checkbox" name="iv_autostart" id="iv_autostart" onClick={this.handleInputChange} checked={!! this.props.iv_autostart} />&nbsp;V<sub>oc</sub></label></span>
 							<input type="number" min="-2.5" max="2.5" step="0.001" name="iv_start" id="iv_start" disabled={!!this.props.iv_autostart} className="form-control" placeholder="1" value={this.props.iv_start} onChange={this.handleInputChange} />
 							<span className="input-group-addon">V</span>
 						</div>

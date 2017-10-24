@@ -7217,6 +7217,24 @@ body.verylight {
   text-align: center;
   white-space: nowrap;
 }
+#root .graph_tooltip.small > div {
+  width: 75px;
+}
+#root .graph_tooltip.small > div.right {
+  margin-left: -52px;
+}
+#root .graph_tooltip.medium > div {
+  width: 100px;
+}
+#root .graph_tooltip.medium > div.right {
+  margin-left: -77px;
+}
+#root .graph_tooltip.large > div {
+  width: 125px;
+}
+#root .graph_tooltip.large > div.right {
+  margin-left: -102px;
+}
 #root .graph_tooltip.absolute {
   position: absolute;
 }
@@ -7569,14 +7587,20 @@ ul.formTabs {
 .state-message {
   padding: 10px;
 }
+.statuses {
+  margin-left: -5px;
+  margin-right: -5px;
+}
 .statuses .alert {
   margin: 5px;
 }
 .statuses .alert .pull-right {
   position: relative;
 }
-.statuses .alert .pull-right .btn {
+.statuses .alert .pull-right > div {
   position: absolute;
   right: 0px;
+  width: 100px;
+  text-align: right;
   top: -7.5px;
 }

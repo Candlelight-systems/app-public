@@ -22,9 +22,8 @@ class CellFormTracking extends React.Component {
 	}
 
 	render() {	 
-console.log( this.props );
-		return (
 
+		return (
 			<div>
 				<div className="form-group">
 					<label htmlFor="tracking_mode" className="col-sm-3">Tracking mode</label>
@@ -60,11 +59,11 @@ console.log( this.props );
 					<label htmlFor="tracking_step" className="col-sm-3">Tracking step</label>
 					<div className="col-sm-9">
 						<select name="tracking_step" id="tracking_step" className="form-control" value={this.props.tracking_step} onChange={this.handleInputChange}>
-								<option key="mv1" value="1">1 mV</option>
-								<option key="mv2" value="2">2 mV</option>
-								<option key="mv3" value="3">3 mV</option>
-								<option key="mv4" value="4">4 mV</option>
-								<option key="mv5" value="5">5 mV</option>
+								<option key="mv1" value="0.001">1 mV</option>
+								<option key="mv2" value="0.002">2 mV</option>
+								<option key="mv3" value="0.003">3 mV</option>
+								<option key="mv4" value="0.004">4 mV</option>
+								<option key="mv5" value="0.005">5 mV</option>
 						</select>
 					</div>
 				</div>
@@ -73,7 +72,7 @@ console.log( this.props );
 					<label htmlFor="tracking_interval" className="col-sm-3">Tracking interval</label>
 					<div className="col-sm-9">
 						<select name="tracking_interval" id="tracking_interval" className="form-control" value={this.props.tracking_interval} onChange={this.handleInputChange}>
-							<option key="never" value="null">Never</option>
+							<option key="0sps" value="0">As fast as possible</option>
 							<option key="100sps" value="100">10 samples per second</option>
 							<option key="1000sps" value="1000">1 sample per second</option>
 							<option key="10000sps" value="10000">6 samples per minute</option>

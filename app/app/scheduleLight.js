@@ -248,7 +248,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 
 		}).then(values => values.json()).then(controller => {
 
-			this.setState(state => ({
+			return this.setState(state => ({
 
 				error: false,
 				controller: controller,
@@ -262,8 +262,6 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			// Catching JSON or request errors
 			console.error(error);
 			let errorMessage = "Error in getting the controller for group name \"" + this.props.groupName + "\"";
-			console.error(errorMessage);
-
 			this.setState({
 				success: false,
 				error: errorMessage

@@ -25,7 +25,13 @@ function onClose() {
 function render( data ) {
 
 	ReactDOM.render(
-	<CellFormAll allStatuses={ data.allStatuses } channelIds={ data.channelIds } formState={ data.cellData } photodiodeRefs={ data.photodiodeRefs } onValidate={ onValidate } onClose={ onClose } />,
+	<CellFormAll 
+		instrumentConfig={ data.instrumentConfig } 
+		allStatuses={ data.allStatuses } 
+		channelIds={ data.channelIds } 
+		formState={ data.cellData } 
+		onValidate={ onValidate } 
+		onClose={ onClose } />,
 	document.getElementById('root')
 	);
 }

@@ -1,16 +1,20 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "128.178.16.172",
+			"trackerHost": "192.168.0.102",
 			"trackerName": "Main Instrument",
-			"trackerPort": 8080
+			"trackerPort": 8080,
+			"buttonValue": "Update",
+			"connect": "Success ! Instrument response: candlelight.1206.10001",
+			"connectstate": "success",
+			"title": "Edit a Candlelight instrument"
 		}
 	],
 	"database": {
-		"host": "influxdb2.epfl.ch",
-		"username": "lpi",
-		"password": "lpi77",
-		"port": 80,
+		"host": "192.168.0.103",
+		"username": "",
+		"password": "",
+		"port": 8086,
 		"db": "matahari"
 	},
 	"githubtokens": {

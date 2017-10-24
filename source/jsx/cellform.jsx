@@ -1,7 +1,7 @@
 import React from 'react';
 import CellFormTracking from "./cellformtracking.jsx"
 import CellFormIV from "./cellformjv.jsx"
-import CellFormLight from "./cellformlight.jsx"
+
 import {remote} from "electron"
 	
 const dialog = remote.dialog;
@@ -14,30 +14,15 @@ class CellForm extends React.Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.subFormChanged = this.subFormChanged.bind( this );
 		this.validateConfig = this.validateConfig.bind( this );
-		this.state = {};
+		this.state = {
+
+			cellArea: 0,
+			cellName: ""
+		};
 		this.close = this.close.bind( this );
 	}
 
 	validateConfig() {
-
-		if( this.state.lightRef == "" || this.state.lightRef == null ) {
-
-			dialog.showMessageBox( {
-			    type: 'error',
-			    message: 'You must select a light reference for this channel',
-			    cancelId: 0,
-			    defaultId: 0,
-			    title: "Error !",
-			    buttons: [ "Ok" ]    
-			  }, ( index ) => {
-
-			  	this.domTabLight.click();
-			  } );
-
-			return;		
-		}
-	  
-
 		this.props.onValidate( this.state );
 		this.close();
 	}
@@ -75,7 +60,7 @@ class CellForm extends React.Component {
 	}
 
 	render() {	 
-
+console.log( this.state.connection );
 		return (
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
@@ -84,7 +69,6 @@ class CellForm extends React.Component {
 				  <li role="presentation" className="active"><a data-target={ "#cell_" + this.state.unique } data-toggle="tab">Cell configuration</a></li>
 				  <li role="presentation"><a data-target={ "#tracker_" + this.state.unique } data-toggle="tab">Tracker</a></li>
 				  <li role="presentation"><a data-target={ "#iv_" + this.state.unique } data-toggle="tab">j(V) curves</a></li>
-				  <li role="presentation"><a data-target={ "#light_" + this.state.unique } ref={ ( el ) => { this.domTabLight = el } } data-toggle="tab">Light reference</a></li>
 				</ul>
 
 
@@ -107,6 +91,39 @@ class CellForm extends React.Component {
 							</div>
 						</div>
 					</div>
+
+					{ this.props.instrumentConfig.relayController &&
+						<div className="form-group">
+							<label htmlFor="cellarea" className="col-sm-3">Connection</label>
+							<div className="col-sm-9">
+								<div className="radio">
+									<label>
+										<input type="radio" name="connection" value="group" onClick={ this.handleInputChange } checked={ this.state.connection == 'group' } /> Cell enclosure
+									</label>
+								</div>
+								<div className="radio">
+									<label>
+										<input type="radio" name="connection" value="external" onClick={ this.handleInputChange }  checked={ this.state.connection == 'external' } /> External connection
+									</label>
+								</div>
+							</div>
+						</div>
+					}
+
+					{ this.state.connection ==  "external" &&
+						<div className="form-group">
+							<label htmlFor="cellarea" className="col-sm-3">Light intensity</label>
+							<div className="col-sm-9">
+								<div className="input-group">
+									<input type="number" className="form-control" name="lightRefValue" value={ this.state.lightRefValue } onChange={ this.handleInputChange } />
+									<span className="input-group-addon">
+										W m<sup>-2</sup>
+									</span>
+								</div>
+							</div>
+						</div>
+					}
+
 				</div>
 
 				<div className="tab-pane" id={ "tracker_" + this.state.unique }>
@@ -119,10 +136,6 @@ class CellForm extends React.Component {
 					<CellFormIV {...this.state} onFormChange={ this.subFormChanged } />
 				</div>
 			
-				<div className="tab-pane" id={ "light_" + this.state.unique }>
-
-					<CellFormLight {...this.state} photodiodeRefs={ this.props.photodiodeRefs } onFormChange={ this.subFormChanged } />
-				</div>
 			
 
 				</div>

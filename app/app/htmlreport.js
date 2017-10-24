@@ -121,7 +121,7 @@ ipcRenderer.on("config", (event, cfg) => {
 
 function render() {
 
-	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__["a" /* default */], { config: config, db: data.db, measurementName: data.measurementName, cellInfo: data.cellInfo, instrumentId: data.instrumentId, chanId: data.chanId }), document.getElementById('root'));
+	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__["a" /* default */], { config: config, db: data.db, measurementName: data.measurementName, cellInfo: data.cellInfo, chanId: data.chanId }), document.getElementById('root'));
 }
 
 /***/ }),
@@ -179,7 +179,6 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	}
 
 	savePDF() {
-		console.log('saving');
 
 		dialog.showSaveDialog({
 

@@ -433,7 +433,39 @@ body.verylight {
 	}
 
 	.graph_tooltip {
-				
+		
+		&.small {
+			> div {
+				width: 75px;
+
+				&.right {
+					margin-left: -52px;
+				}
+			}
+		}
+
+		&.medium {
+			> div {
+				width: 100px;
+
+
+				&.right {
+					margin-left: -77px;
+				}
+			}
+		}
+
+		&.large {
+			> div {
+				width: 125px;
+
+				&.right {
+					margin-left: -102px;
+				}
+			}
+		}
+
+
 		&.absolute {
 			position: absolute;
 		}
@@ -748,6 +780,8 @@ ul.formTabs {
 
 .statuses {
 	
+	margin-left: -5px;
+	margin-right: -5px;
 
 	.alert {
 
@@ -756,9 +790,11 @@ ul.formTabs {
 		.pull-right {
 
 			position: relative;
-			.btn {
+			> div {
 				position: absolute;
 				right: 0px;
+				width: 100px;
+				text-align: right;
 				top: -( @alert-padding / 2 );
 			}
 		}

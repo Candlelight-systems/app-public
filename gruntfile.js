@@ -65,8 +65,6 @@ module.exports = function(grunt) {
 
         copy: { 
 
-         
-                                     // Task
           main: {
             files: [
                {
@@ -240,6 +238,14 @@ module.exports = function(grunt) {
                entry: [ './source/htmlreport_control.jsx' ],
                output: {
                    filename: 'app/app/htmlreport_control.js'
+               } }, webpackConfig ),
+
+
+            showallmeasurements: 
+              Object.assign( {
+               entry: [ './source/showallmeasurements.jsx' ],
+               output: {
+                   filename: 'app/app/showallmeasurements.js'
                } }, webpackConfig )
         }
     });

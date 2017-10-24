@@ -120,8 +120,7 @@ class ScheduleLight extends React.Component {
 		.then( ( values ) => values.json() )
 		.then( ( controller ) => {
 		   	
-
-		   	this.setState( ( state ) => ( {
+		   	return this.setState( ( state ) => ( {
 
 		   	
 		   		error: false,
@@ -137,8 +136,6 @@ class ScheduleLight extends React.Component {
 			// Catching JSON or request errors
 			console.error( error );
 			let errorMessage = "Error in getting the controller for group name \"" + this.props.groupName + "\"";
-			console.error( errorMessage );
-
 			this.setState( {
 				success: false,
 				error: errorMessage

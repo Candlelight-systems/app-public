@@ -32,8 +32,8 @@ ipcMain.on("updateInfluxDB", updateInfluxDB );
 ipcMain.on("downloadData", downloadData );
 ipcMain.on("htmlReport", htmlReport );
 
-ipcMain.on("configChannel", editChannel );
-ipcMain.on("configChannels", editChannels );
+ipcMain.on("configChannel", configChannel );
+ipcMain.on("configChannels", configChannels );
 ipcMain.on("mppt", openMPPT );
 ipcMain.on("bugReport", openBugReport );
 ipcMain.on("calibratePD", openCalibratePD );
@@ -49,6 +49,7 @@ function makeInstrumentMenu() {
       { label: 'Add a new instrument', click() { addInstrument(); } },
       { label: 'Edit instrument', click() { editInstrument( currentInstrument ); } },
       { label: 'Edit database config', click() { editInfluxDB( ); } },
+      { label: 'Show all measurements', click() { showAllMeasurements( currentInstrument ); } },
       { type: 'separator' },
       { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
       { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
@@ -153,25 +154,30 @@ app.on('activate', function () {
   }
 })
 
-function downloadData( event, cellInfo, instrumentId, chanId, measurementName ) {
+function downloadData( event, cellInfo, chanId, measurementName ) {
 
-    openForm( null, "downloadform", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, instrumentId: instrumentId, chanId: chanId },   {
-      width: 850,
-      height: 800,
-      resizable: false
+    openForm( null, "downloadform", { 
+      measurementName: measurementName, 
+      db: config.database, 
+      cellInfo: cellInfo, 
+      chanId: chanId 
+      }, {
+        width: 850,
+        height: 800,
+        resizable: false
 
-    } ).then( ( result ) => {
-    
-      config.instruments.push( result );
-      saveConfig();
-      reloadInstruments();
+      } ).then( ( result ) => {
+      
+        config.instruments.push( result );
+        saveConfig();
+        reloadInstruments();
 
-    }).catch( () => {} );
+      } ).catch( () => {} );
 }
 
 
 
-function htmlReport( event, cellInfo, instrumentId, chanId, measurementName ) {
+function htmlReport( event, cellInfo, chanId, measurementName ) {
 
     let listenerConfig, listenerSavePDF;
 
@@ -193,7 +199,7 @@ function htmlReport( event, cellInfo, instrumentId, chanId, measurementName ) {
       windows[ "htmlReport"].webContents.send( "savePDF", data );
     } ) );
 
-    openForm( null, "htmlreport_control", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, instrumentId: instrumentId, chanId: chanId },   {
+    openForm( null, "htmlreport_control", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId },   {
       width: 400,
       height: 595,
       x: 50,
@@ -217,7 +223,7 @@ function htmlReport( event, cellInfo, instrumentId, chanId, measurementName ) {
   
 
     windows[ 'htmlReport' ].webContents.once("dom-ready", () => {
-      windows[ 'htmlReport' ].webContents.send("loadData", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, instrumentId: instrumentId, chanId: chanId } );
+      windows[ 'htmlReport' ].webContents.send("loadData", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId } );
     });     
       // and load the index.html of the app.
     windows[ 'htmlReport' ].loadURL( url.format({
@@ -458,6 +464,16 @@ function editInfluxDB( event ) {
 }
 
 
+
+
+function showAllMeasurements( instrument ) {
+  
+  openForm( null, "showallmeasurements", { config: instrument }, { width: 600, height: 700, resizable: false } ).then( ( results ) => {
+
+  } ).catch( () => {} );
+}
+
+
 function updateInfluxDB() {
 
   config.instruments.forEach( ( instrument ) => {
@@ -471,36 +487,44 @@ function updateInfluxDB() {
 }
 
 
-async function editChannel ( event, data ) {
+async function configChannel( event, data ) {
 
   let influxConfig = config.database;
 
-  var cellData = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
-  var photodiodeRefs = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getPDOptions?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
-
-  return openForm( null, "cellform", { cellData: cellData[ data.groupName ].channels[ data.chanId ], photodiodeRefs: photodiodeRefs }, { width: 600, height: 800 } ).then( ( results ) => {
+  var channelConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
+  var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
+  var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
   
-    event.sender.send( "channelConfigured", results );
+  //var externalConnection = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
+  var externalConnection = false;
 
+  return openForm( null, "cellform", { 
+    instrumentConfig: instrumentConfig, 
+    channelConfig: channelConfig, 
+    channelState: channelState[ data.groupName ].channels[ data.chanId ],
+  }, { width: 600, height: 800 } ).then( ( results ) => {
+    console.log( results );
+    event.sender.send( "channelConfigured", results );
     return results;    
+
   } ).catch( () => {} );
 }
 
 
 
-async function editChannels( event, data ) {
+async function configChannels( event, data ) {
 
   let influxConfig = config.database;
 
-  var cellData = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() ).then( ( el ) => { return el[ data.groupName ].channels[ data.chanIds[ 0 ] ] } );
-  var cellStatuses = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
-  var photodiodeRefs = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getPDOptions?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
-
+  var channelsState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
+  var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
+  var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() );
+  
   return openForm( null, "cellformall", { 
 
-    cellData: cellData, 
-    allStatuses: cellStatuses[ data.groupName ].channels, 
-    photodiodeRefs: photodiodeRefs,
+    channelState: channelState[ data.groupName ].channels[ data.chanId ], 
+    channelsState: channelsState[ data.groupName ].channels, 
+    instrumentConfig: instrumentConfig,
     channelIds: data.chanIds
 
   }, { width: 600, height: 800 } ).then( ( results ) => {
@@ -510,6 +534,8 @@ async function editChannels( event, data ) {
     
   } ).catch( () => {} );
 }
+
+
 
 
 

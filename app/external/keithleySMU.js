@@ -44,11 +44,14 @@ console.log( resultsParsed );
 		        }
 		        
 		        resultsParsed = resultsParsed[1].split(',').map(result => {
-		        	result = /u'(.*)'/g.exec(result);
+		        	
+		        	result = /u'(.*)'/g.exec( result );
+		        	
 		        	if( ! result || ! result[ 1 ] ) {
 		        		return null;
 		        	}
-		            return result[1];
+
+		            return result[ 1 ];
 		        });
 
 		        resolver( resultsParsed );

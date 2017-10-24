@@ -117,7 +117,11 @@ function onClose() {
 
 function render(data) {
 	;
-	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_cellform_jsx__["a" /* default */], { formState: data.cellData, photodiodeRefs: data.photodiodeRefs, onValidate: onValidate, onClose: onClose }), document.getElementById('root'));
+	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_cellform_jsx__["a" /* default */], {
+		instrumentConfig: data.instrumentConfig,
+		formState: data.channelState,
+		onValidate: onValidate,
+		onClose: onClose }), document.getElementById('root'));
 }
 
 /***/ }),
@@ -135,9 +139,8 @@ module.exports = require("react-dom");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cellformlight_jsx__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -146,7 +149,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 
-const dialog = __WEBPACK_IMPORTED_MODULE_4_electron__["remote"].dialog;
+const dialog = __WEBPACK_IMPORTED_MODULE_3_electron__["remote"].dialog;
 
 class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
@@ -155,29 +158,15 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.subFormChanged = this.subFormChanged.bind(this);
 		this.validateConfig = this.validateConfig.bind(this);
-		this.state = {};
+		this.state = {
+
+			cellArea: 0,
+			cellName: ""
+		};
 		this.close = this.close.bind(this);
 	}
 
 	validateConfig() {
-
-		if (this.state.lightRef == "" || this.state.lightRef == null) {
-
-			dialog.showMessageBox({
-				type: 'error',
-				message: 'You must select a light reference for this channel',
-				cancelId: 0,
-				defaultId: 0,
-				title: "Error !",
-				buttons: ["Ok"]
-			}, index => {
-
-				this.domTabLight.click();
-			});
-
-			return;
-		}
-
 		this.props.onValidate(this.state);
 		this.close();
 	}
@@ -213,7 +202,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	}
 
 	render() {
-
+		console.log(this.state.connection);
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "container-fluid" },
@@ -248,17 +237,6 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 							"a",
 							{ "data-target": "#iv_" + this.state.unique, "data-toggle": "tab" },
 							"j(V) curves"
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"li",
-						{ role: "presentation" },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							"a",
-							{ "data-target": "#light_" + this.state.unique, ref: el => {
-									this.domTabLight = el;
-								}, "data-toggle": "tab" },
-							"Light reference"
 						)
 					)
 				),
@@ -309,6 +287,67 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 									)
 								)
 							)
+						),
+						this.props.instrumentConfig.relayController && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"div",
+							{ className: "form-group" },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"label",
+								{ htmlFor: "cellarea", className: "col-sm-3" },
+								"Connection"
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "col-sm-9" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "connection", value: "group", onClick: this.handleInputChange, checked: this.state.connection == 'group' }),
+										" Cell enclosure"
+									)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "connection", value: "external", onClick: this.handleInputChange, checked: this.state.connection == 'external' }),
+										" External connection"
+									)
+								)
+							)
+						),
+						this.state.connection == "external" && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"div",
+							{ className: "form-group" },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"label",
+								{ htmlFor: "cellarea", className: "col-sm-3" },
+								"Light intensity"
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "col-sm-9" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "input-group" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", className: "form-control", name: "lightRefValue", value: this.state.lightRefValue, onChange: this.handleInputChange }),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"span",
+										{ className: "input-group-addon" },
+										"W m",
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+											"sup",
+											null,
+											"-2"
+										)
+									)
+								)
+							)
 						)
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -320,11 +359,6 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 						"div",
 						{ className: "tab-pane", id: "iv_" + this.state.unique },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__["a" /* default */], _extends({}, this.state, { onFormChange: this.subFormChanged }))
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"div",
-						{ className: "tab-pane", id: "light_" + this.state.unique },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__cellformlight_jsx__["a" /* default */], _extends({}, this.state, { photodiodeRefs: this.props.photodiodeRefs, onFormChange: this.subFormChanged }))
 					)
 				)
 			),
@@ -376,7 +410,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 	componentDidUpdate() {}
 
 	render() {
-		console.log(this.props);
+
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
 			null,
@@ -495,27 +529,27 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 						{ name: 'tracking_step', id: 'tracking_step', className: 'form-control', value: this.props.tracking_step, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv1', value: '1' },
+							{ key: 'mv1', value: '0.001' },
 							'1 mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv2', value: '2' },
+							{ key: 'mv2', value: '0.002' },
 							'2 mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv3', value: '3' },
+							{ key: 'mv3', value: '0.003' },
 							'3 mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv4', value: '4' },
+							{ key: 'mv4', value: '0.004' },
 							'4 mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv5', value: '5' },
+							{ key: 'mv5', value: '0.005' },
 							'5 mV'
 						)
 					)
@@ -537,8 +571,8 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 						{ name: 'tracking_interval', id: 'tracking_interval', className: 'form-control', value: this.props.tracking_interval, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'never', value: 'null' },
-							'Never'
+							{ key: '0sps', value: '0' },
+							'As fast as possible'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
@@ -959,7 +993,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'label',
 								null,
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'iv_autostart', id: 'iv_autostart', onClick: this.handleInputChange, checked: this.props.iv_autostart }),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'iv_autostart', id: 'iv_autostart', onClick: this.handleInputChange, checked: !!this.props.iv_autostart }),
 								'\xA0V',
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 									'sub',
@@ -1089,98 +1123,6 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (CellFormTracking);
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-
-
-
-class CellFormLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
-
-	constructor(props) {
-		super(props);
-		this.handleInputChange = this.handleInputChange.bind(this);
-	}
-
-	handleInputChange(event) {
-		const target = event.target;
-		const value = target.type === 'checkbox' ? target.checked : target.value;
-		const name = target.name;
-		this.props.onFormChange(name, value);
-	}
-
-	componentDidUpdate() {}
-
-	render() {
-
-		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-			'div',
-			null,
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ className: 'form-group' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'label',
-					{ htmlFor: 'lightRefV', className: 'col-sm-3' },
-					'Reference light'
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'col-sm-9' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'select',
-						{ name: 'lightRef', id: 'lightRef', className: 'form-control', value: this.props.lightRef, onChange: this.handleInputChange },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ value: '', ref: '' },
-							'Select a light reference'
-						),
-						(this.props.photodiodeRefs || []).map(light => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ value: light.ref, key: light.ref },
-							light.name
-						)),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ value: 'manual', ref: 'manual' },
-							'Manual value'
-						)
-					)
-				)
-			),
-			this.props.lightRef == 'manual' && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ className: 'form-group' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'label',
-					{ className: 'col-sm-3', htmlFor: 'lightRefValue' },
-					'Light value'
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'col-sm-9' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'input-group' },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'number', min: '0', max: '2.5', step: '0.001', name: 'lightRefValue', id: 'lightRefValue', className: 'form-control', placeholder: '1', value: this.props.lightRefValue, onChange: this.handleInputChange }),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'span',
-							{ className: 'input-group-addon' },
-							'sun'
-						)
-					)
-				)
-			)
-		);
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (CellFormLight);
 
 /***/ })
 /******/ ]);

@@ -92,12 +92,85 @@ class DownloadForm extends React.Component {
 
 		}, ( fileName ) => {
 
-			console.log( fileName );	
 			fs.writeFileSync(fileName, outputfile.build() );
-		});
+		} );
 	}
 
 
+
+	async downloadVocJsc() {
+
+		let data = await this.getVocJscData();
+
+		var outputfile;
+
+		if( this.state.dl_format == "itx" ) {
+			outputfile = new ITXBuilder();	
+		} else {
+			outputfile = new CSVBuilder();	
+		}
+		console.log( data );
+		outputfile.addWaveform( data.waveVoc, { 
+			waveName: "Voc",
+			waveNameX: "Time_voc_h"
+		} );
+
+		outputfile.addWaveform( data.waveJsc, { 
+			waveName: "Jsx",
+			waveNameX: "Time_jsc_h"
+		} );
+
+
+		dialog.showSaveDialog( {
+
+			message: "Save the Voc and Jsc data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: "~/" + this.props.cellInfo.cellName + "_vocjsc.itx"
+
+		}, ( fileName ) => {
+
+			fs.writeFileSync(fileName, outputfile.build() );
+		} );
+	}
+
+
+
+	async downloadIV() {
+
+		let data = await this.getJVData();
+
+		var outputfile;
+
+		if( this.state.dl_format == "itx" ) {
+			outputfile = new ITXBuilder();	
+		} else {
+			outputfile = new CSVBuilder();	
+		}
+		
+		data[ 0 ].map( ( data ) => {
+
+			if( ! data.wave ) {
+				return;
+			}
+
+			outputfile.addWaveform( data.wave, { 
+				waveName: "Current_" + data.time_h + "h",
+				waveNameX: "Voltage_" + data.time_h + "h"
+			} );
+		} );
+		
+
+		dialog.showSaveDialog( {
+
+			message: "Save the JV data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: "~/" + this.props.cellInfo.cellName + "_jv.itx"
+
+		}, ( fileName ) => {
+
+			fs.writeFileSync(fileName, outputfile.build() );
+		} );
+	}
+
+/*
 	plotMPPT( data ) {
 
 		let graph, serie;
@@ -201,7 +274,7 @@ class DownloadForm extends React.Component {
 		while( this.fakeDom.firstChild ) {
 			this.fakeDom.removeChild( this.fakeDom.firstChild );
 		}
-	}
+	}*/
 
 	getTrackData( getEfficiencyAtIntervals ) {
 
@@ -322,17 +395,98 @@ class DownloadForm extends React.Component {
 		});
 	}
 
-	downloadVocJsc() {
 
+	getVocJscData( getEfficiencyAtIntervals ) {
+
+		var db = this.props.db.db;
+
+		let waveVoc = Graph.newWaveform(),
+			waveJsc = Graph.newWaveform(),
+			timefrom;
+
+		return influxquery(`
+			SELECT time,efficiency FROM "${ this.props.measurementName }" ORDER BY time ASC limit 1;
+			SELECT time,voc FROM "${ this.props.measurementName }_voc" ORDER BY time ASC;
+			SELECT time,jsc FROM "${ this.props.measurementName }_jsc" ORDER BY time ASC;`, db, this.props.db ).then( async ( results ) => {
+			
+
+			results.map( ( results, index ) => {
+
+				if( index == 0 ) {
+					timefrom = new Date( results.series[ 0 ].values[ 0 ][ 0 ] );
+					return;
+				}
+
+				if( ! results.series ) {
+					return [];
+				}
+
+				return results.series[ 0 ].values.map( ( value ) => {
+
+					let date = new Date( value[ 0 ] ),
+						time = Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10, 
+						val = value[ 1 ]
+
+					if( index == 1 ) {
+						waveVoc.append( time, val );
+					} else if( index == 2 ) {
+						waveJsc.append( time, val );
+					}
+
+				} );
+			} );
+
+			return {
+				waveVoc: waveVoc,
+				waveJsc: waveJsc
+			};
+
+		} );
 	}
 
-	downloadIV() {
+	getJVData() {
 
+
+		var db = this.props.db.db;
+
+		let timefrom;
+
+		return influxquery(`
+			SELECT time,iv FROM "${ this.props.measurementName }_iv" ORDER BY time ASC;`, db, this.props.db ).then( async ( results ) => {
+
+			return results.map( ( results, index ) => {
+
+				if( ! results.series ) {
+					return {};
+				}
+
+				if( index == 0 ) {
+					timefrom = new Date( results.series[ 0 ].values[ 0 ][ 0 ] );
+				}
+
+				return results.series[ 0 ].values.map( ( value ) => {
+
+					let date = new Date( value[ 0 ] ),
+						data = value[ 1 ].split(","),
+						wave = Graph.newWaveform();
+
+					for( let i = 0; i < data.length; i += 2 ) {
+						wave.append( parseFloat( data[ i ].replace('"', '') ), parseFloat( data[ i + 1 ].replace('"', '') ) );
+					}
+
+					return { 
+						wave: wave, 
+						time_h: Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10 
+					};
+
+				} );
+			} );
+		} );
 	}
-
+	
 	async downloadPDF() {
 
-		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.instrumentId, this.props.chanId, this.props.measurementName );
+		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName );
 	
 	}
 
@@ -343,100 +497,65 @@ class DownloadForm extends React.Component {
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
 
-						<h3>Download data for channel { this.props.cellInfo.cellName } ( channel { this.props.chanId } )</h3>
+					<h3>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>channel { this.props.chanId } )</span> }</h3>
 
-						<div className="form-group">
-							<label className="col-sm-3">Format</label>
-							<div className="col-sm-9">
-								<select name="dl_track_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
-									<option value="csv">Comma separated (.csv)</option>
-									<option value="itx">Igor text file (.itx)</option>
-								</select>
-							</div>
+					<div className="form-group">
+						<label className="col-sm-3">Format</label>
+						<div className="col-sm-9">
+							<select name="dl_track_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
+								<option value="csv">Comma separated (.csv)</option>
+								<option value="itx">Igor text file (.itx)</option>
+							</select>
 						</div>
+					</div>
 
-						<h4>Tracking data</h4>
-						
-						<div className="form-group">
-							<label className="col-sm-3">Number of points</label>
-							<div className="col-sm-9">
-								<select name="dl_track_nb" id="dl_track_nb" className="form-control" value={this.state.dl_track_nb} onChange={this.handleInputChange}>
-									<option value="100">100</option>
-									<option value="300">300</option>
-									<option value="1000">1000</option>
-									<option value="3000">3000</option>
-									<option value="10000">10000</option>
-								</select>
-							</div>
+					<div className="form-group">
+						<label className="col-sm-3">Number of points</label>
+						<div className="col-sm-9">
+							<select name="dl_track_nb" id="dl_track_nb" className="form-control" value={this.state.dl_track_nb} onChange={this.handleInputChange}>
+								<option value="100">100</option>
+								<option value="300">300</option>
+								<option value="1000">1000</option>
+								<option value="3000">3000</option>
+								<option value="10000">10000</option>
+							</select>
 						</div>
+					</div>
 
+					<div className="form-group">
 
-						<div className="form-group">
-							<label className="col-sm-3">Humidity</label>
-							<div className="col-sm-9 checkbox">
-								<label>
-									<input type="checkbox" name="dl_track_humidity" checked={ !! this.state.dl_track_humidity } onChange={ this.handleInputChange } />
-								</label>
-							</div>
+						<div className="col-sm-3">
 						</div>
-
-
-						<div className="form-group">
-							<label className="col-sm-3">Cell temperature</label>
-							<div className="col-sm-9 checkbox">
-								<label>
-									<input type="checkbox" name="dl_track_celltemp" checked={ !! this.state.dl_track_celltemp } onChange={ this.handleInputChange } />
-								</label>
+						<div className="col-sm-9">
+							<div className="btn-group">
+								<button  className="btn btn-primary"  type="button" onClick={ this.downloadTrack }>Download MPP</button>
+								<button  className="btn btn-primary"  type="button" onClick={ this.downloadVocJsc }>Download Voc and Jsc</button>
+								<button className="btn btn-primary" type="button" onClick={ this.downloadIV }>Download JV</button>
 							</div>
+
+
 						</div>
+					</div>
 
 
-						<div className="form-group">
-							<label className="col-sm-3">Box temperature</label>
-							<div className="col-sm-9 checkbox">
-								<label>
-									<input type="checkbox" name="dl_track_boxtemp" checked={ !! this.state.dl_track_boxtemp } onChange={ this.handleInputChange } />
-								</label>
-							</div>
+					<div className="form-group">
+
+						<div className="col-sm-3">
 						</div>
+						<div className="col-sm-9">
+							<div className="btn-group">
+								<button  className="btn btn-success"  type="button" onClick={ this.downloadPDF }>Make PDF report</button>
+								<button type="button" className="btn btn-default"name="update"  onClick={this.close}>Close</button>
+							</div>
 
-						<div className="form-group">
-							
-							<div className="col-sm-9">
-								<button  className="btn btn-primary"  type="button" onClick={ this.downloadTrack }>Download</button>
-							</div>
-							<div className="col-sm-9">
-								<button  className="btn btn-primary"  type="button" onClick={ this.downloadPDF }>Make PDF</button>
-							</div>
+
 						</div>
+					</div>
 
-
-						<h4>V<sub>oc</sub> and J<sub>sc</sub></h4>
-
-
-						<div className="form-group">
-							
-							<div className="col-sm-9">
-								<button  className="btn btn-primary"  type="button" onClick={ this.downloadVocJsc }>Download</button>
-							</div>
-						</div>
-						
-
-						<h4>j-V curve data</h4>
-
-
-						<div className="form-group">
-							
-							<div className="col-sm-9">
-								<button className="btn btn-primary" type="button" onClick={ this.downloadIV }>Download</button>
-							</div>
-						</div>
-						
-						<div ref={ ( el ) => this.fakeDom = el } />
 				</form>
 
 				<div className="btn-group pull-right">
-		          <button type="button" className="btn btn-default"name="update"  onClick={this.close}>Close</button>
+		          
 		      	</div>
 			</div>
 		);

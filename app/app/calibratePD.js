@@ -219,7 +219,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				if (!sunValue) {
 					scalingFactor = this.state.photodiodes[i].factory_scaling_ma_to_sun;
 				} else {
-					scalingFactor = this.state.channelsJsc[this.state.photodiodes[i].ref] / sunValue;
+					scalingFactor = sunValue / this.state.channelsJsc[this.state.photodiodes[i].ref];
 				}
 
 				let body = JSON.stringify({
@@ -254,7 +254,9 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			var str = [];
 
 			for (var i = 0; i < this.state.photodiodes.length; i++) {
+				console.log('here', this.state.photodiodes[i].ref, this.state['mon_' + this.state.photodiodes[i].ref]);
 				if (this.state['mon_' + this.state.photodiodes[i].ref]) {
+					console.log('there');
 					str.push(this.state.photodiodes[i].ref);
 				}
 			}
@@ -264,20 +266,22 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					str.push(this.state.channels[i].chanId);
 				}
 			}
-
+			console.log(str.length);
 			if (str.length == 0) {
 				this.setRequestTimeout();
 				return;
 			}
 
-			fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + this.props.instrumentId + "&chanIds=" + str.join(","), {
+			fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + encodeURIComponent(this.props.instrumentId) + "&chanIds=" + str.join(","), {
 
 				method: 'GET'
 
 			}).then(values => values.json()).then(json => {
 
 				for (var i in json) {
-					json[i] = json[i] * 1000;
+					if (i.indexOf('pd') == -1) {
+						json[i] = json[i] * 1000;
+					}
 				}
 				this.setState({ channelsJsc: json });
 			}).catch(() => {
@@ -285,7 +289,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				// Catching JSON or request errors
 
 			}).then(() => {
-				console.log('timeout');
+
 				this.setRequestTimeout();
 			});
 		}, 2000);
@@ -446,7 +450,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					)
 				) : "",
 				" ",
-				sunRatio ? ' / ' + Math.round(100 * val / sunRatio) / 100 + " sun" : ""
+				sunRatio ? ' / ' + Math.round(100 * val * sunRatio) / 100 + " sun" : ""
 			);
 		}
 
@@ -570,7 +574,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 									"button",
 									{ className: "btn btn-default", type: "button", onClick: () => this.scalePD(photodiode.ref) },
 									"Factory reset (",
-									Math.round(100 * this.state.channelsJsc[photodiode.ref] / photodiode.factory_scaling_ma_to_sun) / 100,
+									Math.round(100 * this.state.channelsJsc[photodiode.ref] * photodiode.factory_scaling_ma_to_sun) / 100,
 									" sun)"
 								)
 							)

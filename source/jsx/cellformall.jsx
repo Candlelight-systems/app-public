@@ -1,7 +1,6 @@
 import React from 'react';
 import CellFormTracking from "./cellformtracking.jsx"
 import CellFormIV from "./cellformjv.jsx"
-import CellFormLight from "./cellformlight.jsx"
 import CellForm from "./cellform.jsx"
 
 class CellFormAll extends CellForm {
@@ -59,7 +58,6 @@ class CellFormAll extends CellForm {
 				  <li role="presentation" className="active"><a data-target={ "#cell_" + unique } data-toggle="tab">Cell configuration</a></li>
 				  <li role="presentation"><a data-target={ "#tracker_" + unique } data-toggle="tab">Tracker</a></li>
 				  <li role="presentation"><a data-target={ "#iv_" + unique } data-toggle="tab">j(V) curves</a></li>
-				  <li role="presentation"><a data-target={ "#light_" + this.state.unique } data-toggle="tab">Light reference</a></li>
 				</ul>
 
 
@@ -87,6 +85,40 @@ class CellFormAll extends CellForm {
 								</div>
 							</div>
 						</div>
+
+
+						{ this.props.instrumentConfig.relayController &&
+							<div className="form-group">
+								<label htmlFor="cellarea" className="col-sm-3">Connection</label>
+								<div className="col-sm-9">
+									<div className="radio">
+										<label>
+											<input type="radio" name="connection" value="group" checked={ this.state.connection == 'group' } /> Cell enclosure
+										</label>
+									</div>
+									<div className="radio">
+										<label>
+											<input type="radio" name="connection" value="external" checked={ this.state.connection == 'external' } /> External connection
+										</label>
+									</div>
+								</div>
+							</div>
+						}
+
+						{ this.state.connection ==  "external" &&
+							<div className="form-group">
+								<label htmlFor="cellarea" className="col-sm-3">Light intensity</label>
+								<div className="col-sm-9">
+									<div className="input-group">
+										<input type="number" className="form-control" name="lightRefValue" value={ this.state.lightRefValue }  onChange={ this.handleInputChange } />
+										<span className="input-group-addon">
+											W m<sup>-2</sup>
+										</span>
+									</div>
+								</div>
+							</div>
+						}
+
 					</div>
 
 					<div className="tab-pane" id={ "tracker_" + unique }>
@@ -97,15 +129,7 @@ class CellFormAll extends CellForm {
 					<div className="tab-pane" id={ "iv_" + unique }>
 
 						<CellFormIV {...this.state} photodiodeRefs={ this.props.photodiodeRefs } onFormChange={ this.subFormChanged } />
-					</div>
-
-
-					<div className="tab-pane" id={ "light_" + this.state.unique }>
-
-						<CellFormLight {...this.state} photodiodeRefs={ this.props.photodiodeRefs } onFormChange={ this.subFormChanged } />
-					</div>
-				
-			
+					</div>			
 				</div>
 			</form>
 			

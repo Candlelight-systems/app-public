@@ -61,7 +61,7 @@ class statusIV extends GraphComponent {
 			.setLabel("Current")
 			.setUnitWrapper("(", ")")
 			.setEngineering( true )
-			.setUnit("A cm^-2")
+			.setUnit("A")
 			.setUnitDecade( true );
 
 
@@ -76,15 +76,29 @@ class statusIV extends GraphComponent {
 		this.serieIV.setLineColor("#be2d2d").setLineWidth( 2 );
 
 		this.serie[ 0 ] = this.graph.newSerie( "iv_0" );
-		this.serie[ 0 ].setLineColor( "#303030" );
+		this.serie[ 0 ].setLineColor( "#1b18ae" );
 		this.serie[ 0 ].autoAxis();
 		this.serie[ 0 ].setLineWidth( 2 );
 
-		this.serie[ 1 ] = this.graph.newSerie( "iv_1" );
-		this.serie[ 1 ].setLineColor( "#303030" );
+		this.serie[ 1 ] = this.graph.newSerie( "iv_0_pwr" );
+		this.serie[ 1 ].setLineColor( "#1b18ae" );
 		this.serie[ 1 ].setLineStyle( 2 );
 		this.serie[ 1 ].autoAxis();
 		this.serie[ 1 ].setLineWidth( 2 );
+
+
+		this.serie[ 2 ] = this.graph.newSerie( "iv_1" );
+		this.serie[ 2 ].setLineColor( "#0e871a" );
+		this.serie[ 2 ].autoAxis();
+		this.serie[ 2 ].setLineWidth( 2 );
+
+		this.serie[ 3 ] = this.graph.newSerie( "iv_1_pwr" );
+		this.serie[ 3 ].setLineColor( "#0e871a" );
+		this.serie[ 3 ].setLineStyle( 2 );
+		this.serie[ 3 ].autoAxis();
+		this.serie[ 3 ].setLineWidth( 2 );
+
+
 
 		this.ellipse = this.graph.newShape( "ellipse" );
 		this.ellipse.setR( 3, 3 );
@@ -97,20 +111,19 @@ class statusIV extends GraphComponent {
 	componentDidUpdate() {
 
 		if( this.graph && this.props.data ) {
+			let wv;
 
-			this.props.data.forEach( ( data, index ) => {
-
-				if( ! data || ! data.getLength ) {
-					this.serie[ index ].setWaveform( Graph.newWaveform().setData( [ ] ) );
-					return;
-				}
-
-				if( index > 1 ) {
-					return;
-
-				}
-				this.serie[ index ].setWaveform( data );
-			});
+			if( this.props.data[ 0 ] ) {
+				wv = this.props.data[ 0 ];//wv = Graph.newWaveform().setData( this.props.data[ 0 ] )
+				this.serie[ 0 ].setWaveform( wv );
+				this.serie[ 1 ].setWaveform( wv.duplicate().math( ( y, x ) => y * x ) );
+			}
+			
+			if( this.props.data[ 1 ] ) {
+				wv = this.props.data[ 1 ];//Graph.newWaveform().setData( this.props.data[ 1 ] )
+				this.serie[ 2 ].setWaveform( wv );
+				this.serie[ 3 ].setWaveform( wv.duplicate().math( ( y, x ) => y * x ) );
+			}
 				
 			if( this.props.dataIV ) {
 				this.serieIV.setWaveform( this.props.dataIV );
@@ -118,6 +131,7 @@ class statusIV extends GraphComponent {
 
 			this.graph.autoscaleAxes();
 			this.graph.show();
+			
 			
 			if( this.props.data[ 0 ] ) {
 				this.graph.getYAxis().forceMin( - this.props.data[ 0 ].getMaxY() * 0.5 );	
@@ -129,7 +143,7 @@ class statusIV extends GraphComponent {
 			this.graph.draw();
 		}
 
-		if( ! this.props.data ) {
+		if( this.graph && ! this.props.data ) {
 
 			this.serie.forEach( ( serie ) => {
 				serie.setWaveform( Graph.newWaveform().setData( [] ) );
@@ -142,7 +156,6 @@ class statusIV extends GraphComponent {
 	}
 	
 	render() {
-
 
 		return (
 			<div className="cellIV">

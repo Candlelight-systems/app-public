@@ -54,7 +54,7 @@ class CalibratePD extends React.Component {
 				if( ! sunValue ) {
 					scalingFactor = this.state.photodiodes[ i ].factory_scaling_ma_to_sun;
 				} else {
-					scalingFactor = this.state.channelsJsc[ this.state.photodiodes[ i ].ref ] / sunValue;
+					scalingFactor = sunValue / this.state.channelsJsc[ this.state.photodiodes[ i ].ref ];
 				}
 
 				let body = JSON.stringify( {
@@ -91,7 +91,9 @@ class CalibratePD extends React.Component {
 			var str = [];
 
 			for( var i = 0; i < this.state.photodiodes.length; i ++ ) {
+				console.log('here', this.state.photodiodes[ i ].ref, this.state[ 'mon_' + this.state.photodiodes[ i ].ref ] );
 				if( this.state[ 'mon_' + this.state.photodiodes[ i ].ref ] ) {
+					console.log('there');
 					str.push( this.state.photodiodes[ i ].ref );
 				}
 			}
@@ -101,14 +103,14 @@ class CalibratePD extends React.Component {
 					str.push( this.state.channels[ i ].chanId );
 				}
 			}
-			
+			console.log( str.length );
 			if( str.length == 0 ) {
 				this.setRequestTimeout();
 				return;
 			}
 
 
-			fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + this.props.instrumentId + "&chanIds=" + str.join(","), {
+			fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + encodeURIComponent( this.props.instrumentId ) + "&chanIds=" + str.join(","), {
 
 				method: 'GET',
 
@@ -116,7 +118,9 @@ class CalibratePD extends React.Component {
 			   .then( ( json ) => {
 
 			   	for( var i in json ) {
-			   		json[ i ] = json[ i ] * 1000
+			   		if( i.indexOf( 'pd' ) == -1 ) {
+			   			json[ i ] = json[ i ] * 1000
+			   		}
 			   	}
 			   	this.setState( { channelsJsc: json } );
 
@@ -125,7 +129,7 @@ class CalibratePD extends React.Component {
 				// Catching JSON or request errors
 
 			} ).then( () => {
-console.log( 'timeout');
+
 				this.setRequestTimeout();
 			});
 
@@ -284,7 +288,7 @@ console.log( 'timeout');
 		let valTxt = val.toPrecision( 4 );
 
 		if( wrapper ) {
-			return ( <span className="badge">{ valTxt } mA { density ? <span>cm<sup>-2</sup></span> : "" } { sunRatio ? ' / ' + ( Math.round( 100 * val / sunRatio ) / 100 ) + " sun" : "" }</span> );
+			return ( <span className="badge">{ valTxt } mA { density ? <span>cm<sup>-2</sup></span> : "" } { sunRatio ? ' / ' + ( Math.round( 100 * val * sunRatio ) / 100 ) + " sun" : "" }</span> );
 		}
 
 		return val;
@@ -363,7 +367,7 @@ console.log( 'timeout');
 							<div className="form-group">
 								<div className="btn-group">
 									<button className="btn btn-default" type="button" onClick={ () => this.scalePD( photodiode.ref, 1 ) }>Set as 1 sun</button>
-							        <button className="btn btn-default" type="button" onClick={ () => this.scalePD( photodiode.ref ) }>Factory reset ({ Math.round( 100 * this.state.channelsJsc[ photodiode.ref ] / photodiode.factory_scaling_ma_to_sun ) / 100 } sun)</button>
+							        <button className="btn btn-default" type="button" onClick={ () => this.scalePD( photodiode.ref ) }>Factory reset ({ Math.round( 100 * this.state.channelsJsc[ photodiode.ref ] * photodiode.factory_scaling_ma_to_sun ) / 100 } sun)</button>
 							    </div>
 							</div>
 						</div> ) }

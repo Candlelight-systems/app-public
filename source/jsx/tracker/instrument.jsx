@@ -35,7 +35,7 @@ class TrackerInstrument extends React.Component {
     this.updateInstrument = this.updateInstrument.bind( this );
     this.getStatus = this.getStatus.bind( this );
     this.updateStatus = this.updateStatus.bind( this );
-
+    this.togglePause = this.togglePause.bind( this );
 //    this.checkAll = this.checkAll.bind( this );
 
     window.addEventListener("online", ( ) => {
@@ -46,7 +46,7 @@ class TrackerInstrument extends React.Component {
       this.updateStatus();
     });
 
-    ipcRenderer.on("light.updated", this.updateInstrument );
+    ipcRenderer.on("light.updated", () => { this.updateInstrument() } );
     
     
   }
@@ -120,9 +120,9 @@ class TrackerInstrument extends React.Component {
     this.updateInstrument();
   }
 
-  getGroups( props = this.props ) {
+  getConfig( props = this.props ) {
 
-    return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getGroups?instrumentId=" + props.instrumentId, { method: 'GET'  } )
+    return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET'  } )
       .then( ( response ) => response.json() )
       .catch( error => {
 
@@ -139,7 +139,7 @@ class TrackerInstrument extends React.Component {
 
       return Promise.all( [
         
-        this.getGroups( props ),
+        this.getConfig( props ),
 
         this.getStatus( props ),
 
@@ -151,10 +151,11 @@ class TrackerInstrument extends React.Component {
             status = args[ 1 ],
             ping = args[ 2 ];
 
-
+            
         this.setState( { 
-            groups: groups,
+            groups: groups.groups,
             serverState: status,
+            paused: status.paused,
             error_influxdb: false,
             error_tracker: false
         } );
@@ -168,6 +169,24 @@ class TrackerInstrument extends React.Component {
     this.setState( {
       refreshRate: rate 
     } );
+  }
+
+  togglePause() {
+
+    let url;
+
+    if( this.state.paused ) {
+      url = "resumeChannels"; 
+    } else {
+      url = "pauseChannels";
+    }
+
+    return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/" + url + "?instrumentId=" + this.props.instrumentId, { method: 'GET'  } )
+      .then( ( response ) => {
+
+        this.updateInstrument();
+
+      });
   }
 
   render() {
@@ -185,17 +204,19 @@ class TrackerInstrument extends React.Component {
           id={ group.groupID } 
           name={ group.groupName }
           channels={ group.channels }
+          groupConfig={ group }
           config={ this.props.config } 
           configDB={ this.props.configDB } 
           serverState={ this.state.serverState[ group.groupName ] }
-          updateState={ this.updateInstrument }
+          update={ this.updateInstrument }
           getStatus={ this.updateStatus }
            />
           } );
       }
 
       if( groupsDoms ) {
-      content = groupsDoms;
+        
+        content = groupsDoms;
 
       } else if( this.state.error ) {
 
@@ -205,16 +226,18 @@ class TrackerInstrument extends React.Component {
           </div>;
       }
 
-    return <div className="container-fluid">
+    return <div>
             
-
+            <h3>{ this.props.instrumentId }</h3>
             <div className="row statuses">
           
               <div className={ "col-sm-4 alert " + ( this.state.error_influxdb ? ' alert-danger' : 'alert-success' ) }>
                 <span title={ this.state.error_influxdb || "" } className={ "glyphicon glyphicon-" + ( this.state.error_influxdb ? 'warning-sign' : 'check' ) }></span>&nbsp;
                 InfluxDB server
                 <div className="pull-right">
-                  <button type="button" className="btn btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }>Config</button>
+                  <div>
+                    <button type="button" className="btn btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }>Config</button>
+                  </div>
                 </div>
               </div>
 
@@ -222,7 +245,21 @@ class TrackerInstrument extends React.Component {
                 <span title={ this.state.error_tracker || "" }  className={ "glyphicon glyphicon-" + ( this.state.error_tracker ? 'warning-sign' : 'check' ) }></span>&nbsp;
                 Instrument connection
                 <div className="pull-right">
-                  <button type="button" className="btn btn-default btn-sm" onClick={ this.editInstrument }>Config</button>
+                  <div>
+                    <button type="button" className="btn btn-default btn-sm" onClick={ this.editInstrument }>Config</button>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div className={ "col-sm-4 alert " + ( this.state.paused ? ' alert-danger' : 'alert-info' ) }>
+                <span className={ "glyphicon glyphicon-" + ( this.state.paused ? "paused" : "start" ) }></span>&nbsp;
+                { this.state.paused ? "Tracking paused" : "Tacking enabled" }
+                <div className="pull-right">
+                  <div>
+                    <button type="button" className="btn btn-default btn-sm" onClick={ this.togglePause }>{ this.state.paused ? "Resume" : "Pause" }</button>
+                  </div>
                 </div>
               </div>
 

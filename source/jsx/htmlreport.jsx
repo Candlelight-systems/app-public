@@ -41,7 +41,6 @@ class HTMLReport extends React.Component {
 	}
 
 	savePDF() {
-console.log('saving');
 
 
       dialog.showSaveDialog( {
@@ -245,8 +244,6 @@ console.log('saving');
 		if( ! data ) {
 			return;
 		}
-
-	
 
 		while( this.domStability.firstChild ) {
 			this.domStability.removeChild( this.domStability.firstChild );

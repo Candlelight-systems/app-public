@@ -24,7 +24,7 @@ class CellButtons extends React.Component {
 				</button>
 			}
 
-			{ !! this.props.start && 
+			{ !! this.props.button_start && 
 				<button className="btn btn-sm btn-success" onClick={ this.props.start }>
 					<span className="glyphicon glyphicon-play"></span>
 				</button> 

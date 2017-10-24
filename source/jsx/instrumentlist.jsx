@@ -94,7 +94,7 @@ class InstrumentList extends React.Component {
     } );
 
     
-    instruments.push(<li className="list-group-item" onClick={this.addInstrument} key={config.trackerHost}><a href="#">+ Add an instrument</a></li>)
+    instruments.push(<li className="list-group-item" onClick={this.addInstrument} key="__new"><a href="#">+ Add an instrument</a></li>)
 
     return (
         <ul id="instrumentList" className="list-group">{ instruments }</ul>

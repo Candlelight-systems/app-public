@@ -1251,10 +1251,13 @@ class KeithleySMU {
 				}
 
 				resultsParsed = resultsParsed[1].split(',').map(result => {
+
 					result = /u'(.*)'/g.exec(result);
+
 					if (!result || !result[1]) {
 						return null;
 					}
+
 					return result[1];
 				});
 

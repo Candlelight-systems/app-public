@@ -23,8 +23,8 @@ const initialState = {
 	data_IV: null,
 	iv: null,
 	efficiency: false,
-	start_efficiency: false,
-	highest_efficiency: false,
+	start_value: false,
+	highest_value: false,
 	voltage: false,
 	ff: false,
 	current: false,
@@ -37,8 +37,11 @@ const initialState = {
 	change: false,
 	showDetails: false,
 
-	serverState: {},
+	_last_iv_time: 0,
+	_last_iv: null,
+	_fist_iv: null,
 
+	serverState: {}
 };
 
 class TrackerDevice extends React.Component {
@@ -48,7 +51,7 @@ class TrackerDevice extends React.Component {
 	 */
 	constructor( props ) {
 		super( props );
-		console.log('create');
+		
 		this.unit = {
 			"voltage": <span>V</span>,
 			"currentdensity": <span>mA cm<sup>-2</sup></span>,
@@ -75,20 +78,17 @@ class TrackerDevice extends React.Component {
 		this.hideDetails = this.hideDetails.bind( this );
 		this.downloadData = this.downloadData.bind( this );
 
-		this.formValidated = this.formValidated.bind( this );
+		
 		this.toggleDetails = this.toggleDetails.bind( this );
 	//	this.formChanged = this.formChanged.bind( this );
 		//this.state.tmpServerState = {};
 
-		this._last_iv_time = 0;
-		this._last_iv = null;
-		this._first_iv = null;
-		console.log( 'create' );
+		
 	}
 
 	shouldComponentUpdate( props, state ) {
 
-		console.log( props, state );
+		
 		return true;
 	}
 	componentWillReceiveProps( nextProps ) {
@@ -125,45 +125,17 @@ class TrackerDevice extends React.Component {
 		}
 	}
 
-	formValidated( el ) {
-	/*	
-		el.tracking_mode = parseInt( el.tracking_mode );
-		el.tracking_step = parseInt( el.tracking_step );
-		el.tracking_fw = parseInt( el.tracking_step );
-		el.tracking_interval = parseInt( el.tracking_interval );
-		el.tracking_record_interval = parseInt( el.tracking_record_interval );
-
-		el.tracking_bwfwthreshold = parseFloat( el.tracking_bwfwthreshold );
-		el.tracking_fwbwthreshold = parseFloat( el.tracking_fwbwthreshold );
-		el.tracking_measure_voc_interval = parseInt( el.tracking_measure_voc_interval );
-		el.tracking_measure_jsc_interval = parseInt( el.tracking_measure_jsc_interval );
-
-		el.tracking_measure_voc = +el.tracking_measure_voc;
-		el.tracking_measure_jsc = +el.tracking_measure_jsc;
-		
-
-		el.cellArea = parseFloat( el.cellArea );
-
-		el.iv_start = parseFloat( el.iv_start );
-		el.iv_stop = parseFloat( el.iv_stop );
-		el.iv_hysteresis = +el.iv_hysteresis;
-
-		el.iv_interval = parseInt( el.iv_interval );
-		el.iv_rate = parseFloat( el.iv_rate );
-*/
-
-		this.saveStatus( el );
-	}
 
 	saveStatus( newState ) {
 
-	//	this.setState( { updating: true } );
-		
 		let body = JSON.stringify( newState );
+		
 		let headers = new Headers({
 		  "Content-Type": "application/json",
 		  "Content-Length": body.length.toString()
 		});
+
+
 
 		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatus", {
 
@@ -183,13 +155,21 @@ class TrackerDevice extends React.Component {
 
 	resetChannel() {
 
+/*
+		this.state.serverState.measurementName = false;
+		this.state.serverState.cellName = "";
+		this.state.serverState.cellArea = 0;
+		this.state.serverState.tracking_mode = 0;
+		this.state.serverState.enable = 0;
 
+*/
 		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetStatus?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId , {
 
 			method: 'GET'
 
 		} ).then( ( response ) => {
 
+			this.setState( Object.assign( {}, initialState ) );
 			this.getStatus();
 
 		} ).catch( () => {
@@ -206,6 +186,7 @@ class TrackerDevice extends React.Component {
 
 		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).then( ( response ) => {
 
+
 			this.getStatus();
 
 		} ).catch( () => {
@@ -221,7 +202,7 @@ class TrackerDevice extends React.Component {
 
 		let body = JSON.stringify( { instrumentId: this.props.instrumentId, chanId: this.props.chanId } );
 
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).then( ( response ) => {
+		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  + "&extend=" + !!! this.state.voc ).then( ( response ) => {
 
 			this.getStatus();
 
@@ -256,7 +237,7 @@ class TrackerDevice extends React.Component {
 
 	downloadData() {
 
-		ipcRenderer.send( "downloadData", this.state.serverState, this.props.instrumentId, this.props.chanId, this.state.serverState.measurementName );
+		ipcRenderer.send( "downloadData", this.state.serverState, this.props.chanId, this.state.serverState.measurementName );
 	}
 
 
@@ -300,20 +281,11 @@ class TrackerDevice extends React.Component {
 	}
 
 	stop() {
-		this.state.serverState.measurementName = false;
-		this.state.serverState.cellName = "";
-		this.state.serverState.cellArea = 0;
-		this.state.serverState.tracking_mode = 0;
-		this.state.serverState.enable = 0;
 
-		this._last_iv_time = false;
-		this._last_iv = false;
-		this._first_iv = false;
 		this.data_sun = false;
 		this.data_humidity = false;
 		this.data_temperature = false;
 
-		this.setState( initialState );
 		this.resetChannel();
 	}
 
@@ -321,11 +293,11 @@ class TrackerDevice extends React.Component {
 		
 		ipcRenderer.once( "channelConfigured", ( event, data ) => {
 
-			if( data.chanId !== this.state.serverState.chanId ) {
+			if( data.chanId != this.state.serverState.chanId ) {
 				return;
 			}
 
-			this.formValidated( data );
+			this.saveStatus( data );
 		});
 
 		ipcRenderer.send( "configChannel", { 
@@ -372,6 +344,7 @@ class TrackerDevice extends React.Component {
 	toggleDetails() {
 		this.setState( ( state ) => ( { showDetails: ! state.showDetails } ) );
 	}
+
 	showDetails() {
 		this.setState( { showDetails: true } );
 	}
@@ -443,17 +416,20 @@ class TrackerDevice extends React.Component {
 			return;
 		}
 
-		switch( this.state.display ) {
+		switch( this.state.serverState.tracking_mode ) {
 
-			case "voc":
+			case 3:
+				parameter = "current_mean";
+			break;
+
+			case 2:
 				parameter = "voltage_mean";
 			break;
 
 			default:
-			case "eff":
+			case 1:
 				parameter = "efficiency";
 			break;
-
 		}
 
 		let queries = [
@@ -473,15 +449,19 @@ class TrackerDevice extends React.Component {
 			let timefrom = results[ 0 ].series[ 0 ].values[ 0 ][ 0 ],
 				timeto = results[ 1 ].series[ 0 ].values[ 0 ][ 0 ],
 				timefrom_date = new Date( timefrom ),
-				timeto_date = new Date( timeto );
+				timeto_date = new Date( timeto ),
+				last_iv;
 
-			let last_iv = new Date( results[ 2 ].series[ 0 ].values[ 0 ][ 0 ] );
+			if( results[ 2 ].series ) {
+				last_iv = new Date( results[ 2 ].series[ 0 ].values[ 0 ][ 0 ] );
+			}
 
-			newState.start_efficiency = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
+			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 			newState.efficiency = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 
 			newState.power = results[ 1 ].series[ 0 ].values[ 0 ][ 2 ];
 			newState.current = ( results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 ).toPrecision( 3 );
+			newState.currentdensity = ( results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 / serverState.cellArea ).toPrecision( 3 );
 			newState.voltage = parseFloat( results[ 1 ].series[ 0 ].values[ 0 ][ 4 ] ).toPrecision( 3 );
 			newState.sun = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 5 ] * 100 ) / 100;
 			newState.pga = results[ 1 ].series[ 0 ].values[ 0 ][ 6 ];
@@ -542,16 +522,15 @@ class TrackerDevice extends React.Component {
 			}
 
 
-			if( results[ 3 ].series ) {
+			if( results[ 3 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.voc = Math.round( results[ 3 ].series[ 0 ].values[ 0 ][ 1 ] * 1000 ) / 1000;
 			}	
 
-			if( results[ 4 ].series ) {
+			if( results[ 4 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.jsc = Math.round( results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000 * 1000 ) / 1000;
 			}
 
-
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(efficiency) as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
 
 			queue.push( influxquery( query, db_ds, this.props.configDB ).then( ( results ) => {
 				
@@ -562,8 +541,8 @@ class TrackerDevice extends React.Component {
 					waveSun = Graph.newWaveform(),
 					waveHumidity = Graph.newWaveform(),
 					waveTemperature = Graph.newWaveform(),
-					highest_efficiency = 0, 
-					highest_efficiency_time = 0;
+					highest_value = 0, 
+					highest_value_time = 0;
 
 				// First point gives the initial efficiency, 2nd row
 				if( values.length < 2 ) {
@@ -571,7 +550,7 @@ class TrackerDevice extends React.Component {
 					return;
 				}
 
-				let effIndex = 2;
+				let valueIndex = 2;
 
 				values.forEach( ( value, index ) => {
 					
@@ -585,23 +564,39 @@ class TrackerDevice extends React.Component {
 						time = ( date.getTime() - offset ) / 1000;
 					}
 
-					if( value[ effIndex ] > 35 || value[ effIndex ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
-						return;
+					if( this.state.serverState.tracking_mode == 1 ) {
+						if( value[ valueIndex ] > 35 || value[ valueIndex ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
+							return;
+						}
+					} else if ( this.state.serverState.tracking_mode == 3 ) {
+						value[ valueIndex ] *= 1000; // In current mode, show mAmps
 					}
 
-					wave.append( time, value[ effIndex ] );
-					waveSun.append( time, value[ 5 ] );
+					wave.append( time, value[ valueIndex ] );
+					waveSun.append( time, value[ 5 ] );					
 					waveIV.append( value[ 3 ], value[ 4 ] );
 					waveTemperature.append( time, value[ 6 ] );
 					waveHumidity.append( time, value[ 7 ] );
-					
-					if( value[ 2 ] > highest_efficiency && !isNaN( value[ 2 ] ) ) {
-						highest_efficiency = value[ 2 ];
-						highest_efficiency_time = time;
+						
+					if( this.state.serverState.tracking_mode == 1 ) {
+						if( value[ 2 ] > highest_value && !isNaN( value[ 2 ] ) ) {
+							highest_value = value[ 2 ];
+							highest_value_time = time;
+						}
 					}
+
 				} );
 
-				if( prev_time && changeUnitVal ) {
+
+				if( this.state.serverState.tracking_mode == 2 ) {
+					newState.voc = Math.round( values[ values.length - 1 ][ 2 ] * 1000 ) / 1000;	
+				}
+
+				if( this.state.serverState.tracking_mode == 3 ) {
+					newState.jsc = Math.round( values[ values.length - 1 ][ 2 ]  * 100 ) / 100;
+				}
+				
+				if(  this.state.serverState.tracking_mode == 1 && prev_time && changeUnitVal ) {
 				
 					wave.fit( {
 
@@ -625,33 +620,32 @@ class TrackerDevice extends React.Component {
 	
 				}
 
-				newState.highest_efficiency = Math.round( highest_efficiency * 100 ) / 100;
-				newState.highest_efficiency_time = highest_efficiency_time;
+				newState.highest_value = Math.round( highest_value * 100 ) / 100;
+				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
 				newState.data_IV = waveIV;
 
-				
 			} ) );
 
 
 
-			if( ! this._first_iv && last_iv ) {
+			if( ! this.state._first_iv && last_iv ) {
+
 				query = "SELECT time, iv FROM \"" + serverState.measurementName + "_iv\" ORDER BY time ASC limit 1";
 				queue.push( influxquery( query, db, this.props.configDB ).then( this.readIVs.bind( this ) ).then( ( iv ) => {
 
-					this._first_iv = iv[ 0 ];
+					newState._first_iv = iv[ 0 ];
 					
 				}) );
 			}
 
-			if( last_iv.getTime() > this._last_iv_time ) {
+			if( last_iv && last_iv.getTime() > this.state._last_iv_time ) {
 
-				this._last_iv_time = last_iv.getTime();
-				this._last_iv = this.readIV( results[ 2 ] );
-				
+				newState._last_iv_time = last_iv.getTime();
+				newState._last_iv = this.readIV( results[ 2 ] );
 			}
 
 
@@ -660,7 +654,6 @@ class TrackerDevice extends React.Component {
 
 				newState.ff = Math.round( newState.power / serverState.cellArea / ( newState.voc * newState.jsc / 1000 ) * 100 );
 				newState.updating = false;
-				console.log('newstate');
 				this.setState( newState );
 
 			}).catch( ( error ) => {
@@ -690,26 +683,59 @@ class TrackerDevice extends React.Component {
 			changeUnit,
 			currVal,
 			startVal,
-			startValPos;
+			startValPos,
+			trackingMode,
+			statusGraphAxisLabel,
+			statusGraphAxisUnit,
+			statusGraphSerieLabelLegend;
 
-		switch( this.state.display ) {
 
-			case "eff":
+		switch( this.state.serverState.tracking_mode ) {
+
+			case 0:
+				trackingMode = "No tracking";
+			break;
+
+			case 1:
 				unit = "%";
-				startVal = this.state.highest_efficiency;
-				startValPos = this.state.highest_efficiency_time;
+				startVal = this.state.highest_value;
+				startValPos = this.state.highest_value_time;
 				currVal = this.state.efficiency;
 				change = ( this.state.efficiency - this.state.prev_efficiency );
+
+				trackingMode = "MPPT";
+				statusGraphAxisLabel = "Efficiency";
+				statusGraphAxisUnit = "%";
+				statusGraphSerieLabelLegend = "PCE";
 
 			break;
 
 
-			case "voc":
+			case 2:
 				unit = "V";
-				startVal = this.state.start_voc;
+				startVal = this.state.start_value;
 				startValPos = 0;
 				currVal = this.state.voc;
 				change = ( this.state.voc - this.state.prev_voc );
+
+				trackingMode = "Voc";
+				statusGraphAxisLabel = "Voltage";
+				statusGraphAxisUnit = "V";
+				statusGraphSerieLabelLegend = "Voc";
+			break;
+
+
+			case 3:
+				unit = this.unit.currentdensity;
+				startVal = this.state.start_value;
+				startValPos = 0;
+				currVal = this.state.jsc;
+				change = ( this.state.jsc - this.state.prev_jsc );
+
+				trackingMode = "Jsc";
+				statusGraphAxisLabel = "Current density";
+				statusGraphAxisUnit = "mA cm^-2";
+				statusGraphSerieLabelLegend = "Jsc";
 			break;
 		}
 
@@ -737,24 +763,6 @@ class TrackerDevice extends React.Component {
 	
 		let active = this.state.serverState.enable && this.state.serverState.tracking_mode > 0;
 
-		let trackingMode;
-
-		if( this.state.serverState.enable == 0 ) {
-			trackingMode = "Off";
-		} else {
-
-			if( this.state.serverState.tracking_mode == 1 ) {
-				trackingMode = "MPPT";
-			} else if ( this.state.serverState.tracking_mode == 2 ) {
-				trackingMode = "Voc";
-			} else if ( this.state.serverState.tracking_mode == 3 ) {
-				trackingMode = "Jsc";
-			} else { 
-				trackingMode = "No tracking";
-			}
-		}
-
-
 		return (
 			<div ref={ ( el ) => this.wrapper = el } className={'cell ' + ( this.state.unknown ? 'cell-unknown' : ( active ? 'cell-running' : 'cell-stopped' ) ) + ( this.state.showDetails && active ? ' show-details' : '' ) }>
 
@@ -776,7 +784,7 @@ class TrackerDevice extends React.Component {
 						</span> }
 					</div>
 					<div className="col-xs-1 propElement">{ !!this.state.sun && <span><span className="label"><span className="glyphicon glyphicon-scale"></span></span><span className="value">{this.state.sun}</span>&nbsp;{this.unit.sun}</span>} </div>
-					<div className="col-xs-1 propElement">{ this.state.efficiency !== undefined && <span><span className="label">&eta;</span><span className="value">{ this.state.efficiency }</span>{ this.unit.efficiency }</span>}</div>
+					<div className="col-xs-1 propElement">{ ! isNaN( this.state.efficiency ) && <span><span className="label">&eta;</span><span className="value">{ this.state.efficiency }</span>{ this.unit.efficiency }</span>}</div>
 					<div className="col-xs-1 propElement">{ !!this.state.voc && 
 						<span>
 							<span className="label">V<sub>oc</sub></span>
@@ -804,7 +812,7 @@ class TrackerDevice extends React.Component {
 						<CellButtons 
 							cfg 			= { () => { this.cfg(); } }
 							stop 			= { this.stop } 
-							start 			= { ( ( ! this.state.serverState.enable && !! this.state.serverState.cellName && this.state.serverState.cellName.length > 0 ) ) ? this.start : undefined }
+							start 			= { this.start }
 							recordJsc 		= { this.recordJsc } 
 							recordVoc 		= { this.recordVoc }
 							recordIV  		= { this.recordIV }
@@ -813,7 +821,7 @@ class TrackerDevice extends React.Component {
 							button_voc 		= { active }
 							button_iv 		= { active }
 							button_download = { active }
-							button_start 	= { ! active && this.props.cellName }
+							button_start 	= { this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && ! active && this.state.serverState.tracking_mode > 0 }
 							button_stop 	= { active }
 							button_details	= { active }
 							details 		= { this.toggleDetails }
@@ -827,10 +835,10 @@ class TrackerDevice extends React.Component {
 					</div>
 					</div>
 
-					{ !!active && this.state.efficiency !== undefined && !!this.state.highest_efficiency &&
+					{ !!active && this.state.efficiency !== undefined && !!this.state.highest_value &&
 						<div className="bar" onClick={ this.showEfficiencies }>
 							<div className="barGreen" style={ { width: this.state.efficiency / 25 * 100 + "%" } }></div>
-							<div className="barRed" style={ { width: ( this.state.highest_efficiency - this.state.efficiency ) / 25 * 100 + "%" } }></div>
+							<div className="barRed" style={ { width: ( this.state.highest_value - this.state.efficiency ) / 25 * 100 + "%" } }></div>
 						</div>
 					}
 				</div>
@@ -850,7 +858,7 @@ class TrackerDevice extends React.Component {
 
 						<span>
 							<span className="label">Highest efficiency</span>
-							<span className="value">{ this.state.highest_efficiency } { this.unit.efficiency }</span>
+							<span className="value">{ this.state.highest_value } { this.unit.efficiency }</span>
 						</span>
 					</div>
 
@@ -868,7 +876,7 @@ class TrackerDevice extends React.Component {
 
 						<span>
 							<span className="label">Actual current density</span>
-							<span className="value">{ this.state.current } { this.unit.currentdensity }</span>
+							<span className="value">{ this.state.currentdensity } { this.unit.currentdensity }</span>
 						</span>
 					</div>
 
@@ -876,7 +884,7 @@ class TrackerDevice extends React.Component {
 
 						<span>
 							<span className="label">Current range</span>
-							<span className="value">&plusmn; { pgaValueToRange( this.state.pga, this.props.config.fullScaleCurrent ) } { this.unit.currentdensity }</span>
+							<span className="value">&plusmn; { pgaValueToRange( this.state.pga, this.props.config.fullScaleCurrent ) } { this.unit.current }</span>
 						</span>
 					</div>
 
@@ -909,16 +917,16 @@ class TrackerDevice extends React.Component {
 								</tr>
 								<tr>
 									<td>Humidity</td>
-									<td>{ ! isNaN( this.state.humidity ) ? this.state.humidity + "%" : "N/A"}</td>
+									<td>{ ! isNaN( this.state.humidity )  && this.state.humidity !== -1 ? this.state.humidity + "%" : "N/A"}</td>
 								</tr>
 								<tr>
 									<td>Board temp.</td>
-									<td>{ ! isNaN( this.state.temperature_base ) ? this.state.temperature_base + "\u00B0C" : "N/A"}</td>
+									<td>{ ! isNaN( this.state.temperature_base ) && this.state.temperature_base !== -1 ? this.state.temperature_base + "\u00B0C" : "N/A"}</td>
 								</tr>
-								
+									
 								<tr>
 									<td>Est. junction temp.</td>
-									<td>{ ! isNaN( this.state.temperature_junction ) ? this.state.temperature_junction + "\u00B0C" : "N/A"}</td>
+									<td>{ ! isNaN( this.state.temperature_junction ) && this.state.temperature_junction !== -1 ? this.state.temperature_junction + "\u00B0C" : "N/A"}</td>
 								</tr>
 							</tbody>
 						</table>
@@ -940,6 +948,9 @@ class TrackerDevice extends React.Component {
 							flag1={startVal} 
 							flag1_pos={startValPos} 
 							unit={unit} 
+							axisLabel={statusGraphAxisLabel}
+							axisUnit={statusGraphAxisUnit}
+							serieLabelLegend={statusGraphSerieLabelLegend}
 							flag2={currVal} />
 					</div>
 
@@ -950,10 +961,11 @@ class TrackerDevice extends React.Component {
 							height="220"
 							shown={this.state.showDetails} 
 							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
-							data={ [ this._first_iv, this._last_iv ] } 
+							data={ [ this.state._first_iv, this.state._last_iv ] } 
 							dataIV={ this.state.data_IV } 
 							voltage={ this.state.voltage } 
 							current={ this.state.current } 
+							cellarea={ this.props.serverState.cellArea }
 							/>
 					</div>
 

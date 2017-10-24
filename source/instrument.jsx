@@ -28,15 +28,21 @@ function render( cfg ) {
 	fetch( "http://" + tracker.trackerHost + ":" + tracker.trackerPort + "/getInstruments", {
       method: 'GET'
     }).then( ( response ) => response.json() ).then( ( json ) => {
-		
+			
+		let trackers = [];
+
+		for( var i in json ) {
+
+			trackers.push(
+				<div key={ i } className="container-fluid">
+					<TrackerInstrument instrumentId={ i } trackerConfig={ json } fullScaleCurrent={ json.fullScaleCurrent } config={ tracker } configDB={ db } />
+				</div>
+    		);
+		}
+
 		  ReactDOM.render(
 		    <div>
-				{ json.map( ( json ) => {
-
-					return <div key={ json.instrumentId }>
-    					<h3>{ json.instrumentId }</h3>
-    					<TrackerInstrument instrumentId={ json.instrumentId } fullScaleCurrent={ json.fullScaleCurrent } config={ tracker } configDB={ db } />
-    				</div> } ) }
+				{ trackers }
 		    </div>,
 		    document.getElementById('root')
 		  );

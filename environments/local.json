@@ -1,0 +1,28 @@
+{
+	"environment": {
+		"ageing": true
+	},	
+	
+	"development": true,
+
+	"defaultConfig": {
+		"instruments": [
+			{
+				"trackerHost": "192.168.0.102",
+				"trackerName": "Main Instrument",
+				"trackerPort": 8080
+			}
+		],
+		"database": {
+			"host": "192.168.0.103",
+			"username": "",
+			"password": "",
+			"port": 8086,
+			"db": "matahari"
+		},
+
+		"githubtokens": {
+			"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"
+		}
+	}
+}
