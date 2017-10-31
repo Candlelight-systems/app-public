@@ -163,9 +163,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 	constructor(props) {
 		super(props);
 		this.handleInputChange = this.handleInputChange.bind(this);
-		this.downloadTrack = this.downloadTrack.bind(this);
-		this.downloadIV = this.downloadIV.bind(this);
-		this.downloadVocJsc = this.downloadVocJsc.bind(this);
+		this.makeDownload = this.makeDownload.bind(this);
 		this.downloadPDF = this.downloadPDF.bind(this);
 		this.close = this.close.bind(this);
 		this.state = {
@@ -188,11 +186,9 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 
 	componentDidMount() {}
 
-	async downloadTrack() {
+	async makeDownload(track = true, jv = true, vocjsc = true) {
 
-		let data = await this.getTrackData();
-
-		var outputfile;
+		let outputfile;
 
 		if (this.state.dl_format == "itx") {
 			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["b" /* ITXBuilder */]();
@@ -200,9 +196,39 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["a" /* CSVBuilder */]();
 		}
 
+		let fileappend = [];
+		if (track) {
+			await this.downloadTrack(outputfile);
+			fileappend.push("track");
+		}
+
+		if (jv) {
+			await this.downloadIV(outputfile);
+			fileappend.push("jv");
+		}
+
+		if (vocjsc) {
+			await this.downloadVocJsc(outputfile);
+			fileappend.push("vocjsc");
+		}
+
+		dialog.showSaveDialog({
+
+			message: "Save the data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: `~/${this.props.cellInfo.cellName}_${fileappend.join("_")}.${this.state.dl_format}`
+
+		}, fileName => {
+
+			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
+		});
+	}
+
+	async downloadTrack(outputfile) {
+
+		let data = await this.getTrackData();
 		outputfile.addWaveform(data.efficiency, {
 			waveName: "Efficiency",
-			waveNameX: "Time_h"
+			waveNameX: "Time_MPP_h"
 		});
 
 		outputfile.addWaveform(data.voltage, {
@@ -229,30 +255,12 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			waveName: "Humidity",
 			noXWave: true
 		});
-
-		dialog.showSaveDialog({
-
-			message: "Save the tracking data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_track.itx"
-
-		}, fileName => {
-
-			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
-		});
 	}
 
-	async downloadVocJsc() {
+	async downloadVocJsc(outputfile) {
 
 		let data = await this.getVocJscData();
 
-		var outputfile;
-
-		if (this.state.dl_format == "itx") {
-			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["b" /* ITXBuilder */]();
-		} else {
-			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["a" /* CSVBuilder */]();
-		}
-		console.log(data);
 		outputfile.addWaveform(data.waveVoc, {
 			waveName: "Voc",
 			waveNameX: "Time_voc_h"
@@ -262,30 +270,11 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			waveName: "Jsx",
 			waveNameX: "Time_jsc_h"
 		});
-
-		dialog.showSaveDialog({
-
-			message: "Save the Voc and Jsc data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_vocjsc.itx"
-
-		}, fileName => {
-
-			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
-		});
 	}
 
-	async downloadIV() {
+	async downloadIV(outputfile) {
 
 		let data = await this.getJVData();
-
-		var outputfile;
-
-		if (this.state.dl_format == "itx") {
-			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["b" /* ITXBuilder */]();
-		} else {
-			outputfile = new __WEBPACK_IMPORTED_MODULE_2__app_util_filebuilder__["a" /* CSVBuilder */]();
-		}
-
 		data[0].map(data => {
 
 			if (!data.wave) {
@@ -296,16 +285,6 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 				waveName: "Current_" + data.time_h + "h",
 				waveNameX: "Voltage_" + data.time_h + "h"
 			});
-		});
-
-		dialog.showSaveDialog({
-
-			message: "Save the JV data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_jv.itx"
-
-		}, fileName => {
-
-			__WEBPACK_IMPORTED_MODULE_1_fs___default.a.writeFileSync(fileName, outputfile.build());
 		});
 	}
 
@@ -636,7 +615,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					this.props.chanId && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'span',
 						null,
-						'channel ',
+						'( channel ',
 						this.props.chanId,
 						' )'
 					)
@@ -654,7 +633,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 						{ className: 'col-sm-9' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'select',
-							{ name: 'dl_track_format', id: 'dl_format', className: 'form-control', value: this.state.dl_format, onChange: this.handleInputChange },
+							{ name: 'dl_format', id: 'dl_format', className: 'form-control', value: this.state.dl_format, onChange: this.handleInputChange },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'option',
 								{ value: 'csv' },
@@ -722,18 +701,31 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 							{ className: 'btn-group' },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'button',
-								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadTrack },
+								{ className: 'btn btn-primary', type: 'button', onClick: () => {
+										this.makeDownload(true, false, false);
+									} },
 								'Download MPP'
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'button',
-								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadVocJsc },
+								{ className: 'btn btn-primary', type: 'button', onClick: () => {
+										this.makeDownload(false, false, true);
+									} },
 								'Download Voc and Jsc'
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'button',
-								{ className: 'btn btn-primary', type: 'button', onClick: this.downloadIV },
+								{ className: 'btn btn-primary', type: 'button', onClick: () => {
+										this.makeDownload(false, true, false);
+									} },
 								'Download JV'
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'button',
+								{ className: 'btn btn-primary', type: 'button', onClick: () => {
+										this.makeDownload(true, true, true);
+									} },
+								'Download All'
 							)
 						)
 					)
@@ -875,11 +867,16 @@ class CSVBuilder extends FileBuilder {
 
 	build() {
 
+		const separator = ",";
 		let output = "";
 		output += this.waves.map(wave => {
 
-			return wave.options.waveName + (wave.data.hasUnit() ? " (" + wave.data.getUnit() + ")" : "");
-		}).join(",");
+			let string = "";
+			if (wave.options.waveNameX) {
+				string += wave.options.waveNameX + (wave.data.getXWaveform().hasUnit() ? " (" + wave.data.getXWaveform().getUnit() + ")" : "") + separator;
+			}
+			return string + wave.options.waveName + (wave.data.hasUnit() ? " (" + wave.data.getUnit() + ")" : "");
+		}).join(separator);
 
 		let i = 0,
 		    iterating,
@@ -893,17 +890,27 @@ class CSVBuilder extends FileBuilder {
 
 			output += this.waves.map(wave => {
 
-				data = wave.data.get(i);
+				let string = "",
+				    data;
 
-				if (data !== undefined) {
+				data = wave.data.getY(i);
+
+				if (data !== undefined && !isNaN(data)) {
 					iterating = true;
-					return data;
+
+					if (wave.options.waveNameX) {
+						string += wave.data.getX(i) + separator;
+					}
+
+					return string + data;
 				}
 
 				return "";
 			}).join(",");
 
-			if (!iterating) {
+			i++;
+
+			if (!iterating || i == 100000) {
 				break;
 			}
 		}

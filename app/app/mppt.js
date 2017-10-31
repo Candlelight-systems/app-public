@@ -1515,11 +1515,16 @@ class CSVBuilder extends FileBuilder {
 
 	build() {
 
+		const separator = ",";
 		let output = "";
 		output += this.waves.map(wave => {
 
-			return wave.options.waveName + (wave.data.hasUnit() ? " (" + wave.data.getUnit() + ")" : "");
-		}).join(",");
+			let string = "";
+			if (wave.options.waveNameX) {
+				string += wave.options.waveNameX + (wave.data.getXWaveform().hasUnit() ? " (" + wave.data.getXWaveform().getUnit() + ")" : "") + separator;
+			}
+			return string + wave.options.waveName + (wave.data.hasUnit() ? " (" + wave.data.getUnit() + ")" : "");
+		}).join(separator);
 
 		let i = 0,
 		    iterating,
@@ -1533,17 +1538,27 @@ class CSVBuilder extends FileBuilder {
 
 			output += this.waves.map(wave => {
 
-				data = wave.data.get(i);
+				let string = "",
+				    data;
 
-				if (data !== undefined) {
+				data = wave.data.getY(i);
+
+				if (data !== undefined && !isNaN(data)) {
 					iterating = true;
-					return data;
+
+					if (wave.options.waveNameX) {
+						string += wave.data.getX(i) + separator;
+					}
+
+					return string + data;
 				}
 
 				return "";
 			}).join(",");
 
-			if (!iterating) {
+			i++;
+
+			if (!iterating || i == 100000) {
 				break;
 			}
 		}
@@ -1617,6 +1632,7 @@ let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) =
     jsc: jsc / area * 1000 * (inverted ? 1 : -1),
     voc: voc,
     ff: ff * 100,
+    powerin: powin,
     power: maxpower * 1000,
     pce: pce,
     jmax: 0,

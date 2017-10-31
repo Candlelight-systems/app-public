@@ -91,7 +91,7 @@ class CalibratePD extends React.Component {
 			var str = [];
 
 			for( var i = 0; i < this.state.photodiodes.length; i ++ ) {
-				console.log('here', this.state.photodiodes[ i ].ref, this.state[ 'mon_' + this.state.photodiodes[ i ].ref ] );
+				
 				if( this.state[ 'mon_' + this.state.photodiodes[ i ].ref ] ) {
 					console.log('there');
 					str.push( this.state.photodiodes[ i ].ref );
@@ -103,7 +103,7 @@ class CalibratePD extends React.Component {
 					str.push( this.state.channels[ i ].chanId );
 				}
 			}
-			console.log( str.length );
+		
 			if( str.length == 0 ) {
 				this.setRequestTimeout();
 				return;

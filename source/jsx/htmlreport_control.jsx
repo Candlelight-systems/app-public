@@ -16,6 +16,7 @@ class HTMLReportControl extends React.Component {
 		this.handleInputChange = this.handleInputChange.bind( this );
 		this.handleSelectChange = this.handleSelectChange.bind( this );
 		this.savePDF = this.savePDF.bind( this );
+		this.printPDF = this.printPDF.bind( this );
 	}
 
 	validateConfig() {
@@ -26,7 +27,11 @@ class HTMLReportControl extends React.Component {
 	}
 
 	savePDF() {
-		ipcRenderer.send( "htmlReport.savePDF" );
+		ipcRenderer.send( "htmlReport.savePDF", { cellName: this.props.cellInfo.cellName } );
+	}
+
+	printPDF() {
+		ipcRenderer.send( "htmlReport.printPDF", { cellName: this.props.cellInfo.cellName } );
 	}
 
 	close() {
@@ -120,6 +125,24 @@ class HTMLReportControl extends React.Component {
 			<div className="container-fluid">
 				<form className="form-horizontal">
 						<h2>General</h2>
+					
+						<div className="form-group">
+							
+							<div className="col-sm-13 checkbox">
+								<label>
+									<input type="checkbox" checked={ this.state.humidity } name="humidity" onClick={ this.handleInputChange } /> Humidity
+								</label>
+							</div>
+						</div>
+
+						<div className="form-group">
+							<div className="col-sm-13 checkbox">
+								<label>
+									<input type="checkbox" checked={ this.state.temeprature } name="temperature" onClick={ this.handleInputChange } /> Temperature
+								</label>
+							</div>
+						</div>
+
 						<div className="form-group">
 							<label className="col-sm-3">Comment</label>
 							<div className="col-sm-9">
@@ -143,6 +166,7 @@ class HTMLReportControl extends React.Component {
 				</form>
 
 				<div className="btn-group pull-right">
+					<button type="button" className="btn btn-primary" onClick={ this.printPDF }>Print PDF</button>
 					<button type="button" className="btn btn-primary" onClick={ this.savePDF }>Save PDF</button>
 		      	</div>
 			</div>

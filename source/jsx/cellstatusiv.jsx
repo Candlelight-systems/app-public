@@ -24,10 +24,10 @@ class statusIV extends GraphComponent {
 
 		this.graph = new Graph( this.graphDOM, {
 			
-			paddingTop: 10,
-			paddingLeft: 25,
-			paddingRight: 25,
-			paddingBottom: 10,
+			paddingTop: 5,
+			paddingLeft: 0,
+			paddingRight: 0,
+			paddingBottom: 5,
 
 			closeColor: "#303030"
 		});
@@ -44,7 +44,7 @@ class statusIV extends GraphComponent {
 			.setSecondaryTicksColor("#303030") 
 			.setTicksLabelColor("#303030") 
 			.setLabelColor("#303030");
-	
+
 
 		this.graph.getBottomAxis()
 			.gridsOff()
@@ -71,88 +71,99 @@ class statusIV extends GraphComponent {
 			.setUnit("V");
 
 
-		this.serieIV = this.graph.newSerie( "iv_time" );
-		this.serieIV.autoAxes();
-		this.serieIV.setLineColor("#be2d2d").setLineWidth( 2 );
+		var legend = this.graph.makeLegend();
+			legend.notHideable();
+			legend.setAutoPosition( "right" );  
+			legend.update(); 
 
-		this.serie[ 0 ] = this.graph.newSerie( "iv_0" );
-		this.serie[ 0 ].setLineColor( "#1b18ae" );
-		this.serie[ 0 ].autoAxis();
-		this.serie[ 0 ].setLineWidth( 2 );
+			
+			
 
-		this.serie[ 1 ] = this.graph.newSerie( "iv_0_pwr" );
-		this.serie[ 1 ].setLineColor( "#1b18ae" );
-		this.serie[ 1 ].setLineStyle( 2 );
-		this.serie[ 1 ].autoAxis();
-		this.serie[ 1 ].setLineWidth( 2 );
-
-
-		this.serie[ 2 ] = this.graph.newSerie( "iv_1" );
-		this.serie[ 2 ].setLineColor( "#0e871a" );
-		this.serie[ 2 ].autoAxis();
-		this.serie[ 2 ].setLineWidth( 2 );
-
-		this.serie[ 3 ] = this.graph.newSerie( "iv_1_pwr" );
-		this.serie[ 3 ].setLineColor( "#0e871a" );
-		this.serie[ 3 ].setLineStyle( 2 );
-		this.serie[ 3 ].autoAxis();
-		this.serie[ 3 ].setLineWidth( 2 );
-
-
-
-		this.ellipse = this.graph.newShape( "ellipse" );
-		this.ellipse.setR( 3, 3 );
-	
-		this.ellipse.setFillColor('#be2d2d');
-		this.ellipse.setStrokeColor('#303030');
-		this.ellipse.draw();
 	}
 
 	componentDidUpdate() {
 
-		if( this.graph && this.props.data ) {
-			let wv;
+		this.props.data.sort( ( a, b ) => {
+			return a.time - b.time;
+		} );
 
-			if( this.props.data[ 0 ] ) {
-				wv = this.props.data[ 0 ];//wv = Graph.newWaveform().setData( this.props.data[ 0 ] )
-				this.serie[ 0 ].setWaveform( wv );
-				this.serie[ 1 ].setWaveform( wv.duplicate().math( ( y, x ) => y * x ) );
+		this.graph.resetSeries();
+
+		let color = 'red';
+		let maxY = 0;
+
+		let indices = [];
+		
+		const firstTime = this.props.data[ 0 ].time;
+		const lastTime = this.props.data[ this.props.data.length - 1 ].time;
+		const idealInterval = ( lastTime - firstTime ) / 4; // 5 iv curves
+
+		let lastInterval = 0;
+
+		this.props.data.forEach( ( data, index ) => {
+
+			if( data.time - lastInterval > idealInterval ) {
+				lastInterval = data.time;
+				indices.push( index ); 
 			}
-			
-			if( this.props.data[ 1 ] ) {
-				wv = this.props.data[ 1 ];//Graph.newWaveform().setData( this.props.data[ 1 ] )
-				this.serie[ 2 ].setWaveform( wv );
-				this.serie[ 3 ].setWaveform( wv.duplicate().math( ( y, x ) => y * x ) );
-			}
-				
-			if( this.props.dataIV ) {
-				this.serieIV.setWaveform( this.props.dataIV );
+		});
+
+		indices.push( this.props.data.length - 1 );
+
+		const colors = [ '#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18' ];
+		let k = 0;
+
+		this.props.data.forEach( ( data, index ) => {
+
+			if( indices.indexOf( index ) == -1 ) {
+				return;
 			}
 
-			this.graph.autoscaleAxes();
-			this.graph.show();
+			let s = this.graph.newSerie( "iv_" + index );
+			s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
+			s.setLineColor( colors[ k ] );
+			s.autoAxis();
+			s.setLineWidth( 2 );
+
+			let s2 = this.graph.newSerie( "power_" + index );
+			s2.setLineColor( colors[ k ] );
+			s2.setLineStyle( 2 );
+			s2.excludedFromLegend = true;
+			s2.autoAxis();
+			s2.setLineWidth( 2 );
+
+			s.setWaveform( data.iv );
+			s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
+
+			maxY = Math.max( maxY, data.iv.getMaxY() );
+			k++;
+		});
+
+		this.serieIV = this.graph.newSerie( "iv_time" );
+		this.serieIV.autoAxes();
+		this.serieIV.setLineColor("black").setLineWidth( 2 );
+
+		this.ellipse = this.graph.newShape( "ellipse" );
+		this.ellipse.setR( 3, 3 );
+	
+		this.ellipse.setFillColor('black');
+		this.ellipse.setStrokeColor('black');
+		this.ellipse.draw();
 			
-			
-			if( this.props.data[ 0 ] ) {
-				this.graph.getYAxis().forceMin( - this.props.data[ 0 ].getMaxY() * 0.5 );	
-			}
-			
-			this.ellipse.setPosition( { x: this.props.voltage, y: this.props.current / 1000 } );
-			this.ellipse.redraw();
-			this.graph.autoscaleAxes();
-			this.graph.draw();
+		if( this.props.dataIV ) {
+			this.serieIV.setWaveform( this.props.dataIV );
 		}
 
-		if( this.graph && ! this.props.data ) {
+		this.graph.autoscaleAxes();
+		this.graph.show();
+		
+		this.graph.getYAxis().forceMin( - maxY * 0.5 );	
+		this.ellipse.setPosition( { x: this.props.voltage, y: this.props.current / 1000 } );
+		this.ellipse.redraw();
 
-			this.serie.forEach( ( serie ) => {
-				serie.setWaveform( Graph.newWaveform().setData( [] ) );
-			});
-
-			this.serieIV.setWaveform( Graph.newWaveform().setData( [] ) );
-			this.graph.draw();
-			this.graph.hide();
-		}
+		this.graph.autoscaleAxes();
+		this.graph.draw();
+		this.graph.updateLegend();
 	}
 	
 	render() {

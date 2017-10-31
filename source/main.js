@@ -179,7 +179,7 @@ function downloadData( event, cellInfo, chanId, measurementName ) {
 
 function htmlReport( event, cellInfo, chanId, measurementName ) {
 
-    let listenerConfig, listenerSavePDF;
+    let listenerConfig, listenerSavePDF/*, listenerPrintPDF*/;
 
     ipcMain.on("htmlReport.config", ( listenerConfig = ( event, data ) => {
       
@@ -196,25 +196,76 @@ function htmlReport( event, cellInfo, chanId, measurementName ) {
         return;
       }
 
-      windows[ "htmlReport"].webContents.send( "savePDF", data );
+
+      dialog.showSaveDialog( {
+
+        message: "Save the report for device " + data.cellName,
+        defaultPath: "~/" + data.cellName + ".pdf"
+
+      }, ( fileName ) => {
+
+        windows[ 'htmlReport' ].webContents.printToPDF( {
+          marginsType: 1,
+          pageSize: 'A4',
+          landscape: true
+        }, ( err, data ) => {
+
+          fs.writeFile( fileName, data, ( error ) => {
+            console.log( err );  
+          } );
+        } );
+
+      } );
+        
+      //windows[ "htmlReport"].webContents.send( "savePDF", data );
     } ) );
 
-    openForm( null, "htmlreport_control", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId },   {
+/*
+
+    ipcMain.on("htmlReport.printPDF", ( listenerPrintPDF = ( event, data ) => {
+      
+      if( ! windows[ 'htmlReport' ] ) {
+        return;
+      }
+
+        windows[ 'htmlReport' ].webContents.print( {
+          marginsType: 1,
+          pageSize: 'A4',
+          landscape: true
+        }, ( err, data ) => {
+
+          fs.writeFile( fileName, data, ( error ) => {
+            console.log( err );  
+          } );
+        } );
+        
+      //windows[ "htmlReport"].webContents.send( "savePDF", data );
+    } ) );
+*/
+    openForm( null, "htmlreport_control", { 
+      measurementName: measurementName, 
+      db: config.database, 
+      cellInfo: cellInfo, 
+      chanId: chanId 
+    },   {
+      
       width: 400,
       height: 595,
       x: 50,
       y: 100,
       center: false,
       resizable: false
+
     }, () => {
 
         ipcMain.removeListener( "htmlReport.config", listenerConfig );
         ipcMain.removeListener( "htmlReport.savePDF", listenerSavePDF );
+   //     ipcMain.removeListener( "htmlReport.printPDF", listenerPrintPDF );
     } );
 
     windows[ 'htmlReport' ] = new BrowserWindow( {
-      width: 822, 
-      height: 595, 
+      width: 1122, 
+      height: 795, 
       x: 500, 
       y: 100, 
       center: false,
@@ -266,7 +317,7 @@ async function openCalibratePD( event, data ) {
 
   //await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/light.pause?instrumentId=" + data.instrumentId, { method: 'GET' } );
   
-  openForm( null, "calibratePD", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
+  openForm( null, "calibratepd", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
     width: 800,
     height: 600,
     resizable: false

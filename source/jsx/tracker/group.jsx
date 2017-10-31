@@ -57,7 +57,7 @@ class TrackerGroupDevices extends React.Component {
 
       this.setState( {
 
-        sun: values[ 1 ],
+        sun: Math.round( values[ 1 ] * 100 ) / 100,
         temperature: values[ 2 ],
         humidity: values[ 3 ]
       

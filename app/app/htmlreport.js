@@ -175,31 +175,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	constructor(props) {
 		super(props);
 		this.state = {};
-		this.savePDF = this.savePDF.bind(this);
-	}
-
-	savePDF() {
-
-		dialog.showSaveDialog({
-
-			message: "Save the report for the device \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + ".itx"
-
-		}, fileName => {
-
-			__WEBPACK_IMPORTED_MODULE_4_html_pdf___default.a.create(document.documentElement.outerHTML, {
-				format: 'A4',
-				orientation: 'landscape',
-				base: "file://" + __dirname + "/"
-
-			}).toFile(fileName, function (err, res) {
-
-				if (err) return console.log(err);
-				console.log(res); // { filename: '/app/businesscard.pdf' }
-			});
-
-			//		fs.writeFileSync( fileName, outputfile.build() );
-		});
+		//		this.savePDF = this.savePDF.bind( this );
 	}
 
 	close() {
@@ -216,35 +192,50 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 			return;
 		}
 
-		const graph = this.graphStability;
+		let numGraphs = 4;
+		if (this.props.config.humidity) {
+			numGraphs++;
+		}
+		if (this.props.config.temperature) {
+			numGraphs++;
+		}
 
-		graph.resize(450, 550);
+		const graph = this.graphStability;
+		const span = 1 / (numGraphs + 1);
+
+		graph.resize(650, 750);
 
 		graph.getBottomAxis().setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
 
-		graph.getLeftAxis(0).setLabel("Efficiency").setUnit("%").setSpan(0.75, 1.00).setUnitWrapper("(", ")").gridsOff().setLineAt([0]).setNbTicksSecondary(0);
+		graph.getLeftAxis(0).setLabel("Efficiency").setUnit("%").setSpan(1 - 2 * span, 1.00 - 0 * span).setUnitWrapper("(", ")").forceMin(0).setLineAt([0]).setNbTicksSecondary(5);
 
 		graph.newSerie("efficiency").setLabel("PCE").autoAxis().setYAxis(graph.getLeftAxis(0)).setLineColor("#1f1fae").setLineWidth(2).setWaveform(data.efficiency);
 
-		graph.getLeftAxis(1).setLabel("Vmpp").setUnit("V").setSpan(0.6, 0.73).setUnitWrapper("(", ")").gridsOff().setLineAt([0]).setNbTicksSecondary(0);
+		graph.getLeftAxis(1).setLabel("Vmpp").setUnit("V").setSpan(1 - 3 * span, 1.00 - 2 * span - 0.01).setUnitWrapper("(", ")").setLineAt([0]).forceMin(0).setNbTicksSecondary(5);
 
 		graph.newSerie("Voltage").autoAxis().setYAxis(graph.getLeftAxis(1)).setLineColor("#1f8eae").setLineWidth(2).setWaveform(data.voltage);
 
-		graph.getLeftAxis(2).setLabel("Jmpp").setUnit("A").setSpan(0.45, 0.58).setUnitWrapper("(", ")").gridsOff().setScientific(true).setUnitDecade(true).setLineAt([0]).setNbTicksSecondary(0);
+		graph.getLeftAxis(2).setLabel("Jmpp").setUnit("A").setSpan(1 - 4 * span, 1.00 - 3 * span - 0.01).setUnitWrapper("(", ")").gridsOff().forceMin(0).setScientific(true).setUnitDecade(true).setLineAt([0]).setNbTicksSecondary(5);
 
 		graph.newSerie("Current").autoAxis().setYAxis(graph.getLeftAxis(2)).setLineColor("#1fae76").setLineWidth(2).setWaveform(data.current);
 
-		graph.getLeftAxis(3).setLabel("Sun").setUnit("-").setSpan(0.3, 0.43).setUnitWrapper("(", ")").gridsOff().forceMin(0).setLineAt([0]).setNbTicksSecondary(0);
+		graph.getLeftAxis(3).setLabel("Irradiance").setUnit("mW cm^-2").setSpan(1 - 5 * span, 1.00 - 4 * span - 0.01).setUnitWrapper("(", ")").gridsOff().forceMin(0).setLineAt([0]).setNbTicksSecondary(0);
 
 		graph.newSerie("sun").autoAxis().setLabel("Sun").setYAxis(graph.getLeftAxis(3)).setLineColor("#7aae1f").setLineWidth(2).setWaveform(data.sun);
 
-		graph.getLeftAxis(4).setLabel("Humid.").setUnit("%").setSpan(0.15, 0.28).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(100).setLineAt([0]).setNbTicksSecondary(0);
+		if (this.props.config.humidity) {
 
-		graph.newSerie("humidity").autoAxis().setLabel("Hum.").setYAxis(graph.getLeftAxis(4)).setLineColor("#ae9b1f").setLineWidth(2).setWaveform(data.humidity);
+			graph.getLeftAxis(4).setLabel("Humid.").setUnit("%").setSpan(1 - 6 * span, 1.00 - 5 * span - 0.01).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(100).setLineAt([0]).setNbTicksSecondary(0);
 
-		graph.getLeftAxis(5).setLabel("Temp.").setUnit("°C").setSpan(0.0, 0.13).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(90).setLineAt([0]).setNbTicksSecondary(0);
+			graph.newSerie("humidity").autoAxis().setLabel("Hum.").setYAxis(graph.getLeftAxis(4)).setLineColor("#ae9b1f").setLineWidth(2).setWaveform(data.humidity);
+		}
 
-		graph.newSerie("temperature").autoAxis().setLabel("Temp.").setYAxis(graph.getLeftAxis(5)).setLineColor("#ae441f").setLineWidth(2).setWaveform(data.temperature);
+		if (this.props.config.temperature) {
+
+			graph.getLeftAxis(5).setLabel("Temp.").setUnit("°C").setSpan(1 - 7 * span, 1.00 - 6 * span - 0.01).setUnitWrapper("(", ")").gridsOff().forceMin(0).forceMax(90).setLineAt([0]).setNbTicksSecondary(0);
+
+			graph.newSerie("temperature").autoAxis().setLabel("Temp.").setYAxis(graph.getLeftAxis(5)).setLineColor("#ae441f").setLineWidth(2).setWaveform(data.temperature);
+		}
 
 		graph.makeLegend({ isSerieHideable: false, frame: false, paddingTop: 5, paddingBottom: 0 }).setAutoPosition("bottom");
 		graph.updateLegend();
@@ -260,7 +251,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 		const graph = this.graphJV;
 
-		graph.resize(300, 140);
+		graph.resize(420, 240);
 
 		graph.getBottomAxis().setLabel("Voltage").setUnit("V").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
 
@@ -377,7 +368,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 				waveVoltage.setUnit("V");
 				waveCurrent.setUnit("mA cm-2");
 
-				waveSun.setUnit("-");
+				waveSun.setUnit("mW cm-2");
 				waveTemperature.setUnit("°C");
 				waveHumidity.setUnit("%");
 
@@ -486,7 +477,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 							time: result.series[0].values[0][0],
 							ellapsed: Math.round((new Date(result.series[0].values[0][0]) - new Date(timefrom)) / 1000 / 3600 * 10) / 10,
 							waveform: waveform,
-							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_5__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), 100, true)
+							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_5__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), result.series[0].values[0][2] * 1000, true)
 						};
 					});
 				});
@@ -877,7 +868,11 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 								{ className: "col-xs-2 color-series-style-" + index },
 								isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
 							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: "col-xs-2 color-series-style-" + index }),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: "col-xs-2 color-series-style-" + index },
+								isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
+							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
 								{ className: "col-xs-2 color-series-style-" + index },
@@ -892,7 +887,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 					}),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { ref: el => this.domJV = el })
 				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-xs-8', ref: el => this.domStability = el })
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-xs-9', ref: el => this.domStability = el })
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
@@ -996,6 +991,7 @@ let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) =
     jsc: jsc / area * 1000 * (inverted ? 1 : -1),
     voc: voc,
     ff: ff * 100,
+    powerin: powin,
     power: maxpower * 1000,
     pce: pce,
     jmax: 0,

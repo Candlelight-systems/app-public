@@ -2,9 +2,6 @@ import React from 'react';
 import CellFormTracking from "./cellformtracking.jsx"
 import CellFormIV from "./cellformjv.jsx"
 
-import {remote} from "electron"
-	
-const dialog = remote.dialog;
 
 class CellForm extends React.Component {
 	
@@ -60,7 +57,6 @@ class CellForm extends React.Component {
 	}
 
 	render() {	 
-console.log( this.state.connection );
 		return (
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">

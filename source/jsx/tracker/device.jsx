@@ -37,10 +37,11 @@ const initialState = {
 	change: false,
 	showDetails: false,
 
-	_last_iv_time: 0,
+	_last_iv_time: false,
 	_last_iv: null,
 	_fist_iv: null,
 
+	ivCurves: [],
 	serverState: {}
 };
 
@@ -363,27 +364,14 @@ class TrackerDevice extends React.Component {
 		this.wrapper.classList.remove("show-second");	
 	}
 
-	readIVs( results ) {
 
-		
-		return results.map( ( result, index ) => {
+	readIV( value ) {
 
-			return this.readIV( result );
-			
-			/*if( index == 1 ) {
-				ivtime = new Date( esult.series[ 0 ].values[ 0 ][ 0 ] )
-			}*/
-			
-		} );
-	}
-
-	readIV( result ) {
-
-		if( ! result.series ) {
+		if( ! value ) {
 			return;
 		}
 
-		let iv = result.series[ 0 ].values[ 0 ][ 1 ].replace("\"", "").split(",").map( (el) => parseFloat( el ) ),
+		let iv = value.replace("\"", "").split(",").map( (el) => parseFloat( el ) ),
 			wave = Graph.newWaveform();
 
 		for( var i = 0; i < iv.length - 1; i += 2 ) {
@@ -435,11 +423,13 @@ class TrackerDevice extends React.Component {
 		let queries = [
 		"SELECT time, efficiency FROM \"" + serverState.measurementName + "\" ORDER BY time ASC limit 1",
 		"SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM \"" + serverState.measurementName + "\" ORDER BY time DESC limit 1",
-		"SELECT time, iv FROM \"" + serverState.measurementName + "_iv\" ORDER BY time DESC limit 1",
-		"SELECT voc FROM \"" + serverState.measurementName + "_voc\" ORDER BY time DESC LIMIT 1",
+		`SELECT time, iv FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
+		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,
 		"SELECT jsc FROM \"" + serverState.measurementName + "_jsc\" ORDER BY time DESC LIMIT 1"
 		];
 		
+		let newIvCurves = false;
+
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
 			
 			if( ! results[ 0 ].series ) {
@@ -452,8 +442,24 @@ class TrackerDevice extends React.Component {
 				timeto_date = new Date( timeto ),
 				last_iv;
 
-			if( results[ 2 ].series ) {
-				last_iv = new Date( results[ 2 ].series[ 0 ].values[ 0 ][ 0 ] );
+
+			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
+				
+console.log( results[ 2 ].series[ 0 ].values.length );
+				newState.ivCurves = this.state.ivCurves.splice( 0 );
+				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
+
+						
+					if( index == results[ 2 ].series[ 0 ].values.length - 1 ) {
+						newState._last_iv_time = value[ 0 ];
+					}	
+
+					return {
+						time: new Date( value[ 0 ] ),
+						iv: this.readIV( value[ 1 ] )
+					}
+
+				} ) );
 			}
 
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
@@ -522,11 +528,11 @@ class TrackerDevice extends React.Component {
 			}
 
 
-			if( results[ 3 ].series && this.state.serverState.tracking_mode == 1 ) {
+			if( results[ 3 ] && results[ 3 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.voc = Math.round( results[ 3 ].series[ 0 ].values[ 0 ][ 1 ] * 1000 ) / 1000;
 			}	
 
-			if( results[ 4 ].series && this.state.serverState.tracking_mode == 1 ) {
+			if( results[ 4 ] && results[ 4 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.jsc = Math.round( results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000 * 1000 ) / 1000;
 			}
 
@@ -629,24 +635,6 @@ class TrackerDevice extends React.Component {
 				newState.data_IV = waveIV;
 
 			} ) );
-
-
-
-			if( ! this.state._first_iv && last_iv ) {
-
-				query = "SELECT time, iv FROM \"" + serverState.measurementName + "_iv\" ORDER BY time ASC limit 1";
-				queue.push( influxquery( query, db, this.props.configDB ).then( this.readIVs.bind( this ) ).then( ( iv ) => {
-
-					newState._first_iv = iv[ 0 ];
-					
-				}) );
-			}
-
-			if( last_iv && last_iv.getTime() > this.state._last_iv_time ) {
-
-				newState._last_iv_time = last_iv.getTime();
-				newState._last_iv = this.readIV( results[ 2 ] );
-			}
 
 
 
@@ -958,10 +946,10 @@ class TrackerDevice extends React.Component {
 					
 						<StatusIV 
 							width="500"
-							height="220"
+							height="240"
 							shown={this.state.showDetails} 
 							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
-							data={ [ this.state._first_iv, this.state._last_iv ] } 
+							data={ this.state.ivCurves } 
 							dataIV={ this.state.data_IV } 
 							voltage={ this.state.voltage } 
 							current={ this.state.current } 

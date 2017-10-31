@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,40 +71,53 @@ module.exports = require("react");
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(2);
-
+module.exports = jQuery;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(3);
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_influxform_jsx__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_influxform_jsx__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__jsx_influx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
 
 
 
 
-const { ipcRenderer } = __webpack_require__(6);
 
-ipcRenderer.on("loadForm", (event, data) => {
-	render(data);
+const dialog = __WEBPACK_IMPORTED_MODULE_4_electron__["remote"].dialog;
+
+let data;
+__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("loadForm", (event, d) => {
+
+	data = d;
+	render();
 });
 
 function onValidate(formData) {
 
-	ipcRenderer.send('validateForm', formData);
+	__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send('validateForm', formData);
 }
 
 function onClose() {
 
-	ipcRenderer.send('closeForm');
+	__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send('closeForm');
 }
 
 function pad(number) {
@@ -117,7 +130,40 @@ function pad(number) {
 
 function downloadData(measurementName, cellInfo) {
 
-	ipcRenderer.send("downloadData", cellInfo, undefined, measurementName);
+	__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send("downloadData", cellInfo, undefined, measurementName);
+}
+
+function removeData(measurementName) {
+
+	dialog.showMessageBox({
+		type: 'question',
+		message: 'Are you sure that you want to delete this measurement ?',
+		cancelId: 0,
+		defaultId: 0,
+		title: "Delete this measurement ?",
+		buttons: ["Cancel", "Yes"]
+	}, async index => {
+
+		if (index == 1) {
+
+			try {
+
+				await fetch(`http://${data.config.trackerHost}:${data.config.trackerPort}/dropMeasurement?measurementName=${measurementName}`);
+				await Object(__WEBPACK_IMPORTED_MODULE_3__jsx_influx__["a" /* query */])(`DROP MEASUREMENT ${measurementName};`);
+				render();
+			} catch (e) {
+
+				dialog.showMessageBox({
+					type: 'error',
+					message: `Error in removing the measurement. The error was :${e.toString()}. Make sure that the database and the server can be accessed.`,
+					cancelId: 0,
+					defaultId: 0,
+					title: "Error",
+					buttons: ["Ok"]
+				});
+			}
+		}
+	});
 }
 
 function formatDate(dateVal) {
@@ -125,16 +171,13 @@ function formatDate(dateVal) {
 	return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 
-async function render(props) {
+async function render() {
 
-	console.log(props);
-	let json = await fetch("http://" + props.config.trackerHost + ":" + props.config.trackerPort + "/getAllMeasurements", {
+	let json = await fetch("http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/getAllMeasurements", {
 
 		method: 'GET'
 
 	}).then(response => response.json());
-
-	console.log(json);
 
 	let jsonArray = [];
 	for (var i in json) {
@@ -149,8 +192,6 @@ async function render(props) {
 
 		return a.startDate - b.startDate;
 	});
-
-	console.log(jsonArray);
 
 	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 		'div',
@@ -174,6 +215,11 @@ async function render(props) {
 							'button',
 							{ className: 'btn btn-sm btn-primary', onClick: () => downloadData(val.measurementName, val.cellInfo) },
 							'Download data'
+						),
+						val.endDate && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'button',
+							{ className: 'btn btn-sm btn-danger', onClick: () => removeData(val.measurementName) },
+							'Delete data'
 						)
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -192,7 +238,7 @@ async function render(props) {
 						' ',
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glypicon-arrow-left' }),
 						' ',
-						val.endDate ? formatDate(val.endDate) : 'Now'
+						val.endDate ? formatDate(val.endDate) : '(Running)'
 					)
 				);
 			})
@@ -201,19 +247,19 @@ async function render(props) {
 }
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
 
 
@@ -378,13 +424,48 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* unused harmony default export */ var _unused_webpack_default_export = (AppForm);
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports) {
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = jQuery;
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return query; });
+/* unused harmony export ping */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
+
+
+
+
+let query = function (query, db, cfg) {
+
+	return new Promise((resolver, rejecter) => {
+
+		let params = {};
+		params.q = query;
+		params.db = db;
+		params.u = cfg.username;
+		params.p = cfg.password;
+
+		__WEBPACK_IMPORTED_MODULE_0_jquery___default.a.get("http://" + cfg.host + ":" + cfg.port + "/query", params, function (results) {
+			resolver(results.results);
+		});
+	});
+};
+
+let ping = function (cfg) {
+	return fetch("http://" + cfg.host + ":" + cfg.port + "/ping", { method: 'GET' });
+};
 
 /***/ }),
-/* 6 */
+/* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = require("electron");

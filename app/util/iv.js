@@ -23,6 +23,7 @@ export let getIVParameters = ( waveform, powerwaveform, area, powin, inverted = 
       jsc: jsc / area * 1000 * ( inverted ? 1 : -1 ),
       voc: voc,
       ff: ff * 100,
+      powerin: powin,
       power: maxpower * 1000,
       pce: pce,
       jmax: 0,

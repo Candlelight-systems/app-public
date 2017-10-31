@@ -496,7 +496,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
   render() {
 
     let content;
-    console.log(this.state);
+
     if (this.state.groups) {
 
       var groupsDoms = this.state.groups.map((group, i) => {
@@ -704,7 +704,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
       this.setState({
 
-        sun: values[1],
+        sun: Math.round(values[1] * 100) / 100,
         temperature: values[2],
         humidity: values[3]
 
@@ -1173,10 +1173,11 @@ const initialState = {
 	change: false,
 	showDetails: false,
 
-	_last_iv_time: 0,
+	_last_iv_time: false,
 	_last_iv: null,
 	_fist_iv: null,
 
+	ivCurves: [],
 	serverState: {}
 };
 
@@ -1511,25 +1512,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 		this.wrapper.classList.remove("show-second");
 	}
 
-	readIVs(results) {
+	readIV(value) {
 
-		return results.map((result, index) => {
-
-			return this.readIV(result);
-
-			/*if( index == 1 ) {
-   	ivtime = new Date( esult.series[ 0 ].values[ 0 ][ 0 ] )
-   }*/
-		});
-	}
-
-	readIV(result) {
-
-		if (!result.series) {
+		if (!value) {
 			return;
 		}
 
-		let iv = result.series[0].values[0][1].replace("\"", "").split(",").map(el => parseFloat(el)),
+		let iv = value.replace("\"", "").split(",").map(el => parseFloat(el)),
 		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
 		for (var i = 0; i < iv.length - 1; i += 2) {
@@ -1576,7 +1565,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				break;
 		}
 
-		let queries = ["SELECT time, efficiency FROM \"" + serverState.measurementName + "\" ORDER BY time ASC limit 1", "SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM \"" + serverState.measurementName + "\" ORDER BY time DESC limit 1", "SELECT time, iv FROM \"" + serverState.measurementName + "_iv\" ORDER BY time DESC limit 1", "SELECT voc FROM \"" + serverState.measurementName + "_voc\" ORDER BY time DESC LIMIT 1", "SELECT jsc FROM \"" + serverState.measurementName + "_jsc\" ORDER BY time DESC LIMIT 1"];
+		let queries = ["SELECT time, efficiency FROM \"" + serverState.measurementName + "\" ORDER BY time ASC limit 1", "SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM \"" + serverState.measurementName + "\" ORDER BY time DESC limit 1", `SELECT time, iv FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, "SELECT jsc FROM \"" + serverState.measurementName + "_jsc\" ORDER BY time DESC LIMIT 1"];
+
+		let newIvCurves = false;
 
 		Object(__WEBPACK_IMPORTED_MODULE_4__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
 
@@ -1590,8 +1581,21 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 			    timeto_date = new Date(timeto),
 			    last_iv;
 
-			if (results[2].series) {
-				last_iv = new Date(results[2].series[0].values[0][0]);
+			if (results[2].series && results[2].series[0]) {
+
+				console.log(results[2].series[0].values.length);
+				newState.ivCurves = this.state.ivCurves.splice(0);
+				newState.ivCurves = newState.ivCurves.concat(results[2].series[0].values.map((value, index) => {
+
+					if (index == results[2].series[0].values.length - 1) {
+						newState._last_iv_time = value[0];
+					}
+
+					return {
+						time: new Date(value[0]),
+						iv: this.readIV(value[1])
+					};
+				}));
 			}
 
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
@@ -1659,11 +1663,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				changeUnit = " &#951;% / minute";
 			}
 
-			if (results[3].series && this.state.serverState.tracking_mode == 1) {
+			if (results[3] && results[3].series && this.state.serverState.tracking_mode == 1) {
 				newState.voc = Math.round(results[3].series[0].values[0][1] * 1000) / 1000;
 			}
 
-			if (results[4].series && this.state.serverState.tracking_mode == 1) {
+			if (results[4] && results[4].series && this.state.serverState.tracking_mode == 1) {
 				newState.jsc = Math.round(results[4].series[0].values[0][1] / serverState.cellArea * 1000 * 1000) / 1000;
 			}
 
@@ -1762,21 +1766,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				newState.data_humidity = waveHumidity;
 				newState.data_IV = waveIV;
 			}));
-
-			if (!this.state._first_iv && last_iv) {
-
-				query = "SELECT time, iv FROM \"" + serverState.measurementName + "_iv\" ORDER BY time ASC limit 1";
-				queue.push(Object(__WEBPACK_IMPORTED_MODULE_4__influx__["b" /* query */])(query, db, this.props.configDB).then(this.readIVs.bind(this)).then(iv => {
-
-					newState._first_iv = iv[0];
-				}));
-			}
-
-			if (last_iv && last_iv.getTime() > this.state._last_iv_time) {
-
-				newState._last_iv_time = last_iv.getTime();
-				newState._last_iv = this.readIV(results[2]);
-			}
 
 			return Promise.all(queue).then(() => {
 
@@ -2336,10 +2325,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 					{ className: "col-sm-6" },
 					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
 						width: "500",
-						height: "220",
+						height: "240",
 						shown: this.state.showDetails,
 						key: this.props.instrumentId + this.props.chanId + "_iv",
-						data: [this.state._first_iv, this.state._last_iv],
+						data: this.state.ivCurves,
 						dataIV: this.state.data_IV,
 						voltage: this.state.voltage,
 						current: this.state.current,
@@ -2485,8 +2474,8 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			legend.setAutoPosition("bottom");
 			legend.update();
 
-			this.graph.getRightAxis(0, { hideWhenNoSeriesShown: true }).setLabel('Sun').setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
-			this.graph.getRightAxis(1, { hideWhenNoSeriesShown: true }).setLabel('Temperature').setUnit("&#xb0;C").setUnitWrapper("(", ")").setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
+			this.graph.getRightAxis(0, { hideWhenNoSeriesShown: true }).setLabel('Sun').forceMin(0).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
+			this.graph.getRightAxis(1, { hideWhenNoSeriesShown: true }).setLabel('Temperature').setUnit("&#xb0;C").forceMin(0).setUnitWrapper("(", ")").setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
 
 			this.graph.getRightAxis(2, { hideWhenNoSeriesShown: true }).setLabel('Humidity').setUnit("%").setUnitWrapper("(", ")").forceMin(0).forceMax(100).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
 
@@ -2799,10 +2788,10 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.graph = new __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default.a(this.graphDOM, {
 
-			paddingTop: 10,
-			paddingLeft: 25,
-			paddingRight: 25,
-			paddingBottom: 10,
+			paddingTop: 5,
+			paddingLeft: 0,
+			paddingRight: 0,
+			paddingBottom: 5,
 
 			closeColor: "#303030"
 		});
@@ -2820,84 +2809,95 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.graph.getXAxis().setLabel("Voltage").setUnitWrapper("(", ")").setUnit("V");
 
-		this.serieIV = this.graph.newSerie("iv_time");
-		this.serieIV.autoAxes();
-		this.serieIV.setLineColor("#be2d2d").setLineWidth(2);
-
-		this.serie[0] = this.graph.newSerie("iv_0");
-		this.serie[0].setLineColor("#1b18ae");
-		this.serie[0].autoAxis();
-		this.serie[0].setLineWidth(2);
-
-		this.serie[1] = this.graph.newSerie("iv_0_pwr");
-		this.serie[1].setLineColor("#1b18ae");
-		this.serie[1].setLineStyle(2);
-		this.serie[1].autoAxis();
-		this.serie[1].setLineWidth(2);
-
-		this.serie[2] = this.graph.newSerie("iv_1");
-		this.serie[2].setLineColor("#0e871a");
-		this.serie[2].autoAxis();
-		this.serie[2].setLineWidth(2);
-
-		this.serie[3] = this.graph.newSerie("iv_1_pwr");
-		this.serie[3].setLineColor("#0e871a");
-		this.serie[3].setLineStyle(2);
-		this.serie[3].autoAxis();
-		this.serie[3].setLineWidth(2);
-
-		this.ellipse = this.graph.newShape("ellipse");
-		this.ellipse.setR(3, 3);
-
-		this.ellipse.setFillColor('#be2d2d');
-		this.ellipse.setStrokeColor('#303030');
-		this.ellipse.draw();
+		var legend = this.graph.makeLegend();
+		legend.notHideable();
+		legend.setAutoPosition("right");
+		legend.update();
 	}
 
 	componentDidUpdate() {
 
-		if (this.graph && this.props.data) {
-			let wv;
+		this.props.data.sort((a, b) => {
+			return a.time - b.time;
+		});
 
-			if (this.props.data[0]) {
-				wv = this.props.data[0]; //wv = Graph.newWaveform().setData( this.props.data[ 0 ] )
-				this.serie[0].setWaveform(wv);
-				this.serie[1].setWaveform(wv.duplicate().math((y, x) => y * x));
+		this.graph.resetSeries();
+
+		let color = 'red';
+		let maxY = 0;
+
+		let indices = [];
+
+		const firstTime = this.props.data[0].time;
+		const lastTime = this.props.data[this.props.data.length - 1].time;
+		const idealInterval = (lastTime - firstTime) / 4; // 5 iv curves
+
+		let lastInterval = 0;
+
+		this.props.data.forEach((data, index) => {
+
+			if (data.time - lastInterval > idealInterval) {
+				lastInterval = data.time;
+				indices.push(index);
+			}
+		});
+
+		indices.push(this.props.data.length - 1);
+
+		const colors = ['#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18'];
+		let k = 0;
+
+		this.props.data.forEach((data, index) => {
+
+			if (indices.indexOf(index) == -1) {
+				return;
 			}
 
-			if (this.props.data[1]) {
-				wv = this.props.data[1]; //Graph.newWaveform().setData( this.props.data[ 1 ] )
-				this.serie[2].setWaveform(wv);
-				this.serie[3].setWaveform(wv.duplicate().math((y, x) => y * x));
-			}
+			let s = this.graph.newSerie("iv_" + index);
+			s.setLabel(Math.round((data.time - firstTime) / 1000 / 3600 * 10) / 10 + "h");
+			s.setLineColor(colors[k]);
+			s.autoAxis();
+			s.setLineWidth(2);
 
-			if (this.props.dataIV) {
-				this.serieIV.setWaveform(this.props.dataIV);
-			}
+			let s2 = this.graph.newSerie("power_" + index);
+			s2.setLineColor(colors[k]);
+			s2.setLineStyle(2);
+			s2.excludedFromLegend = true;
+			s2.autoAxis();
+			s2.setLineWidth(2);
 
-			this.graph.autoscaleAxes();
-			this.graph.show();
+			s.setWaveform(data.iv);
+			s2.setWaveform(data.iv.duplicate().math((y, x) => y * x));
 
-			if (this.props.data[0]) {
-				this.graph.getYAxis().forceMin(-this.props.data[0].getMaxY() * 0.5);
-			}
+			maxY = Math.max(maxY, data.iv.getMaxY());
+			k++;
+		});
 
-			this.ellipse.setPosition({ x: this.props.voltage, y: this.props.current / 1000 });
-			this.ellipse.redraw();
-			this.graph.autoscaleAxes();
-			this.graph.draw();
+		this.serieIV = this.graph.newSerie("iv_time");
+		this.serieIV.autoAxes();
+		this.serieIV.setLineColor("black").setLineWidth(2);
+
+		this.ellipse = this.graph.newShape("ellipse");
+		this.ellipse.setR(3, 3);
+
+		this.ellipse.setFillColor('black');
+		this.ellipse.setStrokeColor('black');
+		this.ellipse.draw();
+
+		if (this.props.dataIV) {
+			this.serieIV.setWaveform(this.props.dataIV);
 		}
 
-		if (this.graph && !this.props.data) {
+		this.graph.autoscaleAxes();
+		this.graph.show();
 
-			this.serie.forEach(serie => {
-				serie.setWaveform(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-			});
+		this.graph.getYAxis().forceMin(-maxY * 0.5);
+		this.ellipse.setPosition({ x: this.props.voltage, y: this.props.current / 1000 });
+		this.ellipse.redraw();
 
-			this.serieIV.setWaveform(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-			this.graph.draw();
-			this.graph.hide();
-		}
+		this.graph.autoscaleAxes();
+		this.graph.draw();
+		this.graph.updateLegend();
 	}
 
 	render() {

@@ -254,7 +254,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			var str = [];
 
 			for (var i = 0; i < this.state.photodiodes.length; i++) {
-				console.log('here', this.state.photodiodes[i].ref, this.state['mon_' + this.state.photodiodes[i].ref]);
+
 				if (this.state['mon_' + this.state.photodiodes[i].ref]) {
 					console.log('there');
 					str.push(this.state.photodiodes[i].ref);
@@ -266,7 +266,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					str.push(this.state.channels[i].chanId);
 				}
 			}
-			console.log(str.length);
+
 			if (str.length == 0) {
 				this.setRequestTimeout();
 				return;

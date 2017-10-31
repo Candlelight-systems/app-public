@@ -141,6 +141,7 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleSelectChange = this.handleSelectChange.bind(this);
 		this.savePDF = this.savePDF.bind(this);
+		this.printPDF = this.printPDF.bind(this);
 	}
 
 	validateConfig() {
@@ -151,7 +152,11 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 	}
 
 	savePDF() {
-		__WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("htmlReport.savePDF");
+		__WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("htmlReport.savePDF", { cellName: this.props.cellInfo.cellName });
+	}
+
+	printPDF() {
+		__WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("htmlReport.printPDF", { cellName: this.props.cellInfo.cellName });
 	}
 
 	close() {
@@ -249,6 +254,34 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 					"div",
 					{ className: "form-group" },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "col-sm-13 checkbox" },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"label",
+							null,
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state.humidity, name: "humidity", onClick: this.handleInputChange }),
+							" Humidity"
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "form-group" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "col-sm-13 checkbox" },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"label",
+							null,
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state.temeprature, name: "temperature", onClick: this.handleInputChange }),
+							" Temperature"
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "form-group" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"label",
 						{ className: "col-sm-3" },
 						"Comment"
@@ -296,6 +329,11 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
 				{ className: "btn-group pull-right" },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"button",
+					{ type: "button", className: "btn btn-primary", onClick: this.printPDF },
+					"Print PDF"
+				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"button",
 					{ type: "button", className: "btn btn-primary", onClick: this.savePDF },

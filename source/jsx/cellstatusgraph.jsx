@@ -92,11 +92,13 @@ class statusGraph extends GraphComponent {
 			this.graph
 				.getRightAxis( 0, { hideWhenNoSeriesShown: true } )
 				.setLabel('Sun')
+				.forceMin( 0 )
 				.setTickPosition( Graph.TICKS_OUTSIDE );
 			this.graph
 				.getRightAxis( 1, { hideWhenNoSeriesShown: true } )
 				.setLabel('Temperature')
 				.setUnit("&#xb0;C")
+				.forceMin( 0 )
 				.setUnitWrapper( "(", ")" )
 				.setTickPosition( Graph.TICKS_OUTSIDE );
 

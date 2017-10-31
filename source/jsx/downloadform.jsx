@@ -14,9 +14,7 @@ class DownloadForm extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.handleInputChange = this.handleInputChange.bind(this);
-		this.downloadTrack = this.downloadTrack.bind( this );
-		this.downloadIV = this.downloadIV.bind( this );
-		this.downloadVocJsc = this.downloadVocJsc.bind( this );
+		this.makeDownload = this.makeDownload.bind( this );
 		this.downloadPDF = this.downloadPDF.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
@@ -43,21 +41,50 @@ class DownloadForm extends React.Component {
 
 	}
 
-	async downloadTrack() {
+	async makeDownload( track = true, jv = true, vocjsc = true ) {
 
-		let data = await this.getTrackData();
-
-		var outputfile;
+		let outputfile;
 
 		if( this.state.dl_format == "itx" ) {
 			outputfile = new ITXBuilder();	
 		} else {
 			outputfile = new CSVBuilder();	
 		}
-		
+			
+		let fileappend = [];
+		if( track ) {
+			await this.downloadTrack( outputfile );
+			fileappend.push( "track" );
+		}	
+
+		if( jv ) {
+			await this.downloadIV( outputfile );
+			fileappend.push( "jv" );
+		}	
+
+		if( vocjsc ) {
+			await this.downloadVocJsc( outputfile );
+			fileappend.push( "vocjsc" );
+		}	
+
+		dialog.showSaveDialog( {
+
+			message: "Save the data for the cell \"" + this.props.cellInfo.cellName + "\"",
+			defaultPath: `~/${ this.props.cellInfo.cellName  }_${ fileappend.join("_") }.${ this.state.dl_format }`
+
+		}, ( fileName ) => {
+
+			fs.writeFileSync(fileName, outputfile.build() );
+		} );	
+	}
+
+
+	async downloadTrack( outputfile ) {
+
+		let data = await this.getTrackData();
 		outputfile.addWaveform( data.efficiency, { 
 			waveName: "Efficiency",
-			waveNameX: "Time_h"
+			waveNameX: "Time_MPP_h"
 		} );
 
 		outputfile.addWaveform( data.voltage, { 
@@ -85,31 +112,14 @@ class DownloadForm extends React.Component {
 			noXWave: true
 		} );
 
-		dialog.showSaveDialog( {
-
-			message: "Save the tracking data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_track.itx"
-
-		}, ( fileName ) => {
-
-			fs.writeFileSync(fileName, outputfile.build() );
-		} );
 	}
 
 
 
-	async downloadVocJsc() {
+	async downloadVocJsc( outputfile ) {
 
 		let data = await this.getVocJscData();
-
-		var outputfile;
-
-		if( this.state.dl_format == "itx" ) {
-			outputfile = new ITXBuilder();	
-		} else {
-			outputfile = new CSVBuilder();	
-		}
-		console.log( data );
+		
 		outputfile.addWaveform( data.waveVoc, { 
 			waveName: "Voc",
 			waveNameX: "Time_voc_h"
@@ -120,32 +130,13 @@ class DownloadForm extends React.Component {
 			waveNameX: "Time_jsc_h"
 		} );
 
-
-		dialog.showSaveDialog( {
-
-			message: "Save the Voc and Jsc data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_vocjsc.itx"
-
-		}, ( fileName ) => {
-
-			fs.writeFileSync(fileName, outputfile.build() );
-		} );
 	}
 
 
 
-	async downloadIV() {
+	async downloadIV( outputfile ) {
 
 		let data = await this.getJVData();
-
-		var outputfile;
-
-		if( this.state.dl_format == "itx" ) {
-			outputfile = new ITXBuilder();	
-		} else {
-			outputfile = new CSVBuilder();	
-		}
-		
 		data[ 0 ].map( ( data ) => {
 
 			if( ! data.wave ) {
@@ -158,16 +149,6 @@ class DownloadForm extends React.Component {
 			} );
 		} );
 		
-
-		dialog.showSaveDialog( {
-
-			message: "Save the JV data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: "~/" + this.props.cellInfo.cellName + "_jv.itx"
-
-		}, ( fileName ) => {
-
-			fs.writeFileSync(fileName, outputfile.build() );
-		} );
 	}
 
 /*
@@ -497,12 +478,12 @@ class DownloadForm extends React.Component {
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
 
-					<h3>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>channel { this.props.chanId } )</span> }</h3>
+					<h3>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h3>
 
 					<div className="form-group">
 						<label className="col-sm-3">Format</label>
 						<div className="col-sm-9">
-							<select name="dl_track_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
+							<select name="dl_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
 								<option value="csv">Comma separated (.csv)</option>
 								<option value="itx">Igor text file (.itx)</option>
 							</select>
@@ -528,12 +509,11 @@ class DownloadForm extends React.Component {
 						</div>
 						<div className="col-sm-9">
 							<div className="btn-group">
-								<button  className="btn btn-primary"  type="button" onClick={ this.downloadTrack }>Download MPP</button>
-								<button  className="btn btn-primary"  type="button" onClick={ this.downloadVocJsc }>Download Voc and Jsc</button>
-								<button className="btn btn-primary" type="button" onClick={ this.downloadIV }>Download JV</button>
+								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
+								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, true, false ) } }>Download JV</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, true, true ) } }>Download All</button>
 							</div>
-
-
 						</div>
 					</div>
 
