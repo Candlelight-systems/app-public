@@ -301,17 +301,31 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
   }
 
   readConfig() {
-    const config = JSON.parse(__WEBPACK_IMPORTED_MODULE_2_fs___default.a.readFileSync(__dirname + '/../config.json'));
-    config.instruments = config.instruments || [];
-    return config;
+
+    let cfg;
+
+    try {
+
+      cfg = JSON.parse(__WEBPACK_IMPORTED_MODULE_2_fs___default.a.readFileSync(__dirname + '/../config.json'));
+
+      cfg.instruments = cfg.instruments || [];
+    } catch (e) {
+      return null;
+    }
+
+    return cfg;
   }
 
   render() {
 
     const config = this.readConfig();
 
-    let instruments = config.instruments.map(config => {
+    if (config === null) {
+      return null;
+    }
 
+    let instruments = config.instruments.map(config => {
+      console.log(config.trackerHost);
       let connected = !!this.state['status_' + config.trackerHost];
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

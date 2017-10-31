@@ -101,7 +101,16 @@ function doMenu() {
 
 
 function saveConfig( ) {
-  fs.writeFileSync( configPath, JSON.stringify( config, undefined, "\t" ) ); 
+  fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
+
+    if( error ) {
+      reportError( error );
+    } else {
+      config = JSON.parse( fs.readFileSync( configPath ) );    
+    }
+    
+  }); 
+  
 }
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -386,6 +395,21 @@ function removeInstrument( event, trackerHost ) {
   } );
 }
 
+function reportError( e ) {
+
+
+  dialog.showMessageBox( {
+    type: 'error',
+    message: 'An error has happened: ' + e.toString(),
+    cancelId: 0,
+    defaultId: 0,
+    title: "Error",
+    buttons: [ "Ok" ]    
+  }, ( index ) => {
+
+  } );
+}
+
 function reloadInstruments() {
   windows[ 'instrumentList' ].webContents.send("reloadInstruments");
   doMenu();
@@ -399,10 +423,16 @@ function addInstrument() {
     resizable: false
 
   } ).then( ( result ) => {
-  
-    config.instruments.push( result );
-    saveConfig();
-    reloadInstruments();
+    
+    try {
+      config.instruments.push( result );
+      saveConfig();
+      reloadInstruments();
+    } catch( e ) {
+      reportError( e );
+    }
+
+
   }).catch( () => {} );
 
 }

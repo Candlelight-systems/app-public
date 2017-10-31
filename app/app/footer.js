@@ -272,13 +272,12 @@ class InstrumentForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 
 	componentWillReceiveProps(nextProps) {
 
-		console.log(nextProps);
 		this.setState(nextProps.formState);
 		this.edit();
 	}
 
 	componentDidMount() {
-		console.log(this.props);
+
 		if (this.props.formState.trackerHost) {
 			this.edit();
 		}

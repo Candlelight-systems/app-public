@@ -57,14 +57,13 @@ class InstrumentForm extends React.Component {
 
 	componentWillReceiveProps( nextProps ) {
 
-console.log( nextProps );
 		this.setState( nextProps.formState );
 		this.edit();
 		
 	}
 
 	componentDidMount() {
-console.log( this.props );
+
 		if( this.props.formState.trackerHost ) {
 			this.edit();
 		}

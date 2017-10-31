@@ -62,17 +62,32 @@ class InstrumentList extends React.Component {
   }
 
   readConfig() {
-    const config = JSON.parse( fs.readFileSync( __dirname + '/../config.json') );
-    config.instruments = config.instruments || [];
-    return config;
+
+    let cfg;
+
+    try {
+      
+      cfg = JSON.parse( fs.readFileSync( __dirname + '/../config.json') );
+      
+      cfg.instruments = cfg.instruments || [];
+
+    } catch( e ) {
+      return null;
+    }
+
+    return cfg;
   }
 
   render() {
 
     const config = this.readConfig();
 
-    let instruments = config.instruments.map( ( config ) => {
+    if( config === null ) {
+      return null;
+    }
 
+    let instruments = config.instruments.map( ( config ) => {
+console.log( config.trackerHost );
         let connected = !! this.state[ 'status_' + config.trackerHost ];
 
         return (
