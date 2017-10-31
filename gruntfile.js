@@ -213,9 +213,9 @@ module.exports = function(grunt) {
 
             calibratePD: 
               Object.assign( {
-               entry: [ './source/calibratePD.jsx' ],
+               entry: [ './source/calibratepd.jsx' ],
                output: {
-                   filename: 'app/app/calibratePD.js'
+                   filename: 'app/app/calibratepd.js'
                } }, webpackConfig ),
 
 

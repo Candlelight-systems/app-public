@@ -2,7 +2,6 @@ import React from 'react';
 import fs from 'fs';
 import { query as influxquery } from "./influx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
-import htmlToPDF from 'html-pdf';
 import { getIVParameters } from '../../app/util/iv'
 import { ipcRenderer } from 'electron';
 const { dialog }  = require('electron').remote;

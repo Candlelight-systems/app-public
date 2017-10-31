@@ -142,12 +142,9 @@ module.exports = require("react-dom");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__influx__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_html_pdf__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_html_pdf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_html_pdf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_util_iv__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_electron__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_electron__);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_util_iv__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_electron__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_electron__);
 
 
 
@@ -183,7 +180,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	}
 
 	componentWillUnmount() {
-		__WEBPACK_IMPORTED_MODULE_6_electron__["ipcRenderer"].removeListener("savePDF", this.savePDF);
+		__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].removeListener("savePDF", this.savePDF);
 	}
 
 	updateGraphStability(data) {
@@ -271,7 +268,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	componentDidMount() {
 		this.updateProps(this.props);
-		__WEBPACK_IMPORTED_MODULE_6_electron__["ipcRenderer"].on("savePDF", this.savePDF);
+		__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].on("savePDF", this.savePDF);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -477,7 +474,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 							time: result.series[0].values[0][0],
 							ellapsed: Math.round((new Date(result.series[0].values[0][0]) - new Date(timefrom)) / 1000 / 3600 * 10) / 10,
 							waveform: waveform,
-							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_5__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), result.series[0].values[0][2] * 1000, true)
+							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_4__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), result.series[0].values[0][2] * 1000, true)
 						};
 					});
 				});
@@ -956,12 +953,6 @@ module.exports = require("node-jsgraph/dist/jsgraph-es6");
 
 /***/ }),
 /* 10 */
-/***/ (function(module, exports) {
-
-module.exports = require("html-pdf");
-
-/***/ }),
-/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
