@@ -22,10 +22,10 @@ var modes = {
 	default: {
 
 		graphConstructor: {
-			paddingTop: 5,
-			paddingLeft: 30,
-			paddingRight: 30,
-			paddingBottom: 0
+			paddingTop: 4,
+			paddingLeft: 4,
+			paddingRight: 4,
+			paddingBottom: 2
 		}
 	}
 }
@@ -63,7 +63,7 @@ class statusGraph extends GraphComponent {
 
 
 		this.serie = this.graph.newSerie();
-		this.serie.setLineColor( "#413ca5" );
+		this.serie.setLineColor( "white" );
 		this.serie.autoAxis();
 		this.serie.setLineWidth( 2 );		
 
@@ -77,54 +77,28 @@ class statusGraph extends GraphComponent {
 
 		} else {
 
-			this.graph.getYAxis().secondaryGridOff();
+			this.graph.getXAxis().hide();
+			this.graph.getYAxis().hide();
 
 			this.graph.getYAxis()
 				.setLabel( this.props.axisLabel )
 				.setUnit( this.props.axisUnit )
 				.setUnitWrapper("(", ")");
-
-			var legend = this.graph.makeLegend();
-			legend.setAutoPosition( "bottom" );  
-			legend.update(); 
-
 			
 			this.graph
 				.getRightAxis( 0, { hideWhenNoSeriesShown: true } )
 				.setLabel('Sun')
 				.forceMin( 0 )
-				.setTickPosition( Graph.TICKS_OUTSIDE );
-			this.graph
-				.getRightAxis( 1, { hideWhenNoSeriesShown: true } )
-				.setLabel('Temperature')
-				.setUnit("&#xb0;C")
-				.forceMin( 0 )
-				.setUnitWrapper( "(", ")" )
-				.setTickPosition( Graph.TICKS_OUTSIDE );
+				.setTickPosition( Graph.TICKS_OUTSIDE )
+				.setAxisColor( 'white' )
+				.setPrimaryTicksColor( 'white' );
 
-			this.graph
-				.getRightAxis( 2, { hideWhenNoSeriesShown: true } )
-				.setLabel('Humidity')
-				.setUnit("%")
-				.setUnitWrapper( "(", ")" )
-				.forceMin( 0 )
-				.forceMax( 100 )
-				.setTickPosition( Graph.TICKS_OUTSIDE );
-			
 			this.graph.getXAxis().setLabel('Time');
 			this.graph.getXAxis().setUnit('h').setUnitWrapper("(", ")");
 
 
-			this.serie_sun = this.graph.newSerie( "sun" ).setLabel("Sun");
-			this.serie_sun.autoAxis().setYAxis( this.graph.getRightAxis( 0 ) ).setLineColor( "#109046" );
-
 			this.graph.getRightAxis( 0 ).forceMin( 0 );
 
-			this.serie_temperature = this.graph.newSerie( "temperature" ).setLabel("Temp.");
-			this.serie_temperature.autoAxis().setYAxis( this.graph.getRightAxis( 1 ) ).setLineColor( "#b57e14" );
-
-			this.serie_humidity = this.graph.newSerie( "humidity" ).setLabel("Hum.");
-			this.serie_humidity.autoAxis().setYAxis( this.graph.getRightAxis( 2 ) ).setLineColor( "#901241" );
 		}
 
 		this.graph.getXAxis().turnGridsOff();
@@ -136,8 +110,8 @@ class statusGraph extends GraphComponent {
 
 
 		this.serieZone = this.graph.newSerie( "zone", {}, "zone" );
-		this.serieZone.setLineColor( "#413ca5" );
-		this.serieZone.setFillColor( "#413ca5" );
+		this.serieZone.setLineColor( "#c0c0c0" );
+		this.serieZone.setFillColor( "#f0f0f0" );
 		this.serieZone.setFillOpacity( 0.2 );
 		this.serieZone.autoAxis();
 		this.serieZone.setLineWidth( 0 );
@@ -191,21 +165,10 @@ class statusGraph extends GraphComponent {
 			this.serieZone.setWaveform( this.props.data.duplicate( true ).prepend( 0, 0 ).append( ( wave ) => wave.getXRaw( wave.getLength() - 1 ), 0 ) );
 			this.graph.autoscaleAxes();
 
-			if( this.serie_sun ) {
-				this.serie_sun.setWaveform( this.props.data_sun.setXScale( 1 / 3600 ) );
-			}
-
-			if( this.serie_temperature ) {
-				this.serie_temperature.setWaveform( this.props.data_temperature.setXScale( 1 / 3600 ) );
-			}
-
-			if( this.serie_humidity ) {
-				this.serie_humidity.setWaveform( this.props.data_humidity.setXScale( 1 / 3600 ) );
-			}
-
+		
 			this.graph.autoscaleAxes();
 			this.graph.draw();
-			this.graph.updateLegend();
+			//this.graph.updateLegend();
 
 			if( this.flag1 && this.flag2 ) {
 				this.flag1.draw();
@@ -226,18 +189,7 @@ class statusGraph extends GraphComponent {
 			this.serie.setWaveform( Graph.newWaveform().setData( [] ) );
 			this.serieZone.setWaveform( Graph.newWaveform().setData( [] ) );
 
-			if( this.serie_sun ) {
-				this.serie_sun.setWaveform( Graph.newWaveform().setData( [] ) );
-			}
-
-			if( this.serie_temperature ) {
-				this.serie_temperature.setWaveform( Graph.newWaveform().setData( [] ) );
-			}
-
-			if( this.serie_humidity ) {
-				this.serie_humidity.setWaveform( Graph.newWaveform().setData( [] ) );
-			}
-
+		
 			this.graph.draw();
 
 			if( this.flag1 && this.flag2 ) {

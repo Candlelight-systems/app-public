@@ -19,13 +19,13 @@ class InstrumentList extends React.Component {
 
           this.setState( { [ stateName ]: true } );
         
-        }).catch( () => {
+        } ).catch( () => {
 
           this.setState( { [ stateName ]: false } );
 
-        });
+        } );
 
-      });
+      } );
 
     }, 1000 );
 
@@ -87,7 +87,7 @@ class InstrumentList extends React.Component {
     }
 
     let instruments = config.instruments.map( ( config ) => {
-console.log( config.trackerHost );
+
         let connected = !! this.state[ 'status_' + config.trackerHost ];
 
         return (

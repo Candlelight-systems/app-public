@@ -4,6 +4,9 @@ import GraphComponent from './graphcomponent.jsx';
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import React from 'react';
 
+
+const color = "#e0e0e0";
+
 class statusIV extends GraphComponent {
 
 	/*
@@ -22,6 +25,7 @@ class statusIV extends GraphComponent {
 			return;
 		}
 
+
 		this.graph = new Graph( this.graphDOM, {
 			
 			paddingTop: 5,
@@ -29,30 +33,32 @@ class statusIV extends GraphComponent {
 			paddingRight: 0,
 			paddingBottom: 5,
 
-			closeColor: "#303030"
+			closeColor: color
 		});
 
 		this.resize( this.props );
 		
 		this.serie = [];
 
+		this.graph.setBackgroundColor( "rgba( 255, 255, 255, 0.2 )" );
+
 		this.graph.getLeftAxis()
 			.setLineAt( [ 0 ] )
 			.gridsOff()
-			.setAxisColor("#303030")
-			.setPrimaryTicksColor("#303030")
-			.setSecondaryTicksColor("#303030") 
-			.setTicksLabelColor("#303030") 
-			.setLabelColor("#303030");
+			.setAxisColor(color)
+			.setPrimaryTicksColor(color)
+			.setSecondaryTicksColor(color) 
+			.setTicksLabelColor(color) 
+			.setLabelColor(color);
 
 
 		this.graph.getBottomAxis()
 			.gridsOff()
-			.setAxisColor("#303030")
-			.setPrimaryTicksColor("#303030")
-			.setSecondaryTicksColor("#303030")
-			.setLabelColor("#303030")
-			.setTicksLabelColor("#303030");
+			.setAxisColor(color)
+			.setPrimaryTicksColor(color)
+			.setSecondaryTicksColor(color)
+			.setLabelColor(color)
+			.setTicksLabelColor(color);
 
 
 	//	this.graph.setTitle("Latest j(V) curve")
@@ -71,14 +77,20 @@ class statusIV extends GraphComponent {
 			.setUnit("V");
 
 
-		var legend = this.graph.makeLegend();
-			legend.notHideable();
-			legend.setAutoPosition( "right" );  
-			legend.update(); 
+		var legend = this.graph.makeLegend( {
+			paddingLeft: 0,
+			paddingRight: 2,
+			paddingTop: 2,
+			paddingBottom: 0,
+			frame: false,
+			backgroundColor: 'transparent',
+			color: color
+		});
 
-			
-			
+		legend.setPosition( { x: 'max', y: 'max' }, 'right', 'top' );
 
+		legend.notHideable();
+		legend.update(); 
 	}
 
 	componentDidUpdate() {
@@ -89,11 +101,14 @@ class statusIV extends GraphComponent {
 
 		this.graph.resetSeries();
 
-		let color = 'red';
+		
 		let maxY = 0;
 
 		let indices = [];
-		
+			
+		if( ! this.props.data[ 0 ] ) {
+			return;
+		}
 		const firstTime = this.props.data[ 0 ].time;
 		const lastTime = this.props.data[ this.props.data.length - 1 ].time;
 		const idealInterval = ( lastTime - firstTime ) / 4; // 5 iv curves
@@ -139,15 +154,15 @@ class statusIV extends GraphComponent {
 			k++;
 		});
 
-		this.serieIV = this.graph.newSerie( "iv_time" );
+		this.serieIV = this.graph.newSerie( "iv_time" ).setLabel("MPPT");
 		this.serieIV.autoAxes();
-		this.serieIV.setLineColor("black").setLineWidth( 2 );
+		this.serieIV.setLineColor( color ).setLineWidth( 2 );
 
 		this.ellipse = this.graph.newShape( "ellipse" );
 		this.ellipse.setR( 3, 3 );
 	
-		this.ellipse.setFillColor('black');
-		this.ellipse.setStrokeColor('black');
+		this.ellipse.setFillColor( color );
+		this.ellipse.setStrokeColor( color );
 		this.ellipse.draw();
 			
 		if( this.props.dataIV ) {

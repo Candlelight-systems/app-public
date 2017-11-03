@@ -230,14 +230,17 @@ class TrackerInstrument extends React.Component {
             
             <h3>{ this.props.instrumentId }</h3>
             <div className="row statuses">
-          
-              <div className={ "col-sm-4 alert " + ( this.state.error_influxdb ? ' alert-danger' : 'alert-success' ) }>
-                <span title={ this.state.error_influxdb || "" } className={ "glyphicon glyphicon-" + ( this.state.error_influxdb ? 'warning-sign' : 'check' ) }></span>&nbsp;
-                InfluxDB server
-                <div className="pull-right">
-                  <div>
-                    <button type="button" className="btn btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }>Config</button>
-                  </div>
+              
+
+              <div className={ "col-lg-4 group-status group-status-db " + ( this.state.error_influxdb ? ' alert-danger' : 'alert-success' ) }>
+                
+                <div className="col-lg-6">
+                  <span title={ this.state.error_influxdb || "" } className={ "glyphicon glyphicon-" + ( this.state.error_influxdb ? 'warning-sign' : 'check' ) }></span>&nbsp;
+                  InfluxDB server
+                </div>
+
+                <div className="col-lg-6">
+                  <button type="button" className="btn btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }>Config</button>
                 </div>
               </div>
 

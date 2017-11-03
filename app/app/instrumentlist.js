@@ -325,7 +325,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
     }
 
     let instruments = config.instruments.map(config => {
-      console.log(config.trackerHost);
+
       let connected = !!this.state['status_' + config.trackerHost];
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

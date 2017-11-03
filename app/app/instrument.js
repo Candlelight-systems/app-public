@@ -88,9 +88,9 @@ module.exports = require("node-jsgraph/dist/jsgraph-es6");
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return query; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ping; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
 
 
@@ -252,7 +252,7 @@ class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 	}
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (CellButtons);
+/* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
 
 /***/ }),
 /* 7 */
@@ -332,10 +332,10 @@ function render(cfg) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lodash_debounce__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(3);
 
@@ -543,22 +543,22 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
         { className: "row statuses" },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "col-sm-4 alert " + (this.state.error_influxdb ? ' alert-danger' : 'alert-success') },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.state.error_influxdb || "", className: "glyphicon glyphicon-" + (this.state.error_influxdb ? 'warning-sign' : 'check') }),
-          "\xA0 InfluxDB server",
+          { className: "col-lg-4 group-status group-status-db " + (this.state.error_influxdb ? ' alert-danger' : 'alert-success') },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
-            { className: "pull-right" },
+            { className: "col-lg-6" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.state.error_influxdb || "", className: "glyphicon glyphicon-" + (this.state.error_influxdb ? 'warning-sign' : 'check') }),
+            "\xA0 InfluxDB server"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-6" },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-default btn-sm", onClick: () => {
-                    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInfluxDB");
-                  } },
-                "Config"
-              )
+              "button",
+              { type: "button", className: "btn btn-default btn-sm", onClick: () => {
+                  __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInfluxDB");
+                } },
+              "Config"
             )
           )
         ),
@@ -1001,18 +1001,43 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "div",
         { className: "row statuses" },
-        !!this.props.serverState.lightController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
           "div",
-          { className: "alert alert-info col-sm-4" },
-          "Light setpoint: ",
-          this.props.serverState.lightSetpoint,
-          " sun",
+          { className: "group-status group-status-light col-lg-3" },
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "h3",
+            null,
+            "Light bias"
+          ),
           __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
-            { className: "pull-right" },
+            { className: "col-lg-6" },
+            "Intensity: ",
+            this.state.sun,
+            " sun"
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: "col-lg-6" },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "button",
+              { type: "button", className: "btn btn-default btn-sm", onClick: this.light_calibrate },
+              "Calibrate"
+            )
+          ),
+          !!this.props.serverState.lightController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              null,
+              { className: "col-lg-6" },
+              "Setpoint: ",
+              this.props.serverState.lightSetpoint,
+              " sun"
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-6" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "button",
                 { type: "button", className: "btn btn-default btn-sm", onClick: this.light_controller_config },
@@ -1023,50 +1048,30 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
         ),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
           "div",
-          { className: "alert alert-info col-sm-4" },
-          "Light intensity: ",
-          this.state.sun,
-          " sun",
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          { className: "group-status group-status-temperature col-lg-3" },
+          this.state.temperature !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
-            { className: "pull-right" },
+            null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-default btn-sm", onClick: this.light_calibrate },
-                "Calibrate"
-              )
+              { className: "col-lg-6" },
+              "Temperature: ",
+              this.state.temperature,
+              " \xB0C"
             )
-          )
-        ),
-        this.state.temperature !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "alert alert-info col-sm-3" },
-          "Temperature: ",
-          this.state.temperature,
-          " \xB0C"
-        ),
-        this.state.humidity !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "alert alert-info col-sm-3" },
-          "Humidity: ",
-          this.state.humidity,
-          " %"
-        ),
-        this.props.groupConfig.heatController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "alert alert-info col-sm-4" },
-          "Heating power:\xA0 ",
-          this.state.heatingPower == -1 ? 'Off' : Math.round(this.state.heatingPower * 100) + " %",
-          " \xA0",
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          ),
+          this.props.groupConfig.heatController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
-            { className: "pull-right" },
+            null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              null,
+              { className: "col-lg-6" },
+              "Heating power: ",
+              this.state.heatingPower == -1 ? 'Off' : Math.round(this.state.heatingPower * 100) + " %"
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-6" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "button",
                 { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
@@ -1078,6 +1083,21 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
                 { type: "button", className: "btn-sm btn btn-default", onClick: this.decreaseHeatingPower },
                 "-"
               )
+            )
+          )
+        ),
+        this.state.humidity !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          "div",
+          { className: "group-status group-status-temperature col-lg-3" },
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            null,
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-6" },
+              "Humidity: ",
+              this.state.humidity,
+              " %"
             )
           )
         ),
@@ -1128,12 +1148,14 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__influx__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_electron__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pgasettings__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pgasettings__ = __webpack_require__(18);
+
 
 
 
@@ -1181,7 +1203,7 @@ const initialState = {
 	serverState: {}
 };
 
-class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Component {
+class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Component {
 
 	/**
   *	@param props.name The name of the cell
@@ -1190,50 +1212,60 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 		super(props);
 
 		this.unit = {
-			"voltage": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"voltage": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"V"
 			),
-			"currentdensity": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"currentdensity": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"mA cm",
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"sup",
 					null,
 					"-2"
 				)
 			),
-			"current": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"current": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"mA"
 			),
-			"efficiency": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"efficiency": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"%"
 			),
-			"fillfactor": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"fillfactor": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"%"
 			),
-			"sun": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"sun": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"sun"
 			),
-			"area": __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			"area": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
 				"cm",
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"sup",
 					null,
 					"2"
 				)
+			),
+			"temperature": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"span",
+				null,
+				"\xB0C"
+			),
+			"humidity": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"span",
+				null,
+				"%"
 			)
 		};
 
@@ -1255,8 +1287,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 		this.toggleDetails = this.toggleDetails.bind(this);
 		//	this.formChanged = this.formChanged.bind( this );
-		//this.state.tmpServerState = {};
-
+		//this.state.tmpServerState = {};		
 	}
 
 	shouldComponentUpdate(props, state) {
@@ -1392,7 +1423,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 	downloadData() {
 
-		__WEBPACK_IMPORTED_MODULE_6_electron__["ipcRenderer"].send("downloadData", this.state.serverState, this.props.chanId, this.state.serverState.measurementName);
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("downloadData", this.state.serverState, this.props.chanId, this.state.serverState.measurementName);
 	}
 
 	componentDidUpdate() {
@@ -1442,7 +1473,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 	cfg() {
 
-		__WEBPACK_IMPORTED_MODULE_6_electron__["ipcRenderer"].once("channelConfigured", (event, data) => {
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].once("channelConfigured", (event, data) => {
 
 			if (data.chanId != this.state.serverState.chanId) {
 				return;
@@ -1451,7 +1482,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 			this.saveStatus(data);
 		});
 
-		__WEBPACK_IMPORTED_MODULE_6_electron__["ipcRenderer"].send("configChannel", {
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("configChannel", {
 
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
@@ -1569,7 +1600,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 		let newIvCurves = false;
 
-		Object(__WEBPACK_IMPORTED_MODULE_4__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
+		Object(__WEBPACK_IMPORTED_MODULE_5__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
 
 			if (!results[0].series) {
 				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
@@ -1583,7 +1614,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 			if (results[2].series && results[2].series[0]) {
 
-				console.log(results[2].series[0].values.length);
 				newState.ivCurves = this.state.ivCurves.splice(0);
 				newState.ivCurves = newState.ivCurves.concat(results[2].series[0].values.map((value, index) => {
 
@@ -1598,12 +1628,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				}));
 			}
 
+			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
 			newState.efficiency = Math.round(results[1].series[0].values[0][1] * 100) / 100;
 
 			newState.power = results[1].series[0].values[0][2];
-			newState.current = (results[1].series[0].values[0][3] * 1000).toPrecision(3);
-			newState.currentdensity = (results[1].series[0].values[0][3] * 1000 / serverState.cellArea).toPrecision(3);
+			newState.current = results[1].series[0].values[0][3] * 1000;
+			newState.currentdensity = results[1].series[0].values[0][3] * 1000 / serverState.cellArea;
 			newState.voltage = parseFloat(results[1].series[0].values[0][4]).toPrecision(3);
 			newState.sun = Math.round(results[1].series[0].values[0][5] * 100) / 100;
 			newState.pga = results[1].series[0].values[0][6];
@@ -1622,7 +1653,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 
 			if (timeDifference < 3600) {
 				newState.ellapsed = Math.round(timeDifference / 60);
-				newState.ellapsedUnit = "min.";
+				newState.ellapsedUnit = "m";
 			} else {
 				newState.ellapsed = Math.round(newState.ellapsed);
 				newState.ellapsedUnit = "h";
@@ -1668,12 +1699,12 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 			}
 
 			if (results[4] && results[4].series && this.state.serverState.tracking_mode == 1) {
-				newState.jsc = Math.round(results[4].series[0].values[0][1] / serverState.cellArea * 1000 * 1000) / 1000;
+				newState.jsc = results[4].series[0].values[0][1] / serverState.cellArea * 1000;
 			}
 
 			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
-			queue.push(Object(__WEBPACK_IMPORTED_MODULE_4__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
+			queue.push(Object(__WEBPACK_IMPORTED_MODULE_5__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
 
 				let values = results[0].series[0].values,
 				    offset,
@@ -1736,28 +1767,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 					newState.jsc = Math.round(values[values.length - 1][2] * 100) / 100;
 				}
 
-				if (this.state.serverState.tracking_mode == 1 && prev_time && changeUnitVal) {
-
-					wave.fit({
-
-						params: [0, 0],
-						subsetIndex: [wave.getIndexFromX((prev_time - offset) / 1000), wave.getIndexFromX((timeto_date.getTime() - offset) / 1000)],
-						function: (x, params) => {
-							return x * params[0] + params[1];
-						}
-					}).then(params => {
-
-						newState.changeRate = Math.round(params[0] * changeUnitVal * 1000) / 1000;
-						newState.absChangeRate = params[0];
-						newState.changeUnit = changeUnit;
-					});
-				} else {
-
-					newState.changeRate = undefined;
-					newState.absChangeRate = undefined;
-					newState.changeUnit = undefined;
-				}
-
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
@@ -1787,6 +1796,39 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 		});
 	}
 
+	processCurrent(value) {
+
+		if (isNaN(value)) {
+			return;
+		}
+
+		if (Math.abs(value) < 0.1) {
+			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"span",
+				null,
+				(Math.round(value * 10000) / 10).toFixed(1),
+				"\u03BCAcm",
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"sup",
+					null,
+					"-2"
+				)
+			);
+		} else {
+			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"span",
+				null,
+				(Math.round(value * 100) / 100).toFixed(1),
+				"mAcm",
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"sup",
+					null,
+					"-2"
+				)
+			);
+		}
+	}
+
 	render() {
 
 		let unit, arrowstatus, change, changeUnit, currVal, startVal, startValPos, trackingMode, statusGraphAxisLabel, statusGraphAxisUnit, statusGraphSerieLabelLegend;
@@ -1802,7 +1844,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				startVal = this.state.highest_value;
 				startValPos = this.state.highest_value_time;
 				currVal = this.state.efficiency;
-				change = this.state.efficiency - this.state.prev_efficiency;
 
 				trackingMode = "MPPT";
 				statusGraphAxisLabel = "Efficiency";
@@ -1816,7 +1857,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				startVal = this.state.start_value;
 				startValPos = 0;
 				currVal = this.state.voc;
-				change = this.state.voc - this.state.prev_voc;
 
 				trackingMode = "Voc";
 				statusGraphAxisLabel = "Voltage";
@@ -1829,7 +1869,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				startVal = this.state.start_value;
 				startValPos = 0;
 				currVal = this.state.jsc;
-				change = this.state.jsc - this.state.prev_jsc;
 
 				trackingMode = "Jsc";
 				statusGraphAxisLabel = "Current density";
@@ -1838,474 +1877,305 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 				break;
 		}
 
-		if (this.state.absChangeRate) {
-
-			change = this.state.absChangeRate * 3600 * 24;
-
-			//let changeDecision = change / this.state.prev_unit_ms * ( 3600 * 1000 );
-			if (change > 0.05) {
-				arrowstatus = 'up';
-			} else if (change < -0.05) {
-				arrowstatus = 'down';
-			} else if (change > 0) {
-				arrowstatus = 'flatup';
-			} else {
-				arrowstatus = 'flatdown';
-			}
-		}
-
+		let active = this.state.serverState.enable > 0 && this.state.serverState.tracking_mode > 0;
 		let notavailable = "N/A";
 
-		let arrowClassWrapper = "arrow " + arrowstatus;
-		let arrowClass = "glyphicon glyphicon-arrow-left";
+		const j_currentdensity = this.processCurrent(this.state.currentdensity);
+		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
-		let active = this.state.serverState.enable && this.state.serverState.tracking_mode > 0;
-
-		return __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+		return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 			"div",
 			{ ref: el => this.wrapper = el, className: 'cell ' + (this.state.unknown ? 'cell-unknown' : active ? 'cell-running' : 'cell-stopped') + (this.state.showDetails && active ? ' show-details' : '') },
-			__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
-				{ className: "row cell-element" },
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				{ className: "cell-name cell-main-info" },
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "summary", ref: el => this.rowSummary = el },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-2 propElement" },
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked }),
-							" ",
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.serverState.cellName || "Ch " + this.state.serverState.chanId,
-								" (",
-								trackingMode,
-								")"
-							)
-						)
+					{ className: "col-lg-9" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"span",
+						null,
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
 					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-1 propElement" },
-						!!this.state.ellapsed && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"span",
+						{ className: "label" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"span",
+						{ className: "value" },
+						this.state.serverState.cellName || "Ch " + this.state.serverState.chanId
+					),
+					" ",
+					this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"span",
+						{ className: "cell-area" },
+						"( ",
+						this.state.serverState.cellArea,
+						" cm",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"sup",
 							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.ellapsed
-							),
-							"\xA0 ",
+							"2"
+						),
+						" )"
+					) : ""
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "cell-iv pull-right col-lg-3" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
+						width: "290",
+						height: "190",
+						shown: true,
+						key: this.props.instrumentId + this.props.chanId + "_iv",
+						data: this.state.ivCurves,
+						dataIV: this.state.data_IV,
+						voltage: this.state.voltage,
+						current: this.state.current,
+						cellarea: this.props.serverState.cellArea
+					})
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"div",
+				{ className: "cell-summary" },
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: `col-lg-1 cell-status ${active ? 'active' : ''}` },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						null,
+						active ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }) : __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
+					),
+					trackingMode
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-1 propElement" },
+					!!this.state.ellapsed && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						null,
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "label" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "value" },
+							this.state.ellapsed,
 							this.state.ellapsedUnit
 						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-1 propElement" },
-						!!this.state.sun && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.sun
-							),
-							"\xA0",
-							this.unit.sun
-						),
-						" "
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-1 propElement" },
-						!isNaN(this.state.efficiency) && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								"\u03B7"
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.efficiency
-							),
-							this.unit.efficiency
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-1 propElement" },
-						!!this.state.voc && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								"V",
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"sub",
-									null,
-									"oc"
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.voc
-							),
-							" ",
-							this.unit.voltage
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-2 propElement" },
-						!!this.state.jsc && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								"J",
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"sub",
-									null,
-									"sc"
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.jsc
-							),
-							" ",
-							this.unit.currentdensity
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-1 propElement" },
-						!!this.state.ff && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "label" },
-								"FF"
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								{ className: "value" },
-								this.state.ff
-							),
-							this.unit.fillfactor
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-2 propElement" },
-						!!active && !!arrowstatus && this.state.serverState.tracking_mode == 1 && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: arrowClassWrapper },
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("span", { className: arrowClass }),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"span",
-								null,
-								this.state.changeRate,
-								" ",
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("span", { dangerouslySetInnerHTML: { __html: this.state.changeUnit } })
-							)
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"div",
-						{ className: "col-xs-4 propElement" },
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__["a" /* default */], {
-							cfg: () => {
-								this.cfg();
-							},
-							stop: this.stop,
-							start: this.start,
-							recordJsc: this.recordJsc,
-							recordVoc: this.recordVoc,
-							recordIV: this.recordIV,
-							downloadData: this.downloadData,
-							button_jsc: active,
-							button_voc: active,
-							button_iv: active,
-							button_download: active,
-							button_start: this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && !active && this.state.serverState.tracking_mode > 0,
-							button_stop: active,
-							button_details: active,
-							details: this.toggleDetails,
-
-							button_jsc_disabled: this.props.serverState.jsc_booked || this.state.updating,
-							button_voc_disabled: this.props.serverState.voc_booked || this.state.updating,
-							button_iv_disabled: this.props.serverState.iv_booked || this.state.updating
-						})
 					)
 				),
-				!!active && this.state.efficiency !== undefined && !!this.state.highest_value && __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "bar", onClick: this.showEfficiencies },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("div", { className: "barGreen", style: { width: this.state.efficiency / 25 * 100 + "%" } }),
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("div", { className: "barRed", style: { width: (this.state.highest_value - this.state.efficiency) / 25 * 100 + "%" } })
-				)
-			),
-			__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-				"div",
-				{ className: "row efficiency cell-element", onClick: this.showSummary, ref: el => this.rowEfficiency = el },
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-2 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"span",
+					{ className: "col-lg-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "record" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
+					),
+					!!this.state.sun && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
 						null,
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
 							{ className: "label" },
-							"Current efficiency"
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
 						),
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "value" },
+							this.state.sun,
+							" ",
+							this.unit.sun
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-1 propElement" },
+					!isNaN(this.state.efficiency) && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						null,
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "label" },
+							"\u03B7"
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
 							{ className: "value" },
 							this.state.efficiency,
-							" ",
 							this.unit.efficiency
 						)
 					)
 				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "col-xs-2 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"span",
-						null,
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "label" },
-							"Highest efficiency"
-						),
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "value" },
-							this.state.highest_value,
-							" ",
-							this.unit.efficiency
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-2 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"span",
-						null,
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "label" },
-							"Actual voltage"
-						),
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "value" },
-							this.state.voltage,
-							" ",
-							this.unit.voltage
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-3 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"span",
-						null,
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "label" },
-							"Actual current density"
-						),
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "value" },
-							this.state.currentdensity,
-							" ",
-							this.unit.currentdensity
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-3 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"span",
-						null,
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "label" },
-							"Current range"
-						),
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"span",
-							{ className: "value" },
-							"\xB1 ",
-							Object(__WEBPACK_IMPORTED_MODULE_7__pgasettings__["a" /* pgaValueToRange */])(this.state.pga, this.props.config.fullScaleCurrent),
-							" ",
-							this.unit.current
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-3 propElement fullHeight" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], { shown: true, mode: "sparkline", width: "180", height: "43", data: this.state.data, unit: unit })
-				)
-			),
-			__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement("div", { className: "clearfix" }),
-			__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-				"div",
-				{ className: "row cell-element" },
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-					"div",
-					{ className: "col-sm-3" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-						"table",
-						{ cellPadding: "0", cellSpacing: "0", className: "parameters" },
-						__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-							"tbody",
+					{ className: "col-lg-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "record" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "label" },
+						"V",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"sub",
 							null,
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
+							"oc"
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "value" },
+						!!this.state.voc ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"span",
+							null,
+							this.state.voc,
+							this.unit.voltage
+						) : 'N/A'
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-xs-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "record" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "label" },
+						"J",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"sub",
+							null,
+							"sc"
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "value" },
+						!!this.state.jsc ? jsc_currentdensity : 'N/A'
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-xs-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "label" },
+						"FF"
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "value" },
+						!!this.state.ff ? this.state.ff : 'N/A'
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-xs-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "label" },
+						"V",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"sub",
+							null,
+							"now"
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "value" },
+						this.state.voltage,
+						" ",
+						this.unit.voltage
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-xs-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "label" },
+						"J",
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"sub",
+							null,
+							"now"
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "value" },
+						j_currentdensity
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						null,
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "label" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-grain" })
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "value" },
+							this.state.temperature_junction ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
 								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"Cell name"
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									this.state.serverState.cellName || "Ch " + this.props.chanId
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
-								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"Area"
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-										"span",
-										null,
-										this.state.serverState.cellArea,
-										" cm",
-										__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-											"sup",
-											null,
-											"2"
-										)
-									) : ""
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
-								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"PCE"
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									this.state.efficiency ? __WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-										"span",
-										null,
-										this.state.efficiency,
-										" ",
-										this.unit.efficiency
-									) : notavailable
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
-								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"Humidity"
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									!isNaN(this.state.humidity) && this.state.humidity !== -1 ? this.state.humidity + "%" : "N/A"
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
-								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"Board temp."
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									!isNaN(this.state.temperature_base) && this.state.temperature_base !== -1 ? this.state.temperature_base + "\u00B0C" : "N/A"
-								)
-							),
-							__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-								"tr",
-								null,
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									"Est. junction temp."
-								),
-								__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
-									"td",
-									null,
-									!isNaN(this.state.temperature_junction) && this.state.temperature_junction !== -1 ? this.state.temperature_junction + "\u00B0C" : "N/A"
-								)
-							)
+								this.state.temperature_junction,
+								" ",
+								this.unit.temperature
+							) : 'N/A'
 						)
 					)
 				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "col-sm-6" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
-						shown: this.state.showDetails,
-						width: "500",
-						height: "220",
+					{ className: "col-lg-1 propElement" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						null,
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "label" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tint" })
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "value" },
+							this.state.humidity ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
+								null,
+								this.state.humidity,
+								" ",
+								this.unit.humidity
+							) : 'N/A'
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "cell-efficiency col-lg-6" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
+						shown: true,
+						width: "600",
+						height: "60",
 						mode: "default",
 						key: this.props.instrumentId + this.props.chanId + "_graph",
 						data: this.state.data,
@@ -2319,62 +2189,37 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_5_react___default.a.Compon
 						axisUnit: statusGraphAxisUnit,
 						serieLabelLegend: statusGraphSerieLabelLegend,
 						flag2: currVal })
-				),
-				__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				"div",
+				{ className: "row cell-actions" },
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "col-sm-6" },
-					__WEBPACK_IMPORTED_MODULE_5_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
-						width: "500",
-						height: "240",
-						shown: this.state.showDetails,
-						key: this.props.instrumentId + this.props.chanId + "_iv",
-						data: this.state.ivCurves,
-						dataIV: this.state.data_IV,
-						voltage: this.state.voltage,
-						current: this.state.current,
-						cellarea: this.props.serverState.cellArea
-					})
+					{ className: "col-lg-1" },
+					"Actions"
+				),
+				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-1" },
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"button",
+						{ className: "btn btn-cl" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
+						" Download"
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"button",
+						{ className: "btn btn-cl" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon stop" }),
+						" Stop"
+					)
 				)
 			)
 		);
 	}
 }
 
-/*		
-				
-
-				<div className="col-sm-3">
-					<h3>Real-time information</h3>
-
-					<div className="tag blue"><span>Current</span><a>{ this.state.currentdensity }</a></div>
-					<div className="tag blue"><span>Voltage</span><a>{ this.state.voltage }</a></div>
-					<div className="tag green"><span>Tracking mode</span><a>{ this.state.tracking_mode }</a></div>
-				</div>
-
-
-				<StatusRender key={ this.props.instrumentId + this.props.chanId + "_status" } tracking_mode={this.state.tracking_mode} start={ startVal } ellapsed={ this.state.ellapsed } ellapsedUnit={ this.state.ellapsedUnit } current={ currVal } arrowstatus={ arrowstatus } change={ change } unit={ unit } changeUnit={ changeUnit } />
-
-				<div className="cellActions pull-right">
-					
-
-					
-				</div>
-
-
-				*/
-/*
-						<div className={ 'action update' + ( this.state.updating ? ' rotating': '' ) } onClick={ this.update }>
-							<span><span className="glyphicon glyphicon-refresh"></span></span> <a>Update</a>
-						</div>
-
-*/
-/*{ ( !! this.state.enable && !!  this.state.measurementName ) && 
-		<div className="config" onClick={ this.pause }>
-			<span className="glyphicon glyphicon-pause"></span> <a>Pause channel</a>
-		</div>
-	}
-
-*/
 /* harmony default export */ __webpack_exports__["a"] = (TrackerDevice);
 
 /***/ }),
@@ -2414,10 +2259,10 @@ var modes = {
 	default: {
 
 		graphConstructor: {
-			paddingTop: 5,
-			paddingLeft: 30,
-			paddingRight: 30,
-			paddingBottom: 0
+			paddingTop: 4,
+			paddingLeft: 4,
+			paddingRight: 4,
+			paddingBottom: 2
 		}
 	}
 };
@@ -2453,7 +2298,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 		this.resize(this.props);
 
 		this.serie = this.graph.newSerie();
-		this.serie.setLineColor("#413ca5");
+		this.serie.setLineColor("white");
 		this.serie.autoAxis();
 		this.serie.setLineWidth(2);
 
@@ -2466,32 +2311,17 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.graph.getYAxis().hide();
 		} else {
 
-			this.graph.getYAxis().secondaryGridOff();
+			this.graph.getXAxis().hide();
+			this.graph.getYAxis().hide();
 
 			this.graph.getYAxis().setLabel(this.props.axisLabel).setUnit(this.props.axisUnit).setUnitWrapper("(", ")");
 
-			var legend = this.graph.makeLegend();
-			legend.setAutoPosition("bottom");
-			legend.update();
-
-			this.graph.getRightAxis(0, { hideWhenNoSeriesShown: true }).setLabel('Sun').forceMin(0).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
-			this.graph.getRightAxis(1, { hideWhenNoSeriesShown: true }).setLabel('Temperature').setUnit("&#xb0;C").forceMin(0).setUnitWrapper("(", ")").setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
-
-			this.graph.getRightAxis(2, { hideWhenNoSeriesShown: true }).setLabel('Humidity').setUnit("%").setUnitWrapper("(", ")").forceMin(0).forceMax(100).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE);
+			this.graph.getRightAxis(0, { hideWhenNoSeriesShown: true }).setLabel('Sun').forceMin(0).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE).setAxisColor('white').setPrimaryTicksColor('white');
 
 			this.graph.getXAxis().setLabel('Time');
 			this.graph.getXAxis().setUnit('h').setUnitWrapper("(", ")");
 
-			this.serie_sun = this.graph.newSerie("sun").setLabel("Sun");
-			this.serie_sun.autoAxis().setYAxis(this.graph.getRightAxis(0)).setLineColor("#109046");
-
 			this.graph.getRightAxis(0).forceMin(0);
-
-			this.serie_temperature = this.graph.newSerie("temperature").setLabel("Temp.");
-			this.serie_temperature.autoAxis().setYAxis(this.graph.getRightAxis(1)).setLineColor("#b57e14");
-
-			this.serie_humidity = this.graph.newSerie("humidity").setLabel("Hum.");
-			this.serie_humidity.autoAxis().setYAxis(this.graph.getRightAxis(2)).setLineColor("#901241");
 		}
 
 		this.graph.getXAxis().turnGridsOff();
@@ -2502,8 +2332,8 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 		this.graph.getYAxis().forceMin(0);
 
 		this.serieZone = this.graph.newSerie("zone", {}, "zone");
-		this.serieZone.setLineColor("#413ca5");
-		this.serieZone.setFillColor("#413ca5");
+		this.serieZone.setLineColor("#c0c0c0");
+		this.serieZone.setFillColor("#f0f0f0");
 		this.serieZone.setFillOpacity(0.2);
 		this.serieZone.autoAxis();
 		this.serieZone.setLineWidth(0);
@@ -2577,21 +2407,9 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.serieZone.setWaveform(this.props.data.duplicate(true).prepend(0, 0).append(wave => wave.getXRaw(wave.getLength() - 1), 0));
 			this.graph.autoscaleAxes();
 
-			if (this.serie_sun) {
-				this.serie_sun.setWaveform(this.props.data_sun.setXScale(1 / 3600));
-			}
-
-			if (this.serie_temperature) {
-				this.serie_temperature.setWaveform(this.props.data_temperature.setXScale(1 / 3600));
-			}
-
-			if (this.serie_humidity) {
-				this.serie_humidity.setWaveform(this.props.data_humidity.setXScale(1 / 3600));
-			}
-
 			this.graph.autoscaleAxes();
 			this.graph.draw();
-			this.graph.updateLegend();
+			//this.graph.updateLegend();
 
 			if (this.flag1 && this.flag2) {
 				this.flag1.draw();
@@ -2610,18 +2428,6 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 
 			this.serie.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
 			this.serieZone.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-
-			if (this.serie_sun) {
-				this.serie_sun.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-			}
-
-			if (this.serie_temperature) {
-				this.serie_temperature.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-			}
-
-			if (this.serie_humidity) {
-				this.serie_humidity.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
-			}
 
 			this.graph.draw();
 
@@ -2768,6 +2574,8 @@ module.exports = function extend() {
 
 
 
+const color = "#e0e0e0";
+
 class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* default */] {
 
 	/*
@@ -2793,25 +2601,37 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			paddingRight: 0,
 			paddingBottom: 5,
 
-			closeColor: "#303030"
+			closeColor: color
 		});
 
 		this.resize(this.props);
 
 		this.serie = [];
 
-		this.graph.getLeftAxis().setLineAt([0]).gridsOff().setAxisColor("#303030").setPrimaryTicksColor("#303030").setSecondaryTicksColor("#303030").setTicksLabelColor("#303030").setLabelColor("#303030");
+		this.graph.setBackgroundColor("rgba( 255, 255, 255, 0.2 )");
 
-		this.graph.getBottomAxis().gridsOff().setAxisColor("#303030").setPrimaryTicksColor("#303030").setSecondaryTicksColor("#303030").setLabelColor("#303030").setTicksLabelColor("#303030");
+		this.graph.getLeftAxis().setLineAt([0]).gridsOff().setAxisColor(color).setPrimaryTicksColor(color).setSecondaryTicksColor(color).setTicksLabelColor(color).setLabelColor(color);
+
+		this.graph.getBottomAxis().gridsOff().setAxisColor(color).setPrimaryTicksColor(color).setSecondaryTicksColor(color).setLabelColor(color).setTicksLabelColor(color);
 
 		//	this.graph.setTitle("Latest j(V) curve")
 		this.graph.getYAxis().flip().setLabel("Current").setUnitWrapper("(", ")").setEngineering(true).setUnit("A").setUnitDecade(true);
 
 		this.graph.getXAxis().setLabel("Voltage").setUnitWrapper("(", ")").setUnit("V");
 
-		var legend = this.graph.makeLegend();
+		var legend = this.graph.makeLegend({
+			paddingLeft: 0,
+			paddingRight: 2,
+			paddingTop: 2,
+			paddingBottom: 0,
+			frame: false,
+			backgroundColor: 'transparent',
+			color: color
+		});
+
+		legend.setPosition({ x: 'max', y: 'max' }, 'right', 'top');
+
 		legend.notHideable();
-		legend.setAutoPosition("right");
 		legend.update();
 	}
 
@@ -2823,11 +2643,13 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.graph.resetSeries();
 
-		let color = 'red';
 		let maxY = 0;
 
 		let indices = [];
 
+		if (!this.props.data[0]) {
+			return;
+		}
 		const firstTime = this.props.data[0].time;
 		const lastTime = this.props.data[this.props.data.length - 1].time;
 		const idealInterval = (lastTime - firstTime) / 4; // 5 iv curves
@@ -2873,15 +2695,15 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			k++;
 		});
 
-		this.serieIV = this.graph.newSerie("iv_time");
+		this.serieIV = this.graph.newSerie("iv_time").setLabel("MPPT");
 		this.serieIV.autoAxes();
-		this.serieIV.setLineColor("black").setLineWidth(2);
+		this.serieIV.setLineColor(color).setLineWidth(2);
 
 		this.ellipse = this.graph.newShape("ellipse");
 		this.ellipse.setR(3, 3);
 
-		this.ellipse.setFillColor('black');
-		this.ellipse.setStrokeColor('black');
+		this.ellipse.setFillColor(color);
+		this.ellipse.setStrokeColor(color);
 		this.ellipse.draw();
 
 		if (this.props.dataIV) {
@@ -2914,22 +2736,62 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 /***/ }),
 /* 15 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = jQuery;
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+
+class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      now: Date.now()
+    };
+  }
+
+  componentDidMount() {
+
+    setInterval(() => {
+      console.log('up');
+      this.setState({ now: Date.now() });
+    }, 1000);
+  }
+
+  render() {
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'span',
+      null,
+      Math.round((this.state.now - this.props.latest) / 1000),
+      's'
+    );
+  }
+
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (Timer);
 
 /***/ }),
 /* 16 */
 /***/ (function(module, exports) {
 
-module.exports = require("fs");
+module.exports = jQuery;
 
 /***/ }),
 /* 17 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return pgaValueToRange; });
+/* unused harmony export pgaValueToRange */
 
 let pgaValueToRange = (pgaValue, fsr) => {
 	// FSR is in A
@@ -2942,7 +2804,7 @@ let pgaValueToRange = (pgaValue, fsr) => {
 };
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2995,7 +2857,7 @@ class Error extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Error);
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 /**

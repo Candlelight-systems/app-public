@@ -2,6 +2,7 @@ import StatusGraph from "../cellstatusgraph.jsx";
 import StatusIV from "../cellstatusiv.jsx";
 import CellButtons from "../cellbuttons.jsx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
+import Timer from '../timer.jsx';
 
 import { query as influxquery } from "../influx";
 import React from 'react';
@@ -60,7 +61,9 @@ class TrackerDevice extends React.Component {
 			"efficiency": <span>%</span>,
 			"fillfactor": <span>%</span>,
 			"sun": <span>sun</span>,
-			"area": <span>cm<sup>2</sup></span>
+			"area": <span>cm<sup>2</sup></span>,
+			"temperature": <span>°C</span>,
+			"humidity": <span>%</span>
 		};
 
 		this.state = initialState;
@@ -82,9 +85,7 @@ class TrackerDevice extends React.Component {
 		
 		this.toggleDetails = this.toggleDetails.bind( this );
 	//	this.formChanged = this.formChanged.bind( this );
-		//this.state.tmpServerState = {};
-
-		
+		//this.state.tmpServerState = {};		
 	}
 
 	shouldComponentUpdate( props, state ) {
@@ -445,7 +446,6 @@ class TrackerDevice extends React.Component {
 
 			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
 				
-console.log( results[ 2 ].series[ 0 ].values.length );
 				newState.ivCurves = this.state.ivCurves.splice( 0 );
 				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
 
@@ -462,12 +462,13 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 				} ) );
 			}
 
+			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 			newState.efficiency = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 
 			newState.power = results[ 1 ].series[ 0 ].values[ 0 ][ 2 ];
-			newState.current = ( results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 ).toPrecision( 3 );
-			newState.currentdensity = ( results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 / serverState.cellArea ).toPrecision( 3 );
+			newState.current = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000;
+			newState.currentdensity = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 / serverState.cellArea;
 			newState.voltage = parseFloat( results[ 1 ].series[ 0 ].values[ 0 ][ 4 ] ).toPrecision( 3 );
 			newState.sun = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 5 ] * 100 ) / 100;
 			newState.pga = results[ 1 ].series[ 0 ].values[ 0 ][ 6 ];
@@ -486,7 +487,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 
 			if( timeDifference < 3600 ) {
 				newState.ellapsed = Math.round( timeDifference / ( 60 ) );
-				newState.ellapsedUnit = "min.";
+				newState.ellapsedUnit = "m";
 			} else {
 				newState.ellapsed = Math.round( newState.ellapsed );
 				newState.ellapsedUnit = "h";
@@ -533,7 +534,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 			}	
 
 			if( results[ 4 ] && results[ 4 ].series && this.state.serverState.tracking_mode == 1 ) {
-				newState.jsc = Math.round( results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000 * 1000 ) / 1000;
+				newState.jsc = results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000;
 			}
 
 			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
@@ -602,29 +603,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 					newState.jsc = Math.round( values[ values.length - 1 ][ 2 ]  * 100 ) / 100;
 				}
 				
-				if(  this.state.serverState.tracking_mode == 1 && prev_time && changeUnitVal ) {
 				
-					wave.fit( {
-
-						params: [ 0, 0 ],
-						subsetIndex: [ wave.getIndexFromX( ( prev_time - offset ) / 1000 ), wave.getIndexFromX( ( timeto_date.getTime() - offset ) / 1000 ) ],
-						function: ( x, params ) => {
-							return x * params[ 0 ] + params[ 1 ]
-						}
-					}).then( ( params ) => {
-
-						newState.changeRate = Math.round( params[ 0 ] * changeUnitVal * 1000 ) / 1000;
-						newState.absChangeRate = params[ 0 ];
-						newState.changeUnit = changeUnit;
-					});
-
-				} else {
-
-					newState.changeRate = undefined;
-					newState.absChangeRate = undefined;
-					newState.changeUnit = undefined;
-	
-				}
 
 				newState.highest_value = Math.round( highest_value * 100 ) / 100;
 				newState.highest_value_time = highest_value_time;
@@ -662,6 +641,18 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 		});
 	}
 
+	processCurrent( value ) {
+
+		if( isNaN( value ) ) {
+			return;
+		}
+
+		if( Math.abs( value ) < 0.1 ) {
+			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toFixed( 1 ) }&mu;Acm<sup>-2</sup></span> );
+		} else {
+			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toFixed( 1 ) }mAcm<sup>-2</sup></span> );
+		}
+	}
 
 	render() {
 
@@ -689,7 +680,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 				startVal = this.state.highest_value;
 				startValPos = this.state.highest_value_time;
 				currVal = this.state.efficiency;
-				change = ( this.state.efficiency - this.state.prev_efficiency );
+				
 
 				trackingMode = "MPPT";
 				statusGraphAxisLabel = "Efficiency";
@@ -704,7 +695,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 				startVal = this.state.start_value;
 				startValPos = 0;
 				currVal = this.state.voc;
-				change = ( this.state.voc - this.state.prev_voc );
+				
 
 				trackingMode = "Voc";
 				statusGraphAxisLabel = "Voltage";
@@ -718,7 +709,7 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 				startVal = this.state.start_value;
 				startValPos = 0;
 				currVal = this.state.jsc;
-				change = ( this.state.jsc - this.state.prev_jsc );
+				
 
 				trackingMode = "Jsc";
 				statusGraphAxisLabel = "Current density";
@@ -727,178 +718,175 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 			break;
 		}
 
-
-		if( this.state.absChangeRate ) {
-
-			change = this.state.absChangeRate * 3600 * 24;
-
-			//let changeDecision = change / this.state.prev_unit_ms * ( 3600 * 1000 );
-			if( change > 0.05 ) {
-				arrowstatus = 'up';
-			} else if( change < -0.05 ) {
-				arrowstatus = 'down';
-			} else if ( change > 0 ) {
-				arrowstatus = 'flatup';
-			} else {
-				arrowstatus = 'flatdown';
-			}
-		}
-
+		let active = this.state.serverState.enable > 0 && this.state.serverState.tracking_mode > 0;
 		let notavailable = "N/A";
 
-		let arrowClassWrapper = "arrow " + arrowstatus;
-		let arrowClass ="glyphicon glyphicon-arrow-left";
-	
-		let active = this.state.serverState.enable && this.state.serverState.tracking_mode > 0;
+		const j_currentdensity = this.processCurrent( this.state.currentdensity );
+		const jsc_currentdensity = this.processCurrent( this.state.jsc );
 
 		return (
 			<div ref={ ( el ) => this.wrapper = el } className={'cell ' + ( this.state.unknown ? 'cell-unknown' : ( active ? 'cell-running' : 'cell-stopped' ) ) + ( this.state.showDetails && active ? ' show-details' : '' ) }>
 
-				<div className="row cell-element">
-				<div className="summary" ref={ (el) => this.rowSummary = el }>
-					<div className="col-xs-2 propElement">
-						<span><input type="checkbox" className="channel-check" onClick={ this.props.toggleChannelCheck } checked={ !! this.props.channelChecked } /> <span className="label"><span className="glyphicon glyphicon-tags"></span></span><span className="value">{ this.state.serverState.cellName || "Ch " + this.state.serverState.chanId } ({ trackingMode })</span></span>
-					</div>
-
-					<div className="col-xs-1 propElement">{ 
-						! ! this.state.ellapsed && 
-						<span>
-							<span className="label">
-								<span className="glyphicon glyphicon-hourglass"></span>
-							</span>
-							<span className="value">
-								{this.state.ellapsed}
-							</span>&nbsp; { this.state.ellapsedUnit }
-						</span> }
-					</div>
-					<div className="col-xs-1 propElement">{ !!this.state.sun && <span><span className="label"><span className="glyphicon glyphicon-scale"></span></span><span className="value">{this.state.sun}</span>&nbsp;{this.unit.sun}</span>} </div>
-					<div className="col-xs-1 propElement">{ ! isNaN( this.state.efficiency ) && <span><span className="label">&eta;</span><span className="value">{ this.state.efficiency }</span>{ this.unit.efficiency }</span>}</div>
-					<div className="col-xs-1 propElement">{ !!this.state.voc && 
-						<span>
-							<span className="label">V<sub>oc</sub></span>
-							<span className="value">{ this.state.voc }</span> { this.unit.voltage }
-						</span>}
-					</div>
-
-					<div className="col-xs-2 propElement">{ !!this.state.jsc && 
-						<span>
-							<span className="label">J<sub>sc</sub></span>
-							<span className="value">{ this.state.jsc }</span> { this.unit.currentdensity }
-						</span>
-					}
-					</div>
-					<div className="col-xs-1 propElement">{ !!this.state.ff && <span><span className="label">FF</span><span className="value">{ this.state.ff }</span>{this.unit.fillfactor}</span>}</div>
-
-					<div className="col-xs-2 propElement">
-					{ !! active && !! arrowstatus && this.state.serverState.tracking_mode == 1 && 
-						<span className={ arrowClassWrapper }><span className={ arrowClass }></span><span>{ this.state.changeRate } <span dangerouslySetInnerHTML={ { __html: this.state.changeUnit } } /></span></span>
-					}
-					</div>
-
-					<div className="col-xs-4 propElement">
-						
-						<CellButtons 
-							cfg 			= { () => { this.cfg(); } }
-							stop 			= { this.stop } 
-							start 			= { this.start }
-							recordJsc 		= { this.recordJsc } 
-							recordVoc 		= { this.recordVoc }
-							recordIV  		= { this.recordIV }
-							downloadData 	= { this.downloadData }
-							button_jsc 		= { active }
-							button_voc 		= { active }
-							button_iv 		= { active }
-							button_download = { active }
-							button_start 	= { this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && ! active && this.state.serverState.tracking_mode > 0 }
-							button_stop 	= { active }
-							button_details	= { active }
-							details 		= { this.toggleDetails }
-
-
-							button_jsc_disabled = { this.props.serverState.jsc_booked || this.state.updating }
-							button_voc_disabled = { this.props.serverState.voc_booked || this.state.updating }
-							button_iv_disabled = { this.props.serverState.iv_booked || this.state.updating }
-						/>
-
-					</div>
-					</div>
-
-					{ !!active && this.state.efficiency !== undefined && !!this.state.highest_value &&
-						<div className="bar" onClick={ this.showEfficiencies }>
-							<div className="barGreen" style={ { width: this.state.efficiency / 25 * 100 + "%" } }></div>
-							<div className="barRed" style={ { width: ( this.state.highest_value - this.state.efficiency ) / 25 * 100 + "%" } }></div>
-						</div>
-					}
-				</div>
-
-				<div className="row efficiency cell-element" onClick={ this.showSummary } ref={ (el) => this.rowEfficiency = el }>
+			
+				<div className="cell-name cell-main-info">
 					
-					<div className="col-xs-2 propElement fullHeight">
-
+					<div className="col-lg-9">
 						<span>
-							<span className="label">Current efficiency</span>
-							<span className="value">{ this.state.efficiency } { this.unit.efficiency }</span>
+							<input type="checkbox" className="channel-check" onClick={ this.props.toggleChannelCheck } checked={ !! this.props.channelChecked } /> 
 						</span>
+						<span className="label">
+							<span className="glyphicon glyphicon-tags"></span>
+						</span>
+						<span className="value">{ this.state.serverState.cellName || "Ch " + this.state.serverState.chanId }</span> { this.state.serverState.cellArea ? <span className="cell-area">( { this.state.serverState.cellArea } cm<sup>2</sup> )</span> :"" }
+		
 					</div>
 
 
-					<div className="col-xs-2 propElement fullHeight">
+					<div className="cell-iv pull-right col-lg-3">
 
-						<span>
-							<span className="label">Highest efficiency</span>
-							<span className="value">{ this.state.highest_value } { this.unit.efficiency }</span>
-						</span>
-					</div>
+						<StatusIV 
+							width="290"
+							height="190"
+							shown={ true } 
+							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
+							data={ this.state.ivCurves } 
+							dataIV={ this.state.data_IV } 
+							voltage={ this.state.voltage } 
+							current={ this.state.current } 
+							cellarea={ this.props.serverState.cellArea }
+							/>
 
-
-					<div className="col-xs-2 propElement fullHeight">
-
-						<span>
-							<span className="label">Actual voltage</span>
-							<span className="value">{ this.state.voltage } { this.unit.voltage }</span>
-						</span>
-					</div>
-
-
-					<div className="col-xs-3 propElement fullHeight">
-
-						<span>
-							<span className="label">Actual current density</span>
-							<span className="value">{ this.state.currentdensity } { this.unit.currentdensity }</span>
-						</span>
-					</div>
-
-					<div className="col-xs-3 propElement fullHeight">
-
-						<span>
-							<span className="label">Current range</span>
-							<span className="value">&plusmn; { pgaValueToRange( this.state.pga, this.props.config.fullScaleCurrent ) } { this.unit.current }</span>
-						</span>
-					</div>
-
-
-					<div className="col-xs-3 propElement fullHeight">
-
-						<StatusGraph shown={ true } mode="sparkline" width="180" height="43" data={ this.state.data } unit={unit} />
 					</div>
 
 				</div>
 
-				<div className="clearfix"></div>
+{/*	
+				<div className="row">
+				
+					<div className="col-lg-1">
+						<div>Last data</div>
+						<div><Timer latest={ this.state.latest } /></div>
+					</div>
 
+					<div className="col-lg-1">
+						<div>Next IV curve</div>
+						<div><Timer latest={ this.state.latest } /></div>
+					</div>
+
+					<div className="col-lg-1">
+						<div>Next Voc</div>
+						<div><Timer latest={ this.state.latest } /></div>
+					</div>
+
+					<div className="col-lg-1">
+						<div>Next Jsc</div>
+						<div><Timer latest={ this.state.latest } /></div>
+					</div>
+				</div>
+				*/ }
+
+
+				<div className="cell-summary">
+					
+
+					<div className={ `col-lg-1 cell-status ${ active ? 'active' : ''}`}>
+						<div>{ active ? <span className="glyphicon glyphicon-record"></span> : <span className="glyphicon glyphicon-stop"></span> }</div>
+						{ trackingMode }
+					</div>
+
+					<div className="col-lg-1 propElement">{ 
+						! ! this.state.ellapsed && 
+						<div>
+							<div className="label">
+								<span className="glyphicon glyphicon-hourglass"></span>
+							</div>
+							<div className="value">
+								{this.state.ellapsed}{ this.state.ellapsedUnit }
+							</div>
+						</div> }
+					</div>
+					<div className="col-lg-1 propElement">
+						<div className="record">
+							<span className="glyphicon glyphicon-record"></span>
+						</div>
+
+						{ 
+						!!this.state.sun && 
+						<div>
+							<div className="label">
+								<span className="glyphicon glyphicon-scale"></span>
+							</div>
+							<div className="value">
+								{ this.state.sun } {this.unit.sun}
+							</div>
+						</div>} 
+					</div>
+					<div className="col-lg-1 propElement">{ 
+						! isNaN( this.state.efficiency ) && 
+						<div>
+							<div className="label">&eta;</div>
+							<div className="value">{ this.state.efficiency }{ this.unit.efficiency }</div>
+						</div> }
+					</div>
+					<div className="col-lg-1 propElement">
+						<div className="record">
+							<span className="glyphicon glyphicon-record"></span>
+						</div>
+						<div className="label">
+							V<sub>oc</sub>
+						</div>
+						<div className="value">
+							{ !!this.state.voc ? <span>{ this.state.voc }{ this.unit.voltage }</span> : 'N/A' }
+						</div>
+						
+					</div>
+
+					<div className="col-xs-1 propElement">
+						<div className="record">
+							<span className="glyphicon glyphicon-record"></span>
+						</div>
+						<div className="label">
+							J<sub>sc</sub>
+						</div>
+						<div className="value">
+							{ !!this.state.jsc ? jsc_currentdensity : 'N/A' }
+						</div>
+						
+					</div>
+
+					<div className="col-xs-1 propElement">
+						<div className="label">FF</div>
+						<div className="value">
+							{ !!this.state.ff ?  this.state.ff : 'N/A' }
+						</div>
+					</div>
+
+
+
+
+					<div className="col-xs-1 propElement">
+						<div className="label">V<sub>now</sub></div>
+						<div className="value">
+							{ this.state.voltage } { this.unit.voltage }
+						</div>
+					</div>
+
+
+
+					<div className="col-xs-1 propElement">
+						<div className="label">J<sub>now</sub></div>
+						<div className="value">
+							{ j_currentdensity }
+						</div>
+					</div>
+					
+{ /*
 				<div className="row cell-element">
 
 					<div className="col-sm-3">
 						<table cellPadding="0" cellSpacing="0" className="parameters">
 							<tbody>
-								<tr>
-									<td>Cell name</td>
-									<td>{ this.state.serverState.cellName || "Ch " + this.props.chanId }</td>
-								</tr>
-								<tr>
-									<td>Area</td>
-									<td>{ this.state.serverState.cellArea ? <span>{ this.state.serverState.cellArea } cm<sup>2</sup></span> :"" }</td>
-								</tr>
+								
 								<tr>
 									<td>PCE</td>
 									<td>{ this.state.efficiency ? <span>{this.state.efficiency} {this.unit.efficiency}</span> : notavailable }</td>
@@ -919,14 +907,37 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 							</tbody>
 						</table>
 					</div>
+*/ }
+						
 
-					
-					<div className="col-sm-6">
-					
+					<div className="col-lg-1 propElement">
+						<div>
+							<div className="label">
+								<span className="glyphicon glyphicon-grain"></span>
+							</div>
+							<div className="value">
+								{ this.state.temperature_junction ? <span>{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+							</div>
+						</div>
+					</div>
+					<div className="col-lg-1 propElement">
+						<div>
+							<div className="label">
+								<span className="glyphicon glyphicon-tint"></span>
+							</div>
+							<div className="value">
+								{ this.state.humidity ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
+							</div>
+						</div>
+					</div>
+
+				
+					<div className="cell-efficiency col-lg-6">
+
 						<StatusGraph 
-							shown={this.state.showDetails} 
-							width="500" 
-							height="220" 
+							shown={ true } 
+							width="600" 
+							height="60" 
 							mode="default" 
 							key={ this.props.instrumentId + this.props.chanId + "_graph" } 
 							data={ this.state.data } 
@@ -940,67 +951,32 @@ console.log( results[ 2 ].series[ 0 ].values.length );
 							axisUnit={statusGraphAxisUnit}
 							serieLabelLegend={statusGraphSerieLabelLegend}
 							flag2={currVal} />
+					
+					</div>
+				
+				</div>
+
+
+				<div className="row cell-actions">
+					
+					<div className="col-lg-1">
+						Actions
 					</div>
 
-					<div className="col-sm-6">
-					
-						<StatusIV 
-							width="500"
-							height="240"
-							shown={this.state.showDetails} 
-							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
-							data={ this.state.ivCurves } 
-							dataIV={ this.state.data_IV } 
-							voltage={ this.state.voltage } 
-							current={ this.state.current } 
-							cellarea={ this.props.serverState.cellArea }
-							/>
+
+					<div className="col-lg-1">
+
+						<button className="btn btn-cl"><span className="glyphicon glyphicon-download-alt"></span> Download</button>
+						<button className="btn btn-cl"><span className="glyphicon stop"></span> Stop</button>
 					</div>
 
 
 				</div>
 
 			</div>
-		
 
 		);
 	}
 }
 
-
-/*		
-				
-
-				<div className="col-sm-3">
-					<h3>Real-time information</h3>
-
-					<div className="tag blue"><span>Current</span><a>{ this.state.currentdensity }</a></div>
-					<div className="tag blue"><span>Voltage</span><a>{ this.state.voltage }</a></div>
-					<div className="tag green"><span>Tracking mode</span><a>{ this.state.tracking_mode }</a></div>
-				</div>
-
-
-				<StatusRender key={ this.props.instrumentId + this.props.chanId + "_status" } tracking_mode={this.state.tracking_mode} start={ startVal } ellapsed={ this.state.ellapsed } ellapsedUnit={ this.state.ellapsedUnit } current={ currVal } arrowstatus={ arrowstatus } change={ change } unit={ unit } changeUnit={ changeUnit } />
-
-				<div className="cellActions pull-right">
-					
-
-					
-				</div>
-
-
-				*/
-/*
-						<div className={ 'action update' + ( this.state.updating ? ' rotating': '' ) } onClick={ this.update }>
-							<span><span className="glyphicon glyphicon-refresh"></span></span> <a>Update</a>
-						</div>
-
-*/
-/*{ ( !! this.state.enable && !!  this.state.measurementName ) && 
-		<div className="config" onClick={ this.pause }>
-			<span className="glyphicon glyphicon-pause"></span> <a>Pause channel</a>
-		</div>
-	}
-
-*/
 export default TrackerDevice;

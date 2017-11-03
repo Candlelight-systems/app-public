@@ -371,44 +371,60 @@ class TrackerGroupDevices extends React.Component {
     return (
       <div>
       <h4>Group: { this.props.name }</h4>
+
+
         <div className="row statuses">
-           { !! this.props.serverState.lightController &&
-            <div className="alert alert-info col-sm-4">
-                Light setpoint: { this.props.serverState.lightSetpoint } sun
-                <div className="pull-right">
-                  <div>
-                    <button type="button" className="btn btn-default btn-sm"  onClick={ this.light_controller_config }>Configure</button>
-                  </div>
+      
+          <div className="group-status group-status-light col-lg-3">
+            <h3>Light bias</h3>
+
+              <div className="col-lg-6">Intensity: { this.state.sun } sun</div>
+              <div className="col-lg-6">
+                <button type="button" className="btn btn-default btn-sm" onClick={ this.light_calibrate }>Calibrate</button>
+              </div>
+                
+
+            { !! this.props.serverState.lightController && <div>
+                <div className="col-lg-6">Setpoint: { this.props.serverState.lightSetpoint } sun</div>
+                <div className="col-lg-6"><button type="button" className="btn btn-default btn-sm"  onClick={ this.light_controller_config }>Configure</button></div>
+              </div>
+            }
+
+          </div>
+
+           
+          <div className="group-status group-status-temperature col-lg-3">
+         
+            { this.state.temperature !== -1 && 
+              <div>
+                <div className="col-lg-6">Temperature: { this.state.temperature } &deg;C</div>
+              </div> }
+
+
+            { this.props.groupConfig.heatController &&
+              <div>
+                <div className="col-lg-6">
+                  Heating power: { this.state.heatingPower == -1 ? 'Off' : Math.round( this.state.heatingPower * 100 ) + " %" }
+                </div>
+                <div className="col-lg-6">
+                    <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
+                    <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
                 </div>
             </div>
           }
+        </div>
 
-          <div className="alert alert-info col-sm-4">
-              Light intensity: { this.state.sun } sun
-              <div className="pull-right">
-                <div>
-                  <button type="button" className="btn btn-default btn-sm" onClick={ this.light_calibrate }>Calibrate</button>
-                </div>
+
+        { 
+          this.state.humidity !== -1 && 
+          <div className="group-status group-status-temperature col-lg-3">
+              <div>
+                <div className="col-lg-6">Humidity: { this.state.humidity } %</div>
               </div>
-          </div>
-
-         
-          { this.state.temperature !== -1 && <div className="alert alert-info col-sm-3">Temperature: { this.state.temperature } &deg;C</div> }
-          { this.state.humidity !== -1 && <div className="alert alert-info col-sm-3">Humidity: { this.state.humidity } %</div> }
-
-          { this.props.groupConfig.heatController &&
-            <div className="alert alert-info col-sm-4">
-                Heating power:&nbsp; { this.state.heatingPower == -1 ? 'Off' : Math.round( this.state.heatingPower * 100 ) + " %" } &nbsp;
-                <div className="pull-right">
-                  <div>
-                    <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
-                    <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
-                  </div>
-                </div>
-          </div>
-
+          </div> 
         }
-          <div className="clearfix"></div>
+
+        <div className="clearfix"></div>
         </div>
 
         <div className="cell toprow">

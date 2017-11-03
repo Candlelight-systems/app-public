@@ -1,28 +1,34 @@
 
-
 @import "./node_modules/bootstrap/less/bootstrap.less";
 
+@grid-columns: 12;
+@grid-gutter-width: 10px;
 
-@grid-columns: 15;
-
-/*@import "compass";*/
-@green: #3ca235;
+@green: #7bc382;
 @blue: #2635a5;
 @red: #a52626;
 @grey: #c0c0c0;
 
-@lightgrey: lighten( @grey, 10% );
-@lightlightgrey: lighten( @grey, 30% );
-@lightlightlightgrey: lighten( @grey, 50% );
-
 @dark: #3a3631;
 @darkorange: rgba(172,101,39,0.8);
 @greyorange: #e8e7e5;
-
-
 @footerheight: 180px;
 
+
+@page-background: #3f3f3f;
+@cell-background: #1c1c1c;
+@text-color: #efefef;
+@text-color-grey: #dfdfdf;
+
+
+
 @import "./calib_light.scss";
+
+.btn-cl {
+	border-radius: 0px;
+	color: @text-color;
+	background-color: transparent;
+}
 
 body {
 
@@ -46,13 +52,11 @@ a {
 }
 
 body.light {
-	background: linear-gradient(to bottom, @lightlightlightgrey 0%,@lightlightgrey 100%);
-	
-
+	background: #f3f3f3;
 }
 
-body.verylight {
-	background: linear-gradient(to bottom, @lightlightlightgrey 0%,@lightlightgrey 100%);
+body#cell-list {
+	background: @page-background;
 	
 }
 
@@ -82,70 +86,98 @@ body.verylight {
 	}
 
 	div.cell {
-		
+	
 		height: 45px;
+
 		overflow-y: hidden;
 		overflow-x: hidden;
 
-		&.show-second .cell-element {
-			animation-name: show-second;
-		}
-
-		&.show-first .cell-element {
-			animation-name: show-first;
-		}
-
-		&.show-details {
-			animation-name: show-details;
-
-			animation-duration: 700ms;
-			animation-iteration-count: 1;
-			animation-timing-function: ease-in-out;
-			animation-fill-mode: forwards;
-
-		}
-		
-		.cell-element {
-
-			animation-duration: 700ms;
-			animation-iteration-count: 1;
-			animation-timing-function: ease-in-out;
-			animation-fill-mode: forwards;
-
-			 @keyframes show-second { 
-		        from { 
-		           // transform: translate(0, 0); 
-		        } to { 
-		            transform: translate(0, -45px); 
-		        }
-		    }
-
-
-			 @keyframes show-first { 
-		        from { 
-		           transform: translate(0, -45px); 
-		        } to { 
-		            transform: translate(0, 0px); 
-		        }
-		    }
-
-
-
-			 @keyframes show-details { 
-		        from { 
-		           
-		        } to { 
-		           height: 350px;
-		        }
-		    }
-		}
-
-		.channel-check {
-			margin-left: 5px;
-		}
-
 		&.cell-running {
-			background-color: #f0f0f0;
+			height: 240px;
+		}
+
+
+		.cell-main-info {
+
+			.cell-area {
+				color: @text-color-grey;
+			}
+
+			.channel-check {
+				margin-left: 5px;
+			}
+
+			border-bottom: 1px solid black;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			font-size: 1.2em;
+			height: 40px;
+		}
+
+
+		.cell-summary {
+
+
+			.cell-status {
+
+				&.active {
+					color: @green;
+				}
+
+				> div {
+					margin: 10px;
+				}
+
+				background-color: @page-background;
+				font-size: 1.3em;
+				height: 120px;
+			}
+
+
+			text-align: center;
+
+			> div {
+
+				padding-top: 10px;
+
+				.label {
+					font-size: 1.1em;
+				}
+				
+				.value {
+					font-size: 1.1em;
+					whitespace: no-wrap;
+					color: @green;
+				}
+
+				.record {
+					float: right;
+					margin-right: 3px;
+					margin-top: -6px;
+					color: @red;
+					font-size: 0.8em;
+				}
+
+				background-color: @page-background;
+				height: 60px;
+				border-left: 2px solid @cell-background;
+				border-bottom: 2px solid @cell-background;
+				border-right: 2px solid @cell-background;
+			}
+
+
+			.cell-efficiency {
+				background-color: @cell-background;
+				
+				padding: 0px;
+			}
+		}
+
+		.cell-actions {
+
+			button {
+			float: left;
+			}
 		}
 
 		.summary, .efficiency {
@@ -209,11 +241,13 @@ body.verylight {
 			}
 		}
 
-		background-color: white;
-		border: 1px solid #c0c0c0;
-		border-radius: 5px;
+		background-color: @cell-background;
+		border: 0px solid black;
+		border-radius: 2px;
 		margin-bottom: 10px;
-		color: #333333;
+		
+		color: @text-color;
+
 		padding-left: 0px;
 		padding-right: 0px;
 
@@ -255,154 +289,6 @@ body.verylight {
 		.action {
 			cursor: pointer;
 		}
-
-/*
-		div.cellName {
-
-			float: left;
-			min-width: 250px;
-
-			h1 {
-				margin-top: 5px;
-				font-size: 3em;
-			}
-
-			div.cellSummary {
-
-				font-size: 0.8em;
-
-				.el {
-					white-space: nowrap;
-					padding-right: 10px;
-				}
-
-				.title {
-					font-weight: bold;
-					padding-right: 5px;
-					
-				}
-			}
-		}
-
-		div.cellActions {
-
-			margin-top: 5px;
-
-
-			.action {
-				
-				&.stop {
-					.buttonState( #f14947 );
-				}
-				&.start {
-					.buttonState( #0e8f5a );
-				}
-
-				&.config {
-					.buttonState(#3a3fad);
-
-				}
-				&.update {
-					.buttonState(#be6a2d);
-				}
-				&.recordIV {
-					.buttonState(#e38d2a);
-				}
-			}
-
-		}
-
-	
-		div.cellStatus {
-
-			float: left;
-			width: 300px;
-
-			div.statusText {
-				text-align: center;
-
-				.start {
-					color: black;
-				}
-
-				.between {
-					height: 40px;
-					line-height: 40px;
-					color: black;
-				}
-
-				.current span {
-					font-size: 2em;
-					font-weight: bold;
-					background-color: @grey;
-					color: #black;
-					border-radius: 3px;
-					padding: 5px;
-				}
-			}
-
-			div.statusSymbol {
-
-				line-height: 40px;
-
-				.text span {
-					white-space: nowrap;
-				}
-
-				&.right {
-					.arrow {
-						color: @blue;
-					}
-
-					.text span {
-						background-color: @blue;
-					}
-				}
-
-				&.up {
-					.arrow {
-						color: @green;
-					}
-
-					.text span {
-						background-color: @green;
-					}
-				}
-
-				&.down {
-					.arrow {
-						color: @red;
-					}
-
-					.text span {
-						background-color: @red;
-					}
-				}
-
-				text-align: center;
-
-				.arrow {
-					font-size: 3em;
-					margin-right: 5px;
-				}
-
-				.text span {
-					padding: 5px;
-					border-radius: 3px;
-				}
-			}
-		}
-
-		div.cellGraph {
-			float:left;
-			min-width: 250px;
-		}
-
-		div.cellIV {
-			float: left;
-			min-width: 250px;
-		}
-		*/
 	}
 
 	.vertical-align {
