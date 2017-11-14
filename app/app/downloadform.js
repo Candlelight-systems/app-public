@@ -630,7 +630,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
-						{ className: 'col-sm-9' },
+						{ className: 'col-sm-6' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'select',
 							{ name: 'dl_format', id: 'dl_format', className: 'form-control', value: this.state.dl_format, onChange: this.handleInputChange },
@@ -657,7 +657,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
-						{ className: 'col-sm-9' },
+						{ className: 'col-sm-6' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'select',
 							{ name: 'dl_track_nb', id: 'dl_track_nb', className: 'form-control', value: this.state.dl_track_nb, onChange: this.handleInputChange },
@@ -695,7 +695,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-sm-3' }),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
-						{ className: 'col-sm-9' },
+						{ className: 'col-sm-6' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
 							{ className: 'btn-group' },
@@ -736,7 +736,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-sm-3' }),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
-						{ className: 'col-sm-9' },
+						{ className: 'col-sm-6' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
 							{ className: 'btn-group' },

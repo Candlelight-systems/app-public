@@ -23,7 +23,7 @@ var modes = {
 
 		graphConstructor: {
 			paddingTop: 4,
-			paddingLeft: 4,
+			paddingLeft: 9,
 			paddingRight: 4,
 			paddingBottom: 2
 		}
@@ -63,7 +63,7 @@ class statusGraph extends GraphComponent {
 
 
 		this.serie = this.graph.newSerie();
-		this.serie.setLineColor( "white" );
+		this.serie.setLineColor( __THEME_GRAPH_EFFICIENCY_LINECOLOR );
 		this.serie.autoAxis();
 		this.serie.setLineWidth( 2 );		
 
@@ -77,7 +77,18 @@ class statusGraph extends GraphComponent {
 
 		} else {
 
-			this.graph.getXAxis().hide();
+			this.graph.getXAxis()
+						.setUnitInTicks( true )
+						.setTickLabelOffset( -60 )
+						.setTickPosition( Graph.TICKS_INSIDE )
+						.secondaryGridOff()
+						.setPrimaryTicksColor( __THEME_GRAPH_EFFICIENCY_TICKCOLOR )
+						.setSecondaryTicksColor( __THEME_GRAPH_EFFICIENCY_TICKCOLOR )
+						.setTicksLabelColor( __THEME_GRAPH_EFFICIENCY_TICKLABELCOLOR )
+						.setNbTicksSecondary( 0 )
+						.setUnit( 'h' )
+						.setPrimaryGridColor( __THEME_GRAPH_EFFICIENCY_AXISCOLOR );
+						
 			this.graph.getYAxis().hide();
 
 			this.graph.getYAxis()
@@ -85,23 +96,11 @@ class statusGraph extends GraphComponent {
 				.setUnit( this.props.axisUnit )
 				.setUnitWrapper("(", ")");
 			
-			this.graph
-				.getRightAxis( 0, { hideWhenNoSeriesShown: true } )
-				.setLabel('Sun')
-				.forceMin( 0 )
-				.setTickPosition( Graph.TICKS_OUTSIDE )
-				.setAxisColor( 'white' )
-				.setPrimaryTicksColor( 'white' );
-
-			this.graph.getXAxis().setLabel('Time');
-			this.graph.getXAxis().setUnit('h').setUnitWrapper("(", ")");
-
-
+			this.graph.getXAxis();
+			this.graph.getXAxis();
 			this.graph.getRightAxis( 0 ).forceMin( 0 );
 
 		}
-
-		this.graph.getXAxis().turnGridsOff();
 
 		this.graph.getXAxis().setAxisDataSpacing( 0.001, 0.001 );
 		this.graph.getYAxis().setAxisDataSpacing( 0.001, 0.001 );
@@ -127,7 +126,7 @@ class statusGraph extends GraphComponent {
 			this.flag1.addTransform("translate", this.graph.newPosition( { dx: "-60px", dy: "0px"} ) );
 			this.flag1.setRenderer( ( dom ) => 
 				{ 
-					ReactDOM.render( <div className="graph_tooltip medium"><div className="right"><span>{ this.props.flag1} { this.props.unit }</span></div></div>, dom )
+					ReactDOM.render( <div className="graph_tooltip medium"><div className="top"><span>{ this.props.flag1} { this.props.unit }</span></div></div>, dom )
 				} );
 			
 			

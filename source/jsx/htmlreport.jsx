@@ -451,7 +451,7 @@ class HTMLReport extends React.Component {
 			<div ref={ el => this.dom = el } className="container-fluid">
 
 				<div className="row">
-					<div className="col-xs-6">
+					<div className="col-xs-4">
 
 						<div className="logos">
 							<img src="images/logo_client.png" width="120" />
@@ -466,52 +466,52 @@ class HTMLReport extends React.Component {
 
 						<h4>Timing</h4>
 						<div className="row">
-							<div className="col-xs-7">Start date: </div><div className="col-xs-7 info">{ !!this.state.data && toDate( this.state.data.start_date ) }</div>
+							<div className="col-xs-4">Start date: </div><div className="col-xs-5 info">{ !!this.state.data && toDate( this.state.data.start_date ) }</div>
 						</div>
 						
 						<div className="row">
-							<div className="col-xs-7">End date: </div><div className="col-xs-7 info">{ !!this.state.data && toDate( this.state.data.end_date ) }</div>
+							<div className="col-xs-4">End date: </div><div className="col-xs-5 info">{ !!this.state.data && toDate( this.state.data.end_date ) }</div>
 						</div>
 
 						<div className="row">
-							<div className="col-xs-7">Ageing time: </div><div className="col-xs-7 info">{ !!this.state.data && this.state.data.ellapsed } hours</div>
+							<div className="col-xs-4">Ageing time: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.ellapsed } hours</div>
 						</div>
 						
 
 						<h4>Device parameters</h4>
 
 						<div className="row">
-							<div className="col-xs-7">Cell active area: </div><div className="col-xs-7  info">{ this.props.cellInfo.cellArea } cm<sup>2</sup></div>
+							<div className="col-xs-4">Cell active area: </div><div className="col-xs-5 info">{ this.props.cellInfo.cellArea } cm<sup>2</sup></div>
 						</div>
 
 						<div className="row">
-							<div className="col-xs-7">Comment: </div><div className="col-xs-7">{ this.props.config.comment }</div>
+							<div className="col-xs-4">Comment: </div><div className="col-xs-5">{ this.props.config.comment }</div>
 						</div>
 	
 
 						<h4>Power conversion efficiencies</h4>
 
 						<div className="row">
-							<div className="col-xs-7">Highest efficiency: </div><div className="col-xs-7 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
+							<div className="col-xs-4">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
 						</div>	
 						{!! this.state.data && !! this.state.data.timeEfficiencies && [					
-							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-7">Efficiency after 1h:</div><div className="col-xs-7 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 1 ] ? <div className="row"><div className="col-xs-7">Efficiency after 24h:</div><div className="col-xs-7 info">{ this.state.data.timeEfficiencies[ 1 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 2 ] ? <div className="row"><div className="col-xs-7">Efficiency after 100h:</div><div className="col-xs-7 info">{ this.state.data.timeEfficiencies[ 2 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 3 ] ? <div className="row"><div className="col-xs-7">Efficiency after 500h:</div><div className="col-xs-7 info">{ this.state.data.timeEfficiencies[ 3 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 4 ] ? <div className="row"><div className="col-xs-7">Efficiency after 1'000h:</div><div className="col-xs-7 info">{ this.state.data.timeEfficiencies[ 4 ] }%</div></div> : '' )
+							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-4">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 1 ] ? <div className="row"><div className="col-xs-4">Efficiency after 24h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 1 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 2 ] ? <div className="row"><div className="col-xs-4">Efficiency after 100h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 2 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 3 ] ? <div className="row"><div className="col-xs-4">Efficiency after 500h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 3 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 4 ] ? <div className="row"><div className="col-xs-4">Efficiency after 1'000h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 4 ] }%</div></div> : '' )
 						] }
-						<div className="row"><div className="col-xs-7">Final efficiency: </div><div className="col-xs-7 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
+						<div className="row"><div className="col-xs-4">Final efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
 
 						<h4>j-V sweeps</h4>	
 						<div className="row ivData ivHead">
 							<div className="col-xs-3">Time<br /><nobr>(h)</nobr></div>
-							<div className="col-xs-2">V<sub>oc</sub><br /><nobr>(V)</nobr></div>
-							<div className="col-xs-2">J<sub>sc</sub><br /><nobr>(mA cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-2">P<sub>out</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-2">P<sub>in</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-2">Fill factor<br /><nobr>(%)</nobr></div>
-							<div className="col-xs-2">PCE<br /><nobr>(%)</nobr></div>
+							<div className="col-xs-1">V<sub>oc</sub><br /><nobr>(V)</nobr></div>
+							<div className="col-xs-1">J<sub>sc</sub><br /><nobr>(mA cm<sup>-2</sup>)</nobr></div>
+							<div className="col-xs-1">P<sub>out</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
+							<div className="col-xs-1">P<sub>in</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
+							<div className="col-xs-1">Fill factor<br /><nobr>(%)</nobr></div>
+							<div className="col-xs-1">PCE<br /><nobr>(%)</nobr></div>
 						</div>
 
 						{
@@ -525,12 +525,12 @@ class HTMLReport extends React.Component {
 
 								<div className="row ivData">
 									<div className={ "col-xs-3 color-series-style-" + index }>{ jv.ellapsed } h</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
-									<div className={ "col-xs-2 color-series-style-" + index }>{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
+									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
 								</div> 
 								);
 							} )
@@ -541,7 +541,7 @@ class HTMLReport extends React.Component {
 						<div ref={ el => this.domJV = el }></div>
 
 					</div>	
-					<div className="col-xs-9" ref={ el => this.domStability = el }></div>
+					<div className="col-xs-5" ref={ el => this.domStability = el }></div>
 				</div>
 				<div className="row footer">
 				<div className="pull-right">Generated on : { new Date().toString() } </div>&copy; Candlelight systems ltd. 

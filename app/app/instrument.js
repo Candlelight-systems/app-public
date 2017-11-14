@@ -132,7 +132,7 @@ module.exports = require("react-dom");
 
 
 
-class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent {
 
 	constructor(props) {
 		super(props);
@@ -376,15 +376,17 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     this.updateInstrument = this.updateInstrument.bind(this);
     this.getStatus = this.getStatus.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
-    this.togglePause = this.togglePause.bind(this);
+
     //    this.checkAll = this.checkAll.bind( this );
 
     window.addEventListener("online", () => {
       this.updateStatus();
+      this.ping();
     });
 
     window.addEventListener("offline", () => {
       this.updateStatus();
+      this.ping();
     });
 
     __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("light.updated", () => {
@@ -396,7 +398,6 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     return Object(__WEBPACK_IMPORTED_MODULE_5__influx__["a" /* ping */])(this.props.configDB).catch(error => {
 
       console.warn("Cannot reach influx DB. Error was: ", error);
-
       this.setState({
         error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
       });
@@ -477,22 +478,6 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     });
   }
 
-  togglePause() {
-
-    let url;
-
-    if (this.state.paused) {
-      url = "resumeChannels";
-    } else {
-      url = "pauseChannels";
-    }
-
-    return fetch("http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/" + url + "?instrumentId=" + this.props.instrumentId, { method: 'GET' }).then(response => {
-
-      this.updateInstrument();
-    });
-  }
-
   render() {
 
     let content;
@@ -513,7 +498,11 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
           configDB: this.props.configDB,
           serverState: this.state.serverState[group.groupName],
           update: this.updateInstrument,
-          getStatus: this.updateStatus
+          getStatus: this.updateStatus,
+
+          error_influxdb: this.state.error_influxdb,
+          error_tracker: this.state.error_tracker,
+          paused: this.state.paused
         });
       });
     }
@@ -536,81 +525,13 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "h3",
         null,
+        "Instrument: ",
         this.props.instrumentId
-      ),
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        { className: "row statuses" },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "col-lg-4 group-status group-status-db " + (this.state.error_influxdb ? ' alert-danger' : 'alert-success') },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-6" },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.state.error_influxdb || "", className: "glyphicon glyphicon-" + (this.state.error_influxdb ? 'warning-sign' : 'check') }),
-            "\xA0 InfluxDB server"
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-6" },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "button",
-              { type: "button", className: "btn btn-default btn-sm", onClick: () => {
-                  __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInfluxDB");
-                } },
-              "Config"
-            )
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "col-sm-4 alert " + (this.state.error_tracker ? ' alert-danger' : 'alert-success') },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.state.error_tracker || "", className: "glyphicon glyphicon-" + (this.state.error_tracker ? 'warning-sign' : 'check') }),
-          "\xA0 Instrument connection",
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "pull-right" },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-default btn-sm", onClick: this.editInstrument },
-                "Config"
-              )
-            )
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "col-sm-4 alert " + (this.state.paused ? ' alert-danger' : 'alert-info') },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? "paused" : "start") }),
-          "\xA0",
-          this.state.paused ? "Tracking paused" : "Tacking enabled",
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "pull-right" },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-default btn-sm", onClick: this.togglePause },
-                this.state.paused ? "Resume" : "Pause"
-              )
-            )
-          )
-        )
       ),
       content
     );
   }
 }
-
-/*
-    
-
-*/
 
 var _initialiseProps = function () {
   this.updateInstrument = __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default()((props = this.props) => {
@@ -660,8 +581,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       channelChecked: {}
     };
 
-    this.pauseAll = this.pauseAll.bind(this);
-    this.resumeAll = this.resumeAll.bind(this);
     this.toggleChannelCheck = this.toggleChannelCheck.bind(this);
 
     this.cfgAll = this.cfgAll.bind(this);
@@ -678,6 +597,10 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     this.setHeatingPower = this.setHeatingPower.bind(this);
     this.increaseHeatingPower = this.increaseHeatingPower.bind(this);
     this.decreaseHeatingPower = this.decreaseHeatingPower.bind(this);
+    this.resetSlave = this.resetSlave.bind(this);
+
+    this.togglePause = this.togglePause.bind(this);
+    this.wsUpdate = this.wsUpdate.bind(this);
 
     setInterval(() => {
 
@@ -690,6 +613,64 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
   componentDidMount() {
     this.updateGroupStatus();
     this.initCheckChannels(this.props);
+
+    this.setState({
+      paused: this.props.paused,
+      heatingPower: this.props.serverState ? this.props.serverState.heatingPower : 'N/A'
+    });
+
+    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+
+    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    if (data.state.hasOwnProperty('paused')) {
+      this.setState({ paused: data.state.paused });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+
+    if (!this.transformed && this.toggleLightMode) {
+
+      $(this.toggleLightMode).bootstrapToggle({
+        on: 'Automatic',
+        off: 'Manual'
+      }).change(() => {
+
+        // Propagate the information to the server
+        let saveJSON = {
+          instrumentId: this.props.instrumentId,
+          groupName: this.props.name,
+          lightController: {
+            modeAutomatic: !!this.toggleLightMode.checked
+          }
+        };
+
+        let body = JSON.stringify(saveJSON);
+        var headers = new Headers({
+          "Content-Type": "application/json",
+          "Content-Length": body.length.toString()
+        });
+
+        return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+
+          method: 'POST',
+          headers: headers,
+          body: body
+
+        }).then(() => {}).catch(error => {
+
+          __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
+        });
+      });
+      this.transformed = true;
+    }
   }
 
   updateGroupStatus() {
@@ -796,7 +777,8 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     this.initCheckChannels(nextProps);
 
     this.setState({
-      heatingPower: nextProps.serverState.heatingPower
+      heatingPower: nextProps.serverState.heatingPower,
+      paused: nextProps.paused
     });
   }
 
@@ -832,26 +814,12 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     }));
   }
 
-  pauseAll() {
-
-    fetch("http://" + this.props.cfg.trackerHost + ":" + this.props.cfg.trackerPort + "/pauseChannels", {
+  resetSlave() {
+    fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetSlave?instrumentId=" + this.props.instrumentId, {
 
       method: 'GET'
 
-    }).then(response => {
-
-      this.setState({ paused: true });
-    });
-  }
-
-  resumeAll() {
-
-    fetch("http://" + this.props.cfg.trackerHost + ":" + this.props.cfg.trackerPort + "/resumeChannels", {
-      method: 'GET'
-    }).then(response => {
-
-      this.setState({ paused: false });
-    });
+    }).then(response => {});
   }
 
   heatingPowerChange(e) {
@@ -944,6 +912,18 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     });
   }
 
+  togglePause() {
+
+    let url;
+
+    if (this.state.paused) {
+      url = "resumeChannels";
+    } else {
+      url = "pauseChannels";
+    }
+    return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent(this.props.instrumentId), { method: 'GET' });
+  }
+
   render() {
 
     if (this.props.channels) {
@@ -1003,59 +983,202 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
         { className: "row statuses" },
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
           "div",
-          { className: "group-status group-status-light col-lg-3" },
+          { className: "col-lg-2 group-status group-status-instrument" },
           __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "h3",
+            "h4",
+            null,
+            "Instrument status"
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: "row" + (this.props.error_influxdb ? ' status-error' : '') },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { title: this.state.error_influxdb || "", className: "glyphicon glyphicon-" + (this.state.error_influxdb ? 'warning-sign' : 'check') }),
+              " InfluxDB server"
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-4" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "button",
+                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+                    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInfluxDB");
+                  } },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+                " Configure"
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: "row" + (this.props.error_tracker ? ' status-error' : '') },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { title: this.props.error_tracker || "", className: "glyphicon glyphicon-" + (this.props.error_tracker ? 'warning-sign' : 'check') }),
+              " MPP Tracker"
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-4" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "button",
+                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+                    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
+                  } },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+                " Configure"
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: "row" + (this.state.paused ? ' status-error' : '') },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? 'warning-sign' : 'check') }),
+              " ",
+              this.state.paused ? "Tracking paused" : "Tracking enabled"
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-4" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "button",
+                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.togglePause },
+                this.state.paused ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+                  "Resume"
+                ) : __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-pause" }),
+                  "Pause"
+                )
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: "row" },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "button",
+                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.resetSlave },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  null,
+                  "Reset enclosure(s)"
+                )
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "col-lg-4" })
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          "div",
+          { className: "group-status group-status-light col-lg-2" },
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "h4",
             null,
             "Light bias"
           ),
           __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
-            { className: "col-lg-6" },
-            "Intensity: ",
-            this.state.sun,
-            " sun"
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "col-lg-6" },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "button",
-              { type: "button", className: "btn btn-default btn-sm", onClick: this.light_calibrate },
-              "Calibrate"
-            )
-          ),
-          !!this.props.serverState.lightController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            null,
+            { className: "row" },
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-6" },
-              "Setpoint: ",
-              this.props.serverState.lightSetpoint,
+              { className: "col-lg-5" },
+              "Intensity: ",
+              this.state.sun,
               " sun"
             ),
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-6" },
+              { className: "col-lg-4" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "button",
-                { type: "button", className: "btn btn-default btn-sm", onClick: this.light_controller_config },
-                "Configure"
+                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
+                " Calibrate"
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "div",
+            { className: this.props.serverState.lightController ? 'visible' : 'hidden' },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-5" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  { className: "grey" },
+                  "Setpoint:"
+                ),
+                " ",
+                this.props.serverState.lightSetpoint,
+                " sun"
+              ),
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-4" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "button",
+                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+                  " Configure"
+                )
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-5" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  { className: "grey" },
+                  "Mode"
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-4" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "label",
+                  { className: "checkbox-inline" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { type: "checkbox", ref: el => this.toggleLightMode = el, checked: this.props.serverState.lightModeAutomatic, "data-width": "100", "data-height": "25" })
+                )
               )
             )
           )
         ),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
           "div",
-          { className: "group-status group-status-temperature col-lg-3" },
+          { className: "group-status group-status-temperature col-lg-2" },
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "h4",
+            null,
+            "Temperature"
+          ),
           this.state.temperature !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
             null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-6" },
-              "Temperature: ",
+              { className: "col-lg-9" },
+              "Box temperature: ",
               this.state.temperature,
               " \xB0C"
             )
@@ -1065,13 +1188,13 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
             null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-6" },
+              { className: "col-lg-5" },
               "Heating power: ",
               this.state.heatingPower == -1 ? 'Off' : Math.round(this.state.heatingPower * 100) + " %"
             ),
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-6" },
+              { className: "col-lg-4" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "button",
                 { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
@@ -1086,43 +1209,27 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
             )
           )
         ),
-        this.state.humidity !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "group-status group-status-temperature col-lg-3" },
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            null,
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-6" },
-              "Humidity: ",
-              this.state.humidity,
-              " %"
-            )
-          )
-        ),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "clearfix" })
       ),
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "div",
-        { className: "cell toprow" },
+        { className: "row" },
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
           "div",
-          { className: "row" },
+          { className: "cell-configure-all col-lg-9" },
           __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "col-sm-2" },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "span",
-              null,
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { className: "channel-check", type: "checkbox", onClick: this.checkAll, checked: this.state.checkAll }),
-              "\xA0",
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "a",
-                { href: "#", onClick: this.cfgAll },
-                "Configure"
-              )
-            )
+            "button",
+            { className: "btn btn-default btn-cl", onClick: this.checkAll },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+            " ",
+            this.state.checkAll ? 'Deselect all' : 'Select all'
+          ),
+          "\xA0",
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            "button",
+            { className: "btn btn-default btn-cl", onClick: this.cfgAll },
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+            " Configure selected"
           )
         )
       ),
@@ -1169,10 +1276,10 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 //import cfg from "./config"
 
 const initialState = {
-	unknown: true,
+
 	display: 'eff',
-	ellapsed: 0,
-	ellapsedUnit: 'min.',
+	ellapsed: false,
+	wsEllapsed: false,
 	changeRate: false,
 	absChangeRate: false,
 	changeUnit: false,
@@ -1186,6 +1293,7 @@ const initialState = {
 	voltage: false,
 	ff: false,
 	current: false,
+	currentdensity: false,
 	voc: false,
 	jsc: false,
 	sun: false,
@@ -1194,6 +1302,7 @@ const initialState = {
 	arrowstatus: false,
 	change: false,
 	showDetails: false,
+	last_time: 0,
 
 	_last_iv_time: false,
 	_last_iv: null,
@@ -1202,6 +1311,11 @@ const initialState = {
 	ivCurves: [],
 	serverState: {}
 };
+
+function round(value, digits) {
+
+	return Math.round(value * 10 ** digits) / 10 ** digits;
+}
 
 class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Component {
 
@@ -1269,7 +1383,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			)
 		};
 
-		this.state = initialState;
+		this.state = Object.assign({}, initialState);
+		this.state.data = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
 		this.cfg = this.cfg.bind(this);
 		this.start = this.start.bind(this);
@@ -1281,11 +1396,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		this.showEfficiencies = this.showEfficiencies.bind(this);
 		this.showSummary = this.showSummary.bind(this);
-		this.showDetails = this.showDetails.bind(this);
-		this.hideDetails = this.hideDetails.bind(this);
+
 		this.downloadData = this.downloadData.bind(this);
 
-		this.toggleDetails = this.toggleDetails.bind(this);
+		this.wsUpdate = this.wsUpdate.bind(this);
+
 		//	this.formChanged = this.formChanged.bind( this );
 		//this.state.tmpServerState = {};		
 	}
@@ -1296,7 +1411,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 	}
 	componentWillReceiveProps(nextProps) {
 
-		this.setState({ updating: false, unknown: false });
+		this.setState({ updating: false });
 		this.setState({ serverState: nextProps.serverState });
 
 		if (nextProps.serverState.tracking_mode > 0 && nextProps.measurementName && nextProps.measurementName !== this.props.measurementName || !this.state.serverState) {
@@ -1307,12 +1422,14 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	componentDidMount() {
 
-		this.setState({ updating: false, unknown: false });
+		this.setState({ updating: false });
 		this.setState({ serverState: this.props.serverState });
 
 		if (this.props.serverState.tracking_mode > 0) {
 			this.updateInfluxData(this.props.serverState);
 		}
+
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].on("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
 	}
 
 	componentWillUnmount() {
@@ -1321,6 +1438,119 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			clearTimeout(this.refreshInterval);
 			this.refreshInterval = true;
 		}
+
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].removeListener("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
+	}
+
+	async wsUpdate(event, data) {
+
+		let newState = {};
+
+		data.state = data.state || {};
+		data.timer = data.timer || {};
+		data.action = data.action || {};
+
+		if (data.state.efficiency) {
+			newState.efficiency = round(data.state.efficiency, 2);
+		}
+
+		if (data.state.current) {
+			// Convert to mA
+			newState.current = round(data.state.current * 1000, 2);
+			newState.currentdensity = data.state.current * 1000 / this.state.serverState.cellArea;
+		}
+
+		if (data.state.voltage) {
+			newState.voltage = round(data.state.voltage, 2);
+		}
+
+		if (data.state.power) {
+			newState.power = round(data.state.power, 2);
+		}
+
+		if (data.state.voc) {
+			newState.power = round(data.state.voc, 2);
+		}
+
+		if (data.state.sun) {
+			newState.sun = round(data.state.sun, 2);
+		}
+
+		if (data.state.jsc) {
+			newState.jsc = data.state.jsc;
+		}
+
+		if (data.state.temperature) {
+			newState.temperature_junction = data.state.temperature;
+		}
+
+		if (data.state.humidity) {
+			newState.humidity = data.state.humidity;
+		}
+
+		if (!isNaN(data.timer.iv)) {
+			// Timer for the next IV curve
+			newState.timer_nextIV = { time: data.timer.iv };
+		}
+
+		if (!isNaN(data.timer.jsc)) {
+			// Timer for the next JSC measurement
+			newState.timer_nextJsc = { time: data.timer.jsc };
+		}
+
+		if (!isNaN(data.timer.voc)) {
+			// Timer for the next Voc curve
+			newState.timer_nextVoc = { time: data.timer.voc };
+		}
+
+		if (!isNaN(data.timer.aquisition)) {
+			// Timer for the last aquisition
+			newState.timer_aquisition = { time: data.timer.aquisition };
+		}
+
+		if (!isNaN(data.timer.ellapsed) && !this.state.ellapsed) {
+			newState.wsEllapsed = data.timer.ellapsed;
+		}
+
+		if (data.action.data && this.state.data) {
+
+			let lastTime;
+
+			if (this.state.data.getLength && this.state.data.getLength() > 0) {
+				lastTime = this.state.data.xdata.data[this.state.data.getLength() - 1];
+				lastTime += this.state.serverState.tracking_record_interval / 1000;
+			} else {
+				lastTime = 0;
+			}
+
+			if (!this.state.data) {
+				newState.data = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+			} else {
+
+				this.state.data.append(lastTime, data.action.data);
+				newState.data = this.state.data;
+			}
+		}
+
+		if (data.action.ivCurve) {
+			this.updateInfluxData();
+		}
+
+		if (data.action.saved) {
+			// Data has just been saved into the DB => reload it into the renderer
+			this.updateInfluxData();
+		}
+
+		if (data.action.update) {
+			this.getStatus();
+		}
+
+		if (data.action.stopped) {
+			await this.getStatus();
+			newState = Object.assign({}, initialState);
+		}
+
+		this.setState(newState);
 	}
 
 	saveStatus(newState) {
@@ -1338,12 +1568,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			method: 'POST',
 			body: body
 
-		}).then(response => {
-
-			this.getStatus();
-		}).catch(() => {
-
-			this.setState({ unknown: true, updating: false });
 		});
 	}
 
@@ -1361,57 +1585,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			method: 'GET'
 
-		}).then(response => {
-
-			this.setState(Object.assign({}, initialState));
-			this.getStatus();
-		}).catch(() => {
-
-			this.setState({ unknown: true, updating: false });
 		});
 	}
 
 	recordIV() {
-
-		this.setState({ updating: true });
-		let body = JSON.stringify({ instrumentId: this.props.instrumentId, chanId: this.props.chanId });
-
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).then(response => {
-
-			this.getStatus();
-		}).catch(() => {
-
-			this.setState({ unkown: true, updating: false });
-		});
+		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId);
 	}
 
 	recordVoc() {
-
-		this.setState({ updating: true });
-
-		let body = JSON.stringify({ instrumentId: this.props.instrumentId, chanId: this.props.chanId });
-
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId + "&extend=" + !!!this.state.voc).then(response => {
-
-			this.getStatus();
-		}).catch(() => {
-
-			this.setState({ unkown: true, updating: false });
-		});
+		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId + "&extend=" + !!!this.state.voc);
 	}
 
 	recordJsc() {
-
-		this.setState({ updating: true });
-		let body = JSON.stringify({ instrumentId: this.props.instrumentId, chanId: this.props.chanId });
-
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).then(response => {
-
-			this.getStatus();
-		}).catch(() => {
-
-			this.setState({ unkown: true, updating: false });
-		});
+		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId);
 	}
 
 	//formChanged( name, value ) {
@@ -1447,7 +1633,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			}
 
 			this.updateInfluxData();
-		}, this.props.refreshRate * 1000 || 10000);
+		}, this.props.refreshRate * 1000 || 60000);
 	}
 
 	pause() {
@@ -1495,7 +1681,20 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	getStatus() {
 
-		this.props.updateStatus();
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getStatus?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+
+			method: 'GET'
+
+		}).then(response => response.json()).then(response => {
+
+			this.setState({ serverState: response[this.props.groupName].channels[this.props.chanId] });
+			//this.updateInfluxData( response );
+		}).catch(error => {
+
+			this.setState({
+				error: error
+			});
+		});
 	}
 
 	tooltip(message, color) {
@@ -1519,18 +1718,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		}
 		this.wrapper.classList.add("show-second");
 		this.wrapper.classList.remove("show-first");
-	}
-
-	toggleDetails() {
-		this.setState(state => ({ showDetails: !state.showDetails }));
-	}
-
-	showDetails() {
-		this.setState({ showDetails: true });
-	}
-
-	hideDetails() {
-		this.setState({ showDetails: false });
 	}
 
 	showSummary() {
@@ -1602,16 +1789,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		Object(__WEBPACK_IMPORTED_MODULE_5__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
 
-			if (!results[0].series) {
-				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
-			}
-
-			let timefrom = results[0].series[0].values[0][0],
-			    timeto = results[1].series[0].values[0][0],
-			    timefrom_date = new Date(timefrom),
-			    timeto_date = new Date(timeto),
-			    last_iv;
-
 			if (results[2].series && results[2].series[0]) {
 
 				newState.ivCurves = this.state.ivCurves.splice(0);
@@ -1628,9 +1805,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				}));
 			}
 
+			if (!results[0].series) {
+				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
+			}
+
+			let timefrom = results[0].series[0].values[0][0],
+			    timeto = results[1].series[0].values[0][0],
+			    timefrom_date = new Date(timefrom),
+			    timeto_date = new Date(timeto),
+			    last_iv;
+
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
-			newState.efficiency = Math.round(results[1].series[0].values[0][1] * 100) / 100;
+			newState.efficiency = round(results[1].series[0].values[0][1], 2);
 
 			newState.power = results[1].series[0].values[0][2];
 			newState.current = results[1].series[0].values[0][3] * 1000;
@@ -1649,15 +1836,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			let timeDifference = (timeto_date - timefrom_date) / 1000;
 
 			newState.last_time = timeto_date;
-			newState.ellapsed = Math.round(timeDifference / 3600 * 10) / 10;
-
-			if (timeDifference < 3600) {
-				newState.ellapsed = Math.round(timeDifference / 60);
-				newState.ellapsedUnit = "m";
-			} else {
-				newState.ellapsed = Math.round(newState.ellapsed);
-				newState.ellapsedUnit = "h";
-			}
+			newState.ellapsed = timeDifference;
 
 			grouping = Math.max(1, Math.round(timeDifference / 100));
 
@@ -1672,27 +1851,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			//query = "SELECT time, MAX(efficiency) as effMax FROM \"" + this.state.serverState.measurementName + "\" ORDER BY time ASC limit 1;"
 			//queue.push( influxquery( query, db_ds ).then( ( results ) => {
-			let changeUnit,
-			    changeUnitVal,
-			    prev_time = timeto_date.getTime() - (timeto_date.getTime() - timefrom_date.getTime()) / 10;
-
-			if (timeto_date.getTime() - timefrom_date.getTime() > 12 * 3600 * 1000) {
-				// Display in days
-
-				changeUnitVal = 24 * 3600;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 day
-				changeUnit = " &#951;% / day";
-			} else if (timeto_date.getTime() - timefrom_date.getTime() > 600 * 1000) {
-
-				changeUnitVal = 3600;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 hour
-				changeUnit = " &#951;% / hour";
-			} else if (timeto_date.getTime() - timefrom_date.getTime() > 300 * 1000) {
-
-				changeUnitVal = 60;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 minute
-				changeUnit = " &#951;% / minute";
-			}
 
 			if (results[3] && results[3].series && this.state.serverState.tracking_mode == 1) {
 				newState.voc = Math.round(results[3].series[0].values[0][1] * 1000) / 1000;
@@ -1722,7 +1880,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 					return;
 				}
 
-				let valueIndex = 2;
+				let valueIndex = 1;
 
 				values.forEach((value, index) => {
 
@@ -1736,6 +1894,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						time = (date.getTime() - offset) / 1000;
 					}
 
+					//value[ valueIndex ] += 2;
 					if (this.state.serverState.tracking_mode == 1) {
 						if (value[valueIndex] > 35 || value[valueIndex] < 0) {
 							// Higher than 35% => fail. Lower than 0% => fail.
@@ -1770,6 +1929,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
+
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -1780,16 +1940,20 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 				newState.ff = Math.round(newState.power / serverState.cellArea / (newState.voc * newState.jsc / 1000) * 100);
 				newState.updating = false;
-				this.setState(newState);
 			}).catch(error => {
 
 				console.error("Could not process influx DB request.");
 				console.error(error);
+			}).then(() => {
+
+				this.setState(newState);
 			});
 		}).catch(error => {
 
 			console.error("Could not process influx DB request.");
 			console.error(error);
+
+			this.setState(newState);
 		}).then(() => {
 
 			this.scheduleRefresh();
@@ -1798,7 +1962,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	processCurrent(value) {
 
-		if (isNaN(value)) {
+		if (isNaN(value) || value === false) {
 			return;
 		}
 
@@ -1807,7 +1971,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				"span",
 				null,
 				(Math.round(value * 10000) / 10).toFixed(1),
-				"\u03BCAcm",
+				"\xA0\u03BCA\xA0cm",
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"sup",
 					null,
@@ -1819,7 +1983,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				"span",
 				null,
 				(Math.round(value * 100) / 100).toFixed(1),
-				"mAcm",
+				"\xA0mA\xA0cm",
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"sup",
 					null,
@@ -1883,340 +2047,494 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		const j_currentdensity = this.processCurrent(this.state.currentdensity);
 		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
-		return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-			"div",
-			{ ref: el => this.wrapper = el, className: 'cell ' + (this.state.unknown ? 'cell-unknown' : active ? 'cell-running' : 'cell-stopped') + (this.state.showDetails && active ? ' show-details' : '') },
-			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+		if (active) {
+
+			let ellapsed = {
+				time: !isNaN(this.state.ellapsed) ? this.state.ellapsed * 1000 : this.state.wsEllapsed
+			};
+
+			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
-				{ className: "cell-name cell-main-info" },
+				{ ref: el => this.wrapper = el, className: 'cell ' + (active ? 'cell-running' : 'cell-stopped') + ' show-details' },
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "col-lg-9" },
+					{ className: "col-lg-7" },
 					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"span",
-						null,
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"span",
-						{ className: "label" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"span",
-						{ className: "value" },
-						this.state.serverState.cellName || "Ch " + this.state.serverState.chanId
-					),
-					" ",
-					this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"span",
-						{ className: "cell-area" },
-						"( ",
-						this.state.serverState.cellArea,
-						" cm",
+						"div",
+						{ className: "cell-name cell-main-info row" },
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"sup",
-							null,
-							"2"
+							"div",
+							{ className: "col-lg-9" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
+								{ className: "label" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
+								{ className: "value" },
+								this.state.serverState.cellName
+							),
+							" ",
+							this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"span",
+								{ className: "cell-area" },
+								"( ",
+								this.state.serverState.cellArea,
+								" cm",
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"sup",
+									null,
+									"2"
+								),
+								" )"
+							) : ""
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "cell-timing row" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								"Last data"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, direction: "ascending", timerValue: this.state.timer_aquisition })
+							)
 						),
-						" )"
-					) : ""
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "record" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordIV })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								"Next IV curve"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextIV })
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "record" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								"Next Voc"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextVoc })
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "record" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								"Next Jsc"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextJsc })
+							)
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "cell-summary row" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: `col-lg-1 cell-status ${active ? 'active' : ''}` },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								active ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }) : __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
+							),
+							trackingMode
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "label" },
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
+								),
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "value" },
+									ellapsed.time ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, maxLevel: 3, spacer: " ", direction: "ascending", timerValue: ellapsed }) : 'N/A'
+								)
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "label" },
+									"\u03B7"
+								),
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "value" },
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										"strong",
+										null,
+										!isNaN(this.state.efficiency) && this.state.efficiency !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+											"span",
+											null,
+											this.state.efficiency,
+											" ",
+											this.unit.efficiency
+										) : 'N/A'
+									)
+								)
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "label" },
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
+								),
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "value" },
+									!isNaN(this.state.sun) && this.state.sun !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										"span",
+										null,
+										this.state.sun,
+										" ",
+										this.unit.sun
+									) : 'N/A'
+								)
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "record" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "label" },
+								"V",
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"sub",
+									null,
+									"oc"
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "value" },
+								!isNaN(this.state.voc) && this.state.voc !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"span",
+									null,
+									this.state.voc,
+									" ",
+									this.unit.voltage
+								) : 'N/A'
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-xs-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "record" },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "label" },
+								"J",
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"sub",
+									null,
+									"sc"
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "value" },
+								jsc_currentdensity || 'N/A'
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-xs-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "label" },
+								"FF"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "value" },
+								!isNaN(this.state.ff) && this.state.ff !== false ? this.state.ff : 'N/A'
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-xs-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "label" },
+								"V",
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"sub",
+									null,
+									"now"
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "value" },
+								!isNaN(this.state.voltage) && this.state.voltage !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"span",
+									null,
+									this.state.voltage,
+									" ",
+									this.unit.voltage
+								) : 'N/A'
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-xs-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "label" },
+								"J",
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"sub",
+									null,
+									"now"
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								{ className: "value" },
+								j_currentdensity || 'N/A'
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "label" },
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-grain" })
+								),
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "value" },
+									this.state.temperature_junction && this.state.temperature_junction > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										"span",
+										null,
+										this.state.temperature_junction,
+										" ",
+										this.unit.temperature
+									) : 'N/A'
+								)
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 propElement" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"div",
+								null,
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "label" },
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tint" })
+								),
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"div",
+									{ className: "value" },
+									this.state.humidity && this.state.humidity > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										"span",
+										null,
+										this.state.humidity,
+										" ",
+										this.unit.humidity
+									) : 'N/A'
+								)
+							)
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "cell-efficiency col-lg-6" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
+								shown: true,
+								width: "720",
+								height: "60",
+								mode: "default",
+								key: this.props.instrumentId + this.props.chanId + "_graph",
+								data: this.state.data,
+								data_sun: this.state.data_sun,
+								data_humidity: this.state.data_humidity,
+								data_temperature: this.state.data_temperature,
+								flag1: startVal,
+								flag1_pos: startValPos,
+								unit: unit,
+								axisLabel: statusGraphAxisLabel,
+								axisUnit: statusGraphAxisUnit,
+								serieLabelLegend: statusGraphSerieLabelLegend,
+								flag2: currVal })
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						"div",
+						{ className: "row cell-actions" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-1 label" },
+							"Actions"
+						),
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"div",
+							{ className: "col-lg-8" },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"button",
+								{ className: "btn btn-cl", onClick: this.downloadData },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
+								" Download"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"button",
+								{ className: "btn btn-cl", onClick: this.stop },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" }),
+								" Stop"
+							),
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								"button",
+								{ className: "btn btn-cl", onClick: this.cfg },
+								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+								" Configure"
+							)
+						)
+					)
 				),
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: "cell-iv pull-right col-lg-3" },
+					{ className: "col-lg-2 cell-iv" },
 					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
 						width: "290",
-						height: "190",
+						height: "230",
 						shown: true,
 						key: this.props.instrumentId + this.props.chanId + "_iv",
 						data: this.state.ivCurves,
 						dataIV: this.state.data_IV,
 						voltage: this.state.voltage,
 						current: this.state.current,
-						cellarea: this.props.serverState.cellArea
+						cellarea: this.state.serverState.cellArea
 					})
 				)
-			),
-			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			);
+		} else {
+
+			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
-				{ className: "cell-summary" },
+				{ ref: el => this.wrapper = el, className: "cell  cell-unknown" },
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
-					{ className: `col-lg-1 cell-status ${active ? 'active' : ''}` },
+					{ className: "cell-name cell-main-info row" },
 					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 						"div",
-						null,
-						active ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }) : __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
-					),
-					trackingMode
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					!!this.state.ellapsed && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						null,
+						{ className: "col-lg-4" },
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "label" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
-						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "value" },
-							this.state.ellapsed,
-							this.state.ellapsedUnit
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "record" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
-					),
-					!!this.state.sun && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						null,
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "label" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
-						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "value" },
-							this.state.sun,
-							" ",
-							this.unit.sun
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					!isNaN(this.state.efficiency) && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						null,
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "label" },
-							"\u03B7"
-						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "value" },
-							this.state.efficiency,
-							this.unit.efficiency
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "record" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "label" },
-						"V",
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"sub",
-							null,
-							"oc"
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "value" },
-						!!this.state.voc ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"span",
 							null,
-							this.state.voc,
-							this.unit.voltage
-						) : 'N/A'
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "record" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" })
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "label" },
-						"J",
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"sub",
-							null,
-							"sc"
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "value" },
-						!!this.state.jsc ? jsc_currentdensity : 'N/A'
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "label" },
-						"FF"
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "value" },
-						!!this.state.ff ? this.state.ff : 'N/A'
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "label" },
-						"V",
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"sub",
-							null,
-							"now"
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "value" },
-						this.state.voltage,
-						" ",
-						this.unit.voltage
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-xs-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "label" },
-						"J",
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"sub",
-							null,
-							"now"
-						)
-					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						{ className: "value" },
-						j_currentdensity
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						null,
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "label" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-grain" })
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
-							{ className: "value" },
-							this.state.temperature_junction ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-								"span",
-								null,
-								this.state.temperature_junction,
-								" ",
-								this.unit.temperature
-							) : 'N/A'
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1 propElement" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"div",
-						null,
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
+							"span",
 							{ className: "label" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tint" })
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-							"div",
+							"span",
 							{ className: "value" },
-							this.state.humidity ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							!this.state.serverState.cellName ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"span",
 								null,
-								this.state.humidity,
-								" ",
-								this.unit.humidity
-							) : 'N/A'
+								"Channel #",
+								this.props.chanId
+							) : this.state.serverState.cellName
 						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "cell-efficiency col-lg-6" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
-						shown: true,
-						width: "600",
-						height: "60",
-						mode: "default",
-						key: this.props.instrumentId + this.props.chanId + "_graph",
-						data: this.state.data,
-						data_sun: this.state.data_sun,
-						data_humidity: this.state.data_humidity,
-						data_temperature: this.state.data_temperature,
-						flag1: startVal,
-						flag1_pos: startValPos,
-						unit: unit,
-						axisLabel: statusGraphAxisLabel,
-						axisUnit: statusGraphAxisUnit,
-						serieLabelLegend: statusGraphSerieLabelLegend,
-						flag2: currVal })
-				)
-			),
-			__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-				"div",
-				{ className: "row cell-actions" },
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1" },
-					"Actions"
-				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-					"div",
-					{ className: "col-lg-1" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"button",
-						{ className: "btn btn-cl" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
-						" Download"
 					),
 					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
-						"button",
-						{ className: "btn btn-cl" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon stop" }),
-						" Stop"
+						"div",
+						{ className: "col-lg-4" },
+						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"button",
+							{ className: "btn btn-cl btn-sm", onClick: this.cfg },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+							" Configure"
+						),
+						!!(this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && !active && this.state.serverState.tracking_mode > 0) && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							"button",
+							{ className: "btn btn-cl btn-sm", onClick: this.start },
+							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+							" Start"
+						)
 					)
 				)
-			)
-		);
+			);
+		}
 	}
 }
 
@@ -2260,7 +2578,7 @@ var modes = {
 
 		graphConstructor: {
 			paddingTop: 4,
-			paddingLeft: 4,
+			paddingLeft: 9,
 			paddingRight: 4,
 			paddingBottom: 2
 		}
@@ -2298,7 +2616,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 		this.resize(this.props);
 
 		this.serie = this.graph.newSerie();
-		this.serie.setLineColor("white");
+		this.serie.setLineColor('#55310d');
 		this.serie.autoAxis();
 		this.serie.setLineWidth(2);
 
@@ -2311,20 +2629,16 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.graph.getYAxis().hide();
 		} else {
 
-			this.graph.getXAxis().hide();
+			this.graph.getXAxis().setUnitInTicks(true).setTickLabelOffset(-60).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_INSIDE).secondaryGridOff().setPrimaryTicksColor('#6c5e47').setSecondaryTicksColor('#6c5e47').setTicksLabelColor('#55310d').setNbTicksSecondary(0).setUnit('h').setPrimaryGridColor('#d3c3a9');
+
 			this.graph.getYAxis().hide();
 
 			this.graph.getYAxis().setLabel(this.props.axisLabel).setUnit(this.props.axisUnit).setUnitWrapper("(", ")");
 
-			this.graph.getRightAxis(0, { hideWhenNoSeriesShown: true }).setLabel('Sun').forceMin(0).setTickPosition(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.TICKS_OUTSIDE).setAxisColor('white').setPrimaryTicksColor('white');
-
-			this.graph.getXAxis().setLabel('Time');
-			this.graph.getXAxis().setUnit('h').setUnitWrapper("(", ")");
-
+			this.graph.getXAxis();
+			this.graph.getXAxis();
 			this.graph.getRightAxis(0).forceMin(0);
 		}
-
-		this.graph.getXAxis().turnGridsOff();
 
 		this.graph.getXAxis().setAxisDataSpacing(0.001, 0.001);
 		this.graph.getYAxis().setAxisDataSpacing(0.001, 0.001);
@@ -2352,7 +2666,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 					{ className: 'graph_tooltip medium' },
 					__WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
 						'div',
-						{ className: 'right' },
+						{ className: 'top' },
 						__WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
 							'span',
 							null,
@@ -2574,7 +2888,7 @@ module.exports = function extend() {
 
 
 
-const color = "#e0e0e0";
+const color = '#55310d';
 
 class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* default */] {
 
@@ -2596,7 +2910,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.graph = new __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default.a(this.graphDOM, {
 
-			paddingTop: 5,
+			paddingTop: 10,
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 5,
@@ -2622,7 +2936,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 		var legend = this.graph.makeLegend({
 			paddingLeft: 0,
 			paddingRight: 2,
-			paddingTop: 2,
+			paddingTop: 10,
 			paddingBottom: 0,
 			frame: false,
 			backgroundColor: 'transparent',
@@ -2633,6 +2947,13 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		legend.notHideable();
 		legend.update();
+
+		this.ellipse = this.graph.newShape("ellipse");
+		this.ellipse.setR("3px", "3px");
+
+		this.ellipse.setFillColor(color);
+		this.ellipse.setStrokeColor(color);
+		this.ellipse.draw();
 	}
 
 	componentDidUpdate() {
@@ -2699,13 +3020,6 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 		this.serieIV.autoAxes();
 		this.serieIV.setLineColor(color).setLineWidth(2);
 
-		this.ellipse = this.graph.newShape("ellipse");
-		this.ellipse.setR(3, 3);
-
-		this.ellipse.setFillColor(color);
-		this.ellipse.setStrokeColor(color);
-		this.ellipse.draw();
-
 		if (this.props.dataIV) {
 			this.serieIV.setWaveform(this.props.dataIV);
 		}
@@ -2744,7 +3058,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 
 
-class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent {
 
   constructor(props) {
     super(props);
@@ -2755,24 +3069,97 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   componentDidMount() {
 
-    setInterval(() => {
-      console.log('up');
-      this.setState({ now: Date.now() });
+    this.updated = Date.now();
+
+    this.interval = setInterval(() => {
+
+      if (this.props.timerValue === undefined || isNaN(this.props.timerValue.time)) {
+        return;
+      }
+
+      if (this.props.direction == 'ascending') {
+
+        if (!this.updated) {
+          return;
+        }
+
+        this.setState({
+          timerValue: Date.now() - this.updated + this.props.timerValue.time
+        });
+      } else {
+
+        this.setState({
+          timerValue: this.props.timerValue.time - (Date.now() - this.updated)
+        });
+      }
     }, 1000);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+    if (nextProps.timerValue === this.props.timerValue) {
+      return;
+    }
+
+    this.updated = Date.now();
+  }
+
+  processTime(value) {
+
+    let str = [];
+    let spacer = this.props.spacer || "";
+
+    value /= 1000;
+    if (value > 60 && (this.props.maxLevel > 1 || !this.props.maxLevel)) {
+      // minutes
+
+      if (value > 3600 && (this.props.maxLevel > 2 || !this.props.maxLevel)) {
+        // hours
+
+        if (value > 3600 * 24 && (this.props.maxLevel > 3 || !this.props.maxLevel)) {
+          // days
+
+          str.push(Math.floor(value / (3600 * 24)) + spacer + "d");
+          value = value % (3600 * 24);
+        }
+
+        str.push(Math.floor(value / 3600) + spacer + "h");
+        value = value % 3600;
+      }
+
+      str.push(Math.floor(value / 60) + spacer + "m");
+      value = value % 60;
+    }
+
+    str.push(Math.floor(value) + spacer + "s");
+    str = str.splice(0, this.props.precision || 1);
+    return str.join(" ");
+  }
+
   render() {
+
+    if (!this.state.timerValue || isNaN(this.state.timerValue)) {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'span',
+        null,
+        'N/A'
+      );
+    }
+
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'span',
       null,
-      Math.round((this.state.now - this.props.latest) / 1000),
-      's'
+      this.processTime(this.state.timerValue)
     );
   }
 
 }
 
-/* unused harmony default export */ var _unused_webpack_default_export = (Timer);
+/* harmony default export */ __webpack_exports__["a"] = (Timer);
 
 /***/ }),
 /* 16 */

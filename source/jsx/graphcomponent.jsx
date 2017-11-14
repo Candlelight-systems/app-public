@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-class GraphComponent extends React.Component {
+class GraphComponent extends React.PureComponent {
 
 
 	constructor( props ) {

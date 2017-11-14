@@ -369,6 +369,25 @@ class InstrumentForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"label",
 						{ className: "col-sm-3" },
+						"Websocket Port"
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "col-sm-9" },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", name: "trackerPortWS", id: "trackerPortWS", className: "form-control", placeholder: "", value: this.state.trackerPortWS, onChange: this.handleInputChange }),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"span",
+							{ className: "help-block" },
+							"8081 is the default websocket communication port."
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "form-group" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"label",
+						{ className: "col-sm-3" },
 						"Attempt to connect"
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

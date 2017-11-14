@@ -113,6 +113,14 @@ class InstrumentForm extends React.Component {
 						</div>
 
 						<div className="form-group">
+							<label className="col-sm-3">Websocket Port</label>
+							<div className="col-sm-9">
+								<input type="text" name="trackerPortWS" id="trackerPortWS" className="form-control" placeholder="" value={this.state.trackerPortWS} onChange={this.handleInputChange} />
+								<span className="help-block">8081 is the default websocket communication port.</span>
+							</div>
+						</div>
+
+						<div className="form-group">
 							<label className="col-sm-3">Attempt to connect</label>
 							<div className="col-sm-9">
 								<p>

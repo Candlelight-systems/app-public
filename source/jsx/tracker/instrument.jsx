@@ -35,33 +35,33 @@ class TrackerInstrument extends React.Component {
     this.updateInstrument = this.updateInstrument.bind( this );
     this.getStatus = this.getStatus.bind( this );
     this.updateStatus = this.updateStatus.bind( this );
-    this.togglePause = this.togglePause.bind( this );
+    
 //    this.checkAll = this.checkAll.bind( this );
 
     window.addEventListener("online", ( ) => {
       this.updateStatus();
+      this.ping();
     });
 
     window.addEventListener("offline", ( ) => {
       this.updateStatus();
+      this.ping();
     });
 
     ipcRenderer.on("light.updated", () => { this.updateInstrument() } );
-    
-    
+
+
   }
 
   async ping( props = this.props ) {
     return ping( this.props.configDB ).catch( ( error ) => { 
 
+      console.warn("Cannot reach influx DB. Error was: ", error );
+      this.setState( {
+        error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
+      } );
 
-        console.warn("Cannot reach influx DB. Error was: ", error );
-
-        this.setState( {
-          error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
-        } );
-
-        return Promise.reject();
+      return Promise.reject();
 
     } );
   }
@@ -69,13 +69,13 @@ class TrackerInstrument extends React.Component {
   async updateStatus() {
     this.getStatus().then( ( serverState ) => {
 
-       this.setState( { 
-        serverState: serverState, 
-        error_tracker: false 
-      } ); 
-    } ).catch( ( error ) => {
-        
-      console.warn("Cannot retrieve channel statuses. Error was: ", error );
+     this.setState( { 
+      serverState: serverState, 
+      error_tracker: false 
+    } ); 
+   } ).catch( ( error ) => {
+
+    console.warn("Cannot retrieve channel statuses. Error was: ", error );
       // TODO something
       this.setState( { error_tracker: error } );
     } );
@@ -91,9 +91,9 @@ class TrackerInstrument extends React.Component {
     .then( response => response.json() )
     .catch( error => {
 
-        this.setState( {
-          error_tracker: error
-        } );
+      this.setState( {
+        error_tracker: error
+      } );
     } );
   }
 
@@ -109,7 +109,7 @@ class TrackerInstrument extends React.Component {
   }
 
   configure() {
-      $( this.modal ).modal( 'show' );
+    $( this.modal ).modal( 'show' );
   }
 
   componentDidMount() {
@@ -123,41 +123,41 @@ class TrackerInstrument extends React.Component {
   getConfig( props = this.props ) {
 
     return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET'  } )
-      .then( ( response ) => response.json() )
-      .catch( error => {
+    .then( ( response ) => response.json() )
+    .catch( error => {
 
-        this.setState( { 
-          error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network", 
-          errorMethods: [ [ "Edit the instrument config", this.editInstrument ], [ "Retry", this.updateInstrument ] ] 
-        } ); 
+      this.setState( { 
+        error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network", 
+        errorMethods: [ [ "Edit the instrument config", this.editInstrument ], [ "Retry", this.updateInstrument ] ] 
+      } ); 
 
-        return Promise.reject();
-      } );
+      return Promise.reject();
+    } );
   }
 
   updateInstrument = debounce( ( props = this.props ) => {
 
-      return Promise.all( [
-        
-        this.getConfig( props ),
+    return Promise.all( [
 
-        this.getStatus( props ),
+      this.getConfig( props ),
 
-        this.ping( props )
+      this.getStatus( props ),
+
+      this.ping( props )
 
       ] ).then( ( args ) => {
 
         let groups = args[ 0 ],
-            status = args[ 1 ],
-            ping = args[ 2 ];
+        status = args[ 1 ],
+        ping = args[ 2 ];
 
-            
+
         this.setState( { 
-            groups: groups.groups,
-            serverState: status,
-            paused: status.paused,
-            error_influxdb: false,
-            error_tracker: false
+          groups: groups.groups,
+          serverState: status,
+          paused: status.paused,
+          error_influxdb: false,
+          error_tracker: false
         } );
 
       } ).catch( ( e ) => { } );
@@ -171,113 +171,55 @@ class TrackerInstrument extends React.Component {
     } );
   }
 
-  togglePause() {
-
-    let url;
-
-    if( this.state.paused ) {
-      url = "resumeChannels"; 
-    } else {
-      url = "pauseChannels";
-    }
-
-    return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/" + url + "?instrumentId=" + this.props.instrumentId, { method: 'GET'  } )
-      .then( ( response ) => {
-
-        this.updateInstrument();
-
-      });
-  }
-
+  
   render() {
 
     let content;
-  
+    
     if( this.state.groups ) {
-      
+
       var groupsDoms = this.state.groups.map( ( group, i ) => {
-        
+
        return <TrackerGroupDevices 
 
-          key={ group.groupID } 
-          instrumentId={ this.props.instrumentId } 
-          id={ group.groupID } 
-          name={ group.groupName }
-          channels={ group.channels }
-          groupConfig={ group }
-          config={ this.props.config } 
-          configDB={ this.props.configDB } 
-          serverState={ this.state.serverState[ group.groupName ] }
-          update={ this.updateInstrument }
-          getStatus={ this.updateStatus }
-           />
-          } );
-      }
+       key={ group.groupID } 
+       instrumentId={ this.props.instrumentId } 
+       id={ group.groupID } 
+       name={ group.groupName }
+       channels={ group.channels }
+       groupConfig={ group }
+       config={ this.props.config } 
+       configDB={ this.props.configDB } 
+       serverState={ this.state.serverState[ group.groupName ] }
+       update={ this.updateInstrument }
+       getStatus={ this.updateStatus }
 
-      if( groupsDoms ) {
-        
-        content = groupsDoms;
+       error_influxdb={ this.state.error_influxdb }
+       error_tracker={ this.state.error_tracker }
+       paused={ this.state.paused }
+       />
+     } );
+    }
 
-      } else if( this.state.error ) {
+    if( groupsDoms ) {
 
-        content = 
-          <div>
-            <Error message={ this.state.error || this.state.error_influxdb } errorMethods={ this.state.errorMethods } />
-          </div>;
-      }
+      content = groupsDoms;
 
-    return <div>
-            
-            <h3>{ this.props.instrumentId }</h3>
-            <div className="row statuses">
-              
+    } else if( this.state.error ) {
 
-              <div className={ "col-lg-4 group-status group-status-db " + ( this.state.error_influxdb ? ' alert-danger' : 'alert-success' ) }>
-                
-                <div className="col-lg-6">
-                  <span title={ this.state.error_influxdb || "" } className={ "glyphicon glyphicon-" + ( this.state.error_influxdb ? 'warning-sign' : 'check' ) }></span>&nbsp;
-                  InfluxDB server
-                </div>
+      content = (
+      <div>
+      <Error message={ this.state.error || this.state.error_influxdb } errorMethods={ this.state.errorMethods } />
+      </div> );
+    }
 
-                <div className="col-lg-6">
-                  <button type="button" className="btn btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }>Config</button>
-                </div>
-              </div>
-
-              <div className={ "col-sm-4 alert " + ( this.state.error_tracker ? ' alert-danger' : 'alert-success' ) }>
-                <span title={ this.state.error_tracker || "" }  className={ "glyphicon glyphicon-" + ( this.state.error_tracker ? 'warning-sign' : 'check' ) }></span>&nbsp;
-                Instrument connection
-                <div className="pull-right">
-                  <div>
-                    <button type="button" className="btn btn-default btn-sm" onClick={ this.editInstrument }>Config</button>
-                  </div>
-                </div>
-              </div>
-
-
-
-              <div className={ "col-sm-4 alert " + ( this.state.paused ? ' alert-danger' : 'alert-info' ) }>
-                <span className={ "glyphicon glyphicon-" + ( this.state.paused ? "paused" : "start" ) }></span>&nbsp;
-                { this.state.paused ? "Tracking paused" : "Tacking enabled" }
-                <div className="pull-right">
-                  <div>
-                    <button type="button" className="btn btn-default btn-sm" onClick={ this.togglePause }>{ this.state.paused ? "Resume" : "Pause" }</button>
-                  </div>
-                </div>
-              </div>
-
-            
-            </div>
-
-      {content}
-    </div>
+    return (
+    <div>
+    <h3>Instrument: { this.props.instrumentId }</h3>
+    {content}
+    </div> );
   }
 }
 
-
-/*
-    
-
-*/
 
 export default TrackerInstrument

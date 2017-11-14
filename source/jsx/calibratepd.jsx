@@ -300,7 +300,7 @@ class CalibratePD extends React.Component {
 		return (
 			<div className="container-fluid" id="calib_light_list">
 
-				<div className="col-sm-15">
+				<div className="col-sm-9">
 					<div className="alert alert-info"> <span className="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Switch to manual mode in order to gain control of the light intensity</div>
 				</div>
 
@@ -309,7 +309,7 @@ class CalibratePD extends React.Component {
 					<div className="alert alert-warning"><span className="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> <strong>Warning !</strong> As long as this page is open, the light intensity will be fixed. Close this window to resume the automatic light program.</div>
 				</div>*/}
 
-				<div className="col-sm-8">
+				<div className="col-sm-5">
 					<h4>Monitor short circuit currents</h4>
 
 					<div className="form-group">
@@ -342,7 +342,7 @@ class CalibratePD extends React.Component {
 						) }
 					</ul>
 				</div>
-				<div className="col-sm-6">
+				<div className="col-sm-4">
 					<h4>2-point calibration</h4>
 					<p>
 						To calibrate the light intensity with respect to the short circuit of your device, manually adjust the light intensity such that the short circuit current of the solar cells corresponds to the one measured on an AM1.5G source.<br />

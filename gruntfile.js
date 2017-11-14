@@ -2,7 +2,14 @@
 
 var fs = require('fs');
 
-let webpackConfig = {
+let webpackConfig;
+
+module.exports = function(grunt) {
+
+
+function generateWebpackConfig( theme ) {
+
+  webpackConfig = {
      
      externals: {
       "jquery": "jQuery",
@@ -41,15 +48,17 @@ let webpackConfig = {
                   'react'
                   ],
                 plugins: [
-                'transform-class-properties'
+                  'transform-class-properties',
+                  [
+                    'inline-replace-variables', theme ]
                 ]
               }
          }]
      }
- };
+ }
 
-module.exports = function(grunt) {
 
+ 
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
@@ -72,6 +81,22 @@ module.exports = function(grunt) {
                 cwd: './node_modules/bootstrap/dist/js/',
                 src: ['bootstrap.min.js'], 
                 dest: 'app/app/js/', 
+                filter: 'isFile'
+              },
+
+              {
+                expand: true, 
+                cwd: './node_modules/bootstrap-toggle/js/',
+                src: ['bootstrap2-toggle.min.js'], 
+                dest: 'app/app/js/', 
+                filter: 'isFile'
+              },
+
+              {
+                expand: true, 
+                cwd: './node_modules/bootstrap-toggle/css/',
+                src: ['bootstrap2-toggle.min.css'], 
+                dest: 'app/app/css/', 
                 filter: 'isFile'
               },
                
@@ -135,8 +160,7 @@ module.exports = function(grunt) {
         },
 
         webpack: {
-
-           
+          
            instrument: Object.assign( {
                entry: [ './source/instrument.jsx' ],
                output: {
@@ -250,13 +274,23 @@ module.exports = function(grunt) {
         }
     });
   
-    var target = grunt.option('target') || 'dev';
+}
+
 
     grunt.registerTask( 'deploy', "Deploying app", () => {
+
+      var target = grunt.option('target') || 'dev';
+      var theme = grunt.option('theme') || 'light';
 
       if( ! fs.existsSync( "./environments/" + target + ".json" ) ) {
         target = 'dev';
       }
+
+      fs.writeFileSync( "./css/_theme.scss", fs.readFileSync( "./css/themes/" + theme + ".scss" ) );
+      let themeJSON = JSON.parse( fs.readFileSync( "./css/themes/" + theme + ".json" ) );
+
+      console.log( themeJSON );
+      generateWebpackConfig( themeJSON );
 
       var env = JSON.parse( fs.readFileSync( "./environments/" + target + ".json" ) );
 

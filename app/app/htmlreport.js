@@ -497,7 +497,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 				{ className: 'row' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
-					{ className: 'col-xs-6' },
+					{ className: 'col-xs-4' },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'logos' },
@@ -528,12 +528,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Start date: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							!!this.state.data && toDate(this.state.data.start_date)
 						)
 					),
@@ -542,12 +542,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'End date: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							!!this.state.data && toDate(this.state.data.end_date)
 						)
 					),
@@ -556,12 +556,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Ageing time: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							!!this.state.data && this.state.data.ellapsed,
 							' hours'
 						)
@@ -576,12 +576,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Cell active area: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7  info' },
+							{ className: 'col-xs-5 info' },
 							this.props.cellInfo.cellArea,
 							' cm',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -596,12 +596,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Comment: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-5' },
 							this.props.config.comment
 						)
 					),
@@ -615,12 +615,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Highest efficiency: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							!!this.state.data && this.state.data.maxEfficiency,
 							'%'
 						)
@@ -630,12 +630,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Efficiency after 1h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							this.state.data.timeEfficiencies[0],
 							'%'
 						)
@@ -644,12 +644,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Efficiency after 24h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							this.state.data.timeEfficiencies[1],
 							'%'
 						)
@@ -658,12 +658,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Efficiency after 100h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							this.state.data.timeEfficiencies[2],
 							'%'
 						)
@@ -672,12 +672,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Efficiency after 500h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							this.state.data.timeEfficiencies[3],
 							'%'
 						)
@@ -686,12 +686,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Efficiency after 1\'000h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							this.state.data.timeEfficiencies[4],
 							'%'
 						)
@@ -701,12 +701,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7' },
+							{ className: 'col-xs-4' },
 							'Final efficiency: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-7 info' },
+							{ className: 'col-xs-5 info' },
 							!!this.state.data && this.state.data.finalEfficiency,
 							'%'
 						)
@@ -732,7 +732,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'V',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'sub',
@@ -748,7 +748,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'J',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'sub',
@@ -770,7 +770,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'P',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'sub',
@@ -792,7 +792,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'P',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'sub',
@@ -814,7 +814,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'Fill factor',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -825,7 +825,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-2' },
+							{ className: 'col-xs-1' },
 							'PCE',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -852,39 +852,39 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.voc) ? 'N/A' : jv.waveInfo.voc.toPrecision(3)
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.jsc) ? 'N/A' : jv.waveInfo.jsc.toPrecision(3)
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.ff) ? 'N/A' : jv.waveInfo.ff.toPrecision(2)
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
-								{ className: "col-xs-2 color-series-style-" + index },
+								{ className: "col-xs-1 color-series-style-" + index },
 								isNaN(jv.waveInfo.pce) ? 'N/A' : jv.waveInfo.pce.toPrecision(3)
 							)
 						);
 					}),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { ref: el => this.domJV = el })
 				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-xs-9', ref: el => this.domStability = el })
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-xs-5', ref: el => this.domStability = el })
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',

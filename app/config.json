@@ -3,7 +3,8 @@
 		{
 			"trackerHost": "128.178.16.172",
 			"trackerName": "Main Instrument",
-			"trackerPort": 8080
+			"trackerPort": 8080,
+			"trackerPortWS": 8081
 		}
 	],
 	"database": {

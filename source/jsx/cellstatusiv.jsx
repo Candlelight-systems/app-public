@@ -5,7 +5,7 @@ import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import React from 'react';
 
 
-const color = "#e0e0e0";
+const color = __THEME_GRAPH_IV_MAINCOLOR;
 
 class statusIV extends GraphComponent {
 
@@ -26,9 +26,12 @@ class statusIV extends GraphComponent {
 		}
 
 
+
+		
+
 		this.graph = new Graph( this.graphDOM, {
 			
-			paddingTop: 5,
+			paddingTop: 10,
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 5,
@@ -80,7 +83,7 @@ class statusIV extends GraphComponent {
 		var legend = this.graph.makeLegend( {
 			paddingLeft: 0,
 			paddingRight: 2,
-			paddingTop: 2,
+			paddingTop: 10,
 			paddingBottom: 0,
 			frame: false,
 			backgroundColor: 'transparent',
@@ -91,6 +94,13 @@ class statusIV extends GraphComponent {
 
 		legend.notHideable();
 		legend.update(); 
+
+		this.ellipse = this.graph.newShape( "ellipse" );
+		this.ellipse.setR( "3px", "3px" );
+	
+		this.ellipse.setFillColor( color );
+		this.ellipse.setStrokeColor( color );	
+		this.ellipse.draw();
 	}
 
 	componentDidUpdate() {
@@ -158,12 +168,6 @@ class statusIV extends GraphComponent {
 		this.serieIV.autoAxes();
 		this.serieIV.setLineColor( color ).setLineWidth( 2 );
 
-		this.ellipse = this.graph.newShape( "ellipse" );
-		this.ellipse.setR( 3, 3 );
-	
-		this.ellipse.setFillColor( color );
-		this.ellipse.setStrokeColor( color );
-		this.ellipse.draw();
 			
 		if( this.props.dataIV ) {
 			this.serieIV.setWaveform( this.props.dataIV );

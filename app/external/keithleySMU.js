@@ -8,7 +8,7 @@ class KeithleySMU {
 	  static list() {
 
         return new Promise((resolver, rejecter) => {
-console.log('listing');
+
         	var list = new PythonShell('script.list', {
 
                 pythonOptions: ['-m'],
@@ -17,22 +17,21 @@ console.log('listing');
             } );
 
             list.once( "error", ( error ) => {
-console.log('error');
+            	error = error.toString('utf-8');
             	list.removeAllListeners( "message" );
             	rejecter( error );
             });
 
             list.once("message", ( results ) => {
-console.log( results );
-            	list.removeAllListeners( "error" );
 
+            	results = results.toString('utf-8');
+
+            	list.removeAllListeners( "error" );
             	if( Array.isArray( results ) ) {
 		            results = results[ 0 ]; 
 		        }
-		   	
-		   		
+		   			   		
 		        let resultsParsed = /\((.*)\)/gim.exec(results);
-console.log( resultsParsed );
 
 		        if( ! resultsParsed || ! resultsParsed[ 1 ] ) {
 		        	return rejecter();
@@ -102,12 +101,15 @@ console.log( resultsParsed );
 
 			this.visaShell.once( "error", ( error ) => {
 			//	this.visaShell.removeAllListeners("message");
+
+				error = error.toString('utf-8');
 				clearTimeout( timeout );
 				rejecter( error );
 			});
 
 			this.visaShell.once( "message", async ( message ) => {
 
+				message = message.toString('utf-8');
 				this.visaShell.removeAllListeners("error");
 
 				
@@ -135,7 +137,7 @@ console.log( resultsParsed );
 		return new Promise( ( resolver, rejecter ) => {
 
 			this.visaShell.once( "message", async ( message ) => {
-
+				message = message.toString('utf-8');
 				await this.delay( 20 );
 	            resolver( message );
 	        } );	
@@ -151,7 +153,7 @@ console.log( resultsParsed );
 		return new Promise( ( resolver, rejecter ) => {
 
 			this.visaShell.once( "message", async ( message ) => {
-				
+				message = message.toString('utf-8');
 				await this.delay( 20 );
 
 				if( message.indexOf("ERROR") > -1 ) {

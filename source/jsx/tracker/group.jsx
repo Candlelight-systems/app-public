@@ -12,8 +12,6 @@ class TrackerGroupDevices extends React.Component {
       channelChecked: {}
     };  
 
-    this.pauseAll = this.pauseAll.bind( this );
-    this.resumeAll = this.resumeAll.bind( this );
     this.toggleChannelCheck = this.toggleChannelCheck.bind( this );
 
     this.cfgAll = this.cfgAll.bind( this );
@@ -30,6 +28,10 @@ class TrackerGroupDevices extends React.Component {
     this.setHeatingPower = this.setHeatingPower.bind( this );
     this.increaseHeatingPower = this.increaseHeatingPower.bind( this );
     this.decreaseHeatingPower = this.decreaseHeatingPower.bind( this );
+    this.resetSlave = this.resetSlave.bind( this );
+
+    this.togglePause = this.togglePause.bind( this );
+    this.wsUpdate = this.wsUpdate.bind( this );
 
     setInterval( () => {
       
@@ -43,6 +45,71 @@ class TrackerGroupDevices extends React.Component {
   componentDidMount() {
     this.updateGroupStatus();
     this.initCheckChannels( this.props );
+
+    this.setState( {
+        paused: this.props.paused,
+        heatingPower: this.props.serverState ? this.props.serverState.heatingPower : 'N/A',
+    });
+
+    ipcRenderer.on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
+  }
+
+  componentWillUnmount() {
+
+    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
+  }
+
+  wsUpdate( event, data ) {
+
+    if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }
+  }
+
+
+
+  componentDidUpdate( prevProps ) {
+
+    if( ! this.transformed && this.toggleLightMode ) {
+
+      $( this.toggleLightMode ).bootstrapToggle({
+        on: 'Automatic',
+        off: 'Manual'
+      }).change( () => {
+
+        // Propagate the information to the server
+      let saveJSON = {
+        instrumentId: this.props.instrumentId,
+        groupName: this.props.name,
+        lightController: {
+          modeAutomatic: !! this.toggleLightMode.checked
+        }
+      };
+
+      let body = JSON.stringify( saveJSON );
+      var headers = new Headers( {
+        "Content-Type": "application/json",
+        "Content-Length": body.length.toString()
+      });
+
+      return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+
+        method: 'POST',
+        headers: headers,
+        body: body
+
+      } ).then( () => {
+
+      } ).catch( ( error ) => {
+
+        ipcRenderer.send("reportError", "Unable to change the light mode" );
+
+      } );
+
+      
+    } );
+      this.transformed = true;
+    }
   }
 
   updateGroupStatus() {
@@ -157,7 +224,8 @@ class TrackerGroupDevices extends React.Component {
     this.initCheckChannels( nextProps );
 
     this.setState( {
-      heatingPower: nextProps.serverState.heatingPower
+      heatingPower: nextProps.serverState.heatingPower,
+      paused: nextProps.paused
     });
   }
 
@@ -196,28 +264,17 @@ class TrackerGroupDevices extends React.Component {
   }
 
 
-  pauseAll() {
-
-    fetch( "http://" + this.props.cfg.trackerHost + ":" + this.props.cfg.trackerPort + "/pauseChannels", {
+  resetSlave() {
+    fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetSlave?instrumentId=" + this.props.instrumentId, {
 
       method: 'GET'
     
     }).then( ( response ) => {
 
-      this.setState( { paused: true } );
     });
+
   }
 
-
-  resumeAll() {
-
-    fetch( "http://" + this.props.cfg.trackerHost + ":" + this.props.cfg.trackerPort + "/resumeChannels", {
-      method: 'GET'
-    }).then( ( response ) => {
-
-      this.setState( { paused: false } );
-    });
-  }
 
 
   heatingPowerChange( e ) {
@@ -323,6 +380,20 @@ class TrackerGroupDevices extends React.Component {
 
   }
 
+  togglePause() {
+
+    let url;
+
+    if( this.state.paused ) {
+      url = "resumeChannels"; 
+    } else {
+      url = "pauseChannels";
+    }
+    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent( this.props.instrumentId ), { method: 'GET'  } );
+
+  }
+
+
   render() {
 
     if( this.props.channels ) {
@@ -374,39 +445,91 @@ class TrackerGroupDevices extends React.Component {
 
 
         <div className="row statuses">
-      
-          <div className="group-status group-status-light col-lg-3">
-            <h3>Light bias</h3>
+        
+        <div className="col-lg-2 group-status group-status-instrument">
+          <h4>Instrument status</h4>
+          <div className={ "row" + ( this.props.error_influxdb ? ' status-error' : '' ) }>
+            <div className="col-lg-5">
+              <span title={ this.state.error_influxdb || "" } className={ "glyphicon glyphicon-" + ( this.state.error_influxdb ? 'warning-sign' : 'check' ) }></span> InfluxDB server
+            </div>
+            <div className="col-lg-4">
+              <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => { ipcRenderer.send("editInfluxDB" ) } }><span className="glyphicon glyphicon-cog"></span> Configure</button>
+            </div>
+          </div>
 
-              <div className="col-lg-6">Intensity: { this.state.sun } sun</div>
-              <div className="col-lg-6">
-                <button type="button" className="btn btn-default btn-sm" onClick={ this.light_calibrate }>Calibrate</button>
-              </div>
-                
+          <div className={ "row" + ( this.props.error_tracker ? ' status-error' : '' ) }>
+            <div className="col-lg-5">
+              <span title={ this.props.error_tracker || "" } className={ "glyphicon glyphicon-" + ( this.props.error_tracker ? 'warning-sign' : 'check' ) }></span> MPP Tracker
+            </div>
+            <div className="col-lg-4">
+              <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => { ipcRenderer.send( "editInstrument", this.props.config.trackerHost ) } }><span className="glyphicon glyphicon-cog"></span> Configure</button>
+            </div>
+          </div>
 
-            { !! this.props.serverState.lightController && <div>
-                <div className="col-lg-6">Setpoint: { this.props.serverState.lightSetpoint } sun</div>
-                <div className="col-lg-6"><button type="button" className="btn btn-default btn-sm"  onClick={ this.light_controller_config }>Configure</button></div>
+          <div className={ "row" + ( this.state.paused ? ' status-error' : '' ) }>
+            <div className="col-lg-5">
+              <span className={ "glyphicon glyphicon-" + ( this.state.paused ? 'warning-sign' : 'check' ) }></span> { this.state.paused ? "Tracking paused" : "Tracking enabled" }
+            </div>
+            <div className="col-lg-4">
+              <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.togglePause }>{ this.state.paused ? <span><span className="glyphicon glyphicon-start"></span>Resume</span> : <span><span className="glyphicon glyphicon-pause"></span>Pause</span> }</button>
+            </div>
+          </div>
+
+           <div className="row">
+            <div className="col-lg-5">
+                <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.resetSlave }><span>Reset enclosure(s)</span></button>              
+            </div>
+            <div className="col-lg-4">
+
+            </div>
+          </div>
+
+
+        </div>
+
+
+          <div className="group-status group-status-light col-lg-2">
+              <h4>Light bias</h4>
+              <div className="row">
+              <div className="col-lg-5">Intensity: { this.state.sun } sun</div>
+              <div className="col-lg-4">
+                <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.light_calibrate }><span className="glyphicon glyphicon-scale"></span> Calibrate</button>
               </div>
-            }
+              </div>
+
+              <div className={ this.props.serverState.lightController ? 'visible' : 'hidden' }>
+                <div className="row">
+                  <div className="col-lg-5"><span className="grey">Setpoint:</span> { this.props.serverState.lightSetpoint } sun</div>
+                  <div className="col-lg-4"><button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }><span className="glyphicon glyphicon-cog"></span> Configure</button></div>
+                </div>
+                <div className="row">
+                  <div className="col-lg-5"><span className="grey">Mode</span></div>
+                  <div className="col-lg-4">
+                    <label className="checkbox-inline">
+                      <input type="checkbox" ref={ ( el ) => this.toggleLightMode = el } checked={ this.props.serverState.lightModeAutomatic } data-width="100" data-height="25" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
 
           </div>
 
            
-          <div className="group-status group-status-temperature col-lg-3">
-         
+          <div className="group-status group-status-temperature col-lg-2">
+            <h4>Temperature</h4>
             { this.state.temperature !== -1 && 
               <div>
-                <div className="col-lg-6">Temperature: { this.state.temperature } &deg;C</div>
+                <div className="col-lg-9">Box temperature: { this.state.temperature } &deg;C</div>
               </div> }
 
 
             { this.props.groupConfig.heatController &&
               <div>
-                <div className="col-lg-6">
+                <div className="col-lg-5">
                   Heating power: { this.state.heatingPower == -1 ? 'Off' : Math.round( this.state.heatingPower * 100 ) + " %" }
                 </div>
-                <div className="col-lg-6">
+                <div className="col-lg-4">
                     <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
                     <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
                 </div>
@@ -415,28 +538,21 @@ class TrackerGroupDevices extends React.Component {
         </div>
 
 
-        { 
-          this.state.humidity !== -1 && 
-          <div className="group-status group-status-temperature col-lg-3">
-              <div>
-                <div className="col-lg-6">Humidity: { this.state.humidity } %</div>
-              </div>
-          </div> 
-        }
 
         <div className="clearfix"></div>
         </div>
 
-        <div className="cell toprow">
-          <div className="row">
-            <div className="col-sm-2">
-              <span>
-                <input className="channel-check" type="checkbox" onClick={ this.checkAll } checked={ this.state.checkAll } /> 
-                 &nbsp;<a href="#" onClick={ this.cfgAll }>Configure</a>
-              </span>
-            </div>
+        
+        <div className="row">
+            
+          <div className="cell-configure-all col-lg-9">
+            
+            <button className="btn btn-default btn-cl" onClick={ this.checkAll }><span className="glyphicon glyphicon-cog"></span> { this.state.checkAll ? 'Deselect all' : 'Select all'}</button>
+             &nbsp;
+            <button className="btn btn-default btn-cl" onClick={ this.cfgAll }><span className="glyphicon glyphicon-cog"></span> Configure selected</button>
           </div>
         </div>
+
         <div>
         { channelDoms }
         </div>

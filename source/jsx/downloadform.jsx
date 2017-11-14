@@ -482,7 +482,7 @@ class DownloadForm extends React.Component {
 
 					<div className="form-group">
 						<label className="col-sm-3">Format</label>
-						<div className="col-sm-9">
+						<div className="col-sm-6">
 							<select name="dl_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
 								<option value="csv">Comma separated (.csv)</option>
 								<option value="itx">Igor text file (.itx)</option>
@@ -492,7 +492,7 @@ class DownloadForm extends React.Component {
 
 					<div className="form-group">
 						<label className="col-sm-3">Number of points</label>
-						<div className="col-sm-9">
+						<div className="col-sm-6">
 							<select name="dl_track_nb" id="dl_track_nb" className="form-control" value={this.state.dl_track_nb} onChange={this.handleInputChange}>
 								<option value="100">100</option>
 								<option value="300">300</option>
@@ -507,7 +507,7 @@ class DownloadForm extends React.Component {
 
 						<div className="col-sm-3">
 						</div>
-						<div className="col-sm-9">
+						<div className="col-sm-6">
 							<div className="btn-group">
 								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
 								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
@@ -522,7 +522,7 @@ class DownloadForm extends React.Component {
 
 						<div className="col-sm-3">
 						</div>
-						<div className="col-sm-9">
+						<div className="col-sm-6">
 							<div className="btn-group">
 								<button  className="btn btn-success"  type="button" onClick={ this.downloadPDF }>Make PDF report</button>
 								<button type="button" className="btn btn-default"name="update"  onClick={this.close}>Close</button>

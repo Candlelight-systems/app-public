@@ -464,7 +464,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			{ className: "container-fluid", id: "calib_light_list" },
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
-				{ className: "col-sm-15" },
+				{ className: "col-sm-9" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"div",
 					{ className: "alert alert-info" },
@@ -475,7 +475,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
-				{ className: "col-sm-8" },
+				{ className: "col-sm-5" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"h4",
 					null,
@@ -525,7 +525,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
-				{ className: "col-sm-6" },
+				{ className: "col-sm-4" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"h4",
 					null,

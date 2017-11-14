@@ -11,6 +11,7 @@ const fs = require('fs');
 const request = require('request');
 const fix = require( 'fix-path' );
 const fetch = require( 'node-fetch' );
+const WebSocket = require( 'ws' );
 const environment = require("./environment.json");
 
 fix();
@@ -39,7 +40,7 @@ ipcMain.on("bugReport", openBugReport );
 ipcMain.on("calibratePD", openCalibratePD );
 ipcMain.on("scheduleLight", openScheduleLight );
 
-
+ipcMain.on("reportError", reportError );
 
 
 function makeInstrumentMenu() {
@@ -101,6 +102,7 @@ function doMenu() {
 
 
 function saveConfig( ) {
+  return;
   fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
 
     if( error ) {
@@ -415,6 +417,22 @@ function reloadInstruments() {
   doMenu();
 }
 
+function wsIncoming( data ) {
+
+  data = JSON.parse( data );
+
+  if( data.instrumentId && windows[ 'instrumentMain' ]) {
+
+    if( data.chanId ) {
+      windows[ 'instrumentMain' ].webContents.send( "channel.update." + data.instrumentId + "." + data.chanId, data ); 
+    }
+
+    if( data.groupName ) {
+      windows[ 'instrumentMain' ].webContents.send( "group.update." + data.instrumentId + "." + data.groupName, data ); 
+    }
+  }
+}
+
 function addInstrument() {
 
   openForm( null, "instrumentform", {},   {
@@ -480,11 +498,17 @@ function loadInstrument( event, trackerHost ) {
       windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: instrumentConfig, db: config.database } );  
   }
   
-
   windows[ 'instrumentMain' ].once("close", () => {
     windows[ 'instrumentMain' ] = null;
-  })
+  });
+  
+  const ws = new WebSocket('ws://' + instrumentConfig.trackerHost + ':' + instrumentConfig.trackerPortWS );
+  
+  ws.on('open', function open() {
+    console.log("Socket is open");
+  });
 
+  ws.on('message', wsIncoming );
 }
 
 function editInstrument( event, trackerHost ) {
@@ -584,7 +608,7 @@ async function configChannel( event, data ) {
     channelConfig: channelConfig, 
     channelState: channelState[ data.groupName ].channels[ data.chanId ],
   }, { width: 600, height: 800 } ).then( ( results ) => {
-    console.log( results );
+    
     event.sender.send( "channelConfigured", results );
     return results;    
 

@@ -12,10 +12,10 @@ import { pgaValueToRange } from "../../pgasettings"
 //import cfg from "./config"
 
 const initialState = {
-	unknown: true,
+	
 	display: 'eff',
-	ellapsed: 0,
-	ellapsedUnit: 'min.',
+	ellapsed: false,
+	wsEllapsed: false,
 	changeRate: false,
 	absChangeRate: false,
 	changeUnit: false,
@@ -29,6 +29,7 @@ const initialState = {
 	voltage: false,
 	ff: false,
 	current: false,
+	currentdensity: false,
 	voc: false,
 	jsc: false,
 	sun: false,
@@ -37,7 +38,8 @@ const initialState = {
 	arrowstatus: false,
 	change: false,
 	showDetails: false,
-
+	last_time: 0,
+	
 	_last_iv_time: false,
 	_last_iv: null,
 	_fist_iv: null,
@@ -45,6 +47,11 @@ const initialState = {
 	ivCurves: [],
 	serverState: {}
 };
+
+function round( value, digits ) {
+
+	return Math.round( value * 10 ** digits ) / ( 10 ** digits );
+}
 
 class TrackerDevice extends React.Component {
 	
@@ -66,7 +73,8 @@ class TrackerDevice extends React.Component {
 			"humidity": <span>%</span>
 		};
 
-		this.state = initialState;
+		this.state = Object.assign( {}, initialState );
+		this.state.data = Graph.newWaveform();
 
 		this.cfg = this.cfg.bind( this );
 		this.start = this.start.bind( this );
@@ -78,12 +86,11 @@ class TrackerDevice extends React.Component {
 
 		this.showEfficiencies = this.showEfficiencies.bind( this );
 		this.showSummary = this.showSummary.bind( this );
-		this.showDetails = this.showDetails.bind( this );
-		this.hideDetails = this.hideDetails.bind( this );
+		
 		this.downloadData = this.downloadData.bind( this );
 
+		this.wsUpdate = this.wsUpdate.bind( this );
 		
-		this.toggleDetails = this.toggleDetails.bind( this );
 	//	this.formChanged = this.formChanged.bind( this );
 		//this.state.tmpServerState = {};		
 	}
@@ -95,7 +102,7 @@ class TrackerDevice extends React.Component {
 	}
 	componentWillReceiveProps( nextProps ) {
 
-		this.setState( { updating: false, unknown: false } );
+		this.setState( { updating: false } );
       	this.setState( { serverState: nextProps.serverState } );
   	
       	if( 
@@ -110,13 +117,14 @@ class TrackerDevice extends React.Component {
 
 	componentDidMount() {
 
-		this.setState( { updating: false, unknown: false } );
+		this.setState( { updating: false } );
       	this.setState( { serverState: this.props.serverState } );
   	
       	if( this.props.serverState.tracking_mode > 0 ) {
         	this.updateInfluxData( this.props.serverState );
       	}
 
+      	ipcRenderer.on("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate );
 	}
 
 	componentWillUnmount() {
@@ -125,8 +133,116 @@ class TrackerDevice extends React.Component {
 			clearTimeout( this.refreshInterval );
 			this.refreshInterval = true;
 		}
+
+		ipcRenderer.removeListener("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate );
 	}
 
+	async wsUpdate( event, data ) {
+
+		let newState = {};
+
+		data.state = data.state || {};
+		data.timer = data.timer || {};
+		data.action = data.action || {};
+
+		if( data.state.efficiency ) {
+			newState.efficiency = round( data.state.efficiency, 2 );
+		}
+
+		if( data.state.current ) {
+			// Convert to mA
+			newState.current = round( data.state.current * 1000, 2 );
+			newState.currentdensity = data.state.current * 1000 / this.state.serverState.cellArea;
+		}
+
+		if( data.state.voltage ) {
+			newState.voltage = round( data.state.voltage, 2 );
+		}
+
+		if( data.state.power ) {
+			newState.power = round( data.state.power, 2 );
+		}
+
+		if( data.state.voc ) {
+			newState.power = round( data.state.voc, 2 );
+		}
+		
+		if( data.state.sun ) {
+			newState.sun = round( data.state.sun, 2 );
+		}
+
+		if( data.state.jsc ) {
+			newState.jsc = data.state.jsc;
+		}
+
+
+		if( data.state.temperature ) {
+			newState.temperature_junction = data.state.temperature;
+		}
+
+		if( data.state.humidity ) {
+			newState.humidity = data.state.humidity;
+		}
+
+		if(  ! isNaN( data.timer.iv ) ) {	// Timer for the next IV curve
+			newState.timer_nextIV = { time: data.timer.iv };
+		}
+
+		if(  ! isNaN( data.timer.jsc ) ) {	// Timer for the next JSC measurement
+			newState.timer_nextJsc = { time: data.timer.jsc };
+		}
+
+		if(  ! isNaN( data.timer.voc ) ) {	// Timer for the next Voc curve
+			newState.timer_nextVoc ={ time: data.timer.voc };
+		}
+
+		if( ! isNaN( data.timer.aquisition ) ) {	// Timer for the last aquisition
+			newState.timer_aquisition = { time: data.timer.aquisition };
+		}
+
+		if( ! isNaN( data.timer.ellapsed ) && ! this.state.ellapsed ) {
+			newState.wsEllapsed = data.timer.ellapsed;
+		}
+
+		if( data.action.data && this.state.data ) {
+			
+			let lastTime;
+
+			if( this.state.data.getLength && this.state.data.getLength() > 0 ) {
+				lastTime = this.state.data.xdata.data[ this.state.data.getLength() - 1 ];
+				lastTime += this.state.serverState.tracking_record_interval / 1000;
+			} else {
+				lastTime = 0;
+			}
+
+			if( ! this.state.data ) {
+				newState.data = Graph.newWaveform();
+			} else {
+				
+				this.state.data.append( lastTime, data.action.data );
+				newState.data = this.state.data;
+			}
+		}
+
+		if( data.action.ivCurve ) {
+			this.updateInfluxData();
+		}
+
+		if( data.action.saved ) { // Data has just been saved into the DB => reload it into the renderer
+			this.updateInfluxData();
+		}
+
+		if( data.action.update ) {
+			this.getStatus();
+		}
+
+		if( data.action.stopped ) {
+			await this.getStatus();
+			newState = Object.assign( {}, initialState );
+		}
+
+		this.setState( newState );
+	}
 
 	saveStatus( newState ) {
 
@@ -145,15 +261,11 @@ class TrackerDevice extends React.Component {
 			method: 'POST',
 			body: body
 
-		} ).then( ( response ) => {
-
-			this.getStatus();
-
-		} ).catch( () => {
-
-			this.setState( { unknown:true, updating: false } );
 		} );
 	}
+
+
+
 
 	resetChannel() {
 
@@ -169,65 +281,21 @@ class TrackerDevice extends React.Component {
 
 			method: 'GET'
 
-		} ).then( ( response ) => {
-
-			this.setState( Object.assign( {}, initialState ) );
-			this.getStatus();
-
-		} ).catch( () => {
-
-			this.setState( { unknown:true, updating: false } );
 		} );
-
 	}
 
 	recordIV() {
-
-		this.setState( { updating: true } );
-		let body = JSON.stringify( { instrumentId: this.props.instrumentId, chanId: this.props.chanId } );
-
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).then( ( response ) => {
-
-
-			this.getStatus();
-
-		} ).catch( () => {
-
-			this.setState( { unkown:true, updating: false } );
-		} );
+		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId );
 	}
 
 
 	recordVoc() {
-
-		this.setState( { updating: true } );
-
-		let body = JSON.stringify( { instrumentId: this.props.instrumentId, chanId: this.props.chanId } );
-
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  + "&extend=" + !!! this.state.voc ).then( ( response ) => {
-
-			this.getStatus();
-
-		} ).catch( () => {
-
-			this.setState( { unkown:true, updating: false } );
-		} );
+		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  + "&extend=" + !!! this.state.voc );
 	}
 
 
 	recordJsc() {
-
-		this.setState( { updating: true } );
-		let body = JSON.stringify( { instrumentId: this.props.instrumentId, chanId: this.props.chanId } );
-
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).then( ( response ) => {
-
-			this.getStatus();
-
-		} ).catch( () => {
-
-			this.setState( { unkown:true, updating: false } );
-		} );
+		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId );
 	}
 
 	//formChanged( name, value ) {
@@ -266,7 +334,7 @@ class TrackerDevice extends React.Component {
 
 			this.updateInfluxData();	
 
-		}, this.props.refreshRate * 1000 || 10000 );
+		}, this.props.refreshRate * 1000 || 60000 );
 	}
 
 
@@ -316,8 +384,25 @@ class TrackerDevice extends React.Component {
 
 	getStatus() {
 
-		this.props.updateStatus();
-	}
+	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getStatus?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+
+	      method: 'GET'
+
+	    } )
+	    .then( response => response.json() )
+	    .then( response => {
+
+			this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
+	      	//this.updateInfluxData( response );
+	    } )
+	    .catch( error => {
+
+	      this.setState( {
+	        error: error
+	      } );
+
+	    } );
+	 }
 
 	tooltip( message, color ) {
 
@@ -341,18 +426,6 @@ class TrackerDevice extends React.Component {
 		}
 		this.wrapper.classList.add("show-second");
 		this.wrapper.classList.remove("show-first");
-	}
-
-	toggleDetails() {
-		this.setState( ( state ) => ( { showDetails: ! state.showDetails } ) );
-	}
-
-	showDetails() {
-		this.setState( { showDetails: true } );
-	}
-
-	hideDetails() {
-		this.setState( { showDetails: false } );
 	}
 
 	showSummary() {
@@ -382,7 +455,6 @@ class TrackerDevice extends React.Component {
 	}
 
 	updateInfluxData( serverState = this.state.serverState ) {
-
 
 		/*
 		*	Procedure:
@@ -433,6 +505,22 @@ class TrackerDevice extends React.Component {
 
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
 			
+			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
+				
+				newState.ivCurves = this.state.ivCurves.splice( 0 );
+				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
+
+					if( index == results[ 2 ].series[ 0 ].values.length - 1 ) {
+						newState._last_iv_time = value[ 0 ];
+					}	
+
+					return {
+						time: new Date( value[ 0 ] ),
+						iv: this.readIV( value[ 1 ] )
+					}
+				} ) );
+			}
+
 			if( ! results[ 0 ].series ) {
 				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
 			}
@@ -444,27 +532,10 @@ class TrackerDevice extends React.Component {
 				last_iv;
 
 
-			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
-				
-				newState.ivCurves = this.state.ivCurves.splice( 0 );
-				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
-
-						
-					if( index == results[ 2 ].series[ 0 ].values.length - 1 ) {
-						newState._last_iv_time = value[ 0 ];
-					}	
-
-					return {
-						time: new Date( value[ 0 ] ),
-						iv: this.readIV( value[ 1 ] )
-					}
-
-				} ) );
-			}
 
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
-			newState.efficiency = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
+			newState.efficiency = round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ], 2 );
 
 			newState.power = results[ 1 ].series[ 0 ].values[ 0 ][ 2 ];
 			newState.current = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000;
@@ -483,15 +554,7 @@ class TrackerDevice extends React.Component {
 			let timeDifference = ( timeto_date - timefrom_date ) / 1000;
 
 			newState.last_time = timeto_date;
-			newState.ellapsed = Math.round( timeDifference / ( 3600 ) * 10 ) / 10;
-
-			if( timeDifference < 3600 ) {
-				newState.ellapsed = Math.round( timeDifference / ( 60 ) );
-				newState.ellapsedUnit = "m";
-			} else {
-				newState.ellapsed = Math.round( newState.ellapsed );
-				newState.ellapsedUnit = "h";
-			}
+			newState.ellapsed = timeDifference;
 
 			grouping = Math.max( 1, Math.round( timeDifference / 100 ) );
 
@@ -505,30 +568,7 @@ class TrackerDevice extends React.Component {
 
 			//query = "SELECT time, MAX(efficiency) as effMax FROM \"" + this.state.serverState.measurementName + "\" ORDER BY time ASC limit 1;"
 			//queue.push( influxquery( query, db_ds ).then( ( results ) => {
-			let changeUnit, 
-				changeUnitVal,
-				prev_time = timeto_date.getTime() - ( timeto_date.getTime() - timefrom_date.getTime() ) / 10;
-
-			if( timeto_date.getTime() - timefrom_date.getTime() > 12 * 3600 * 1000 ) { // Display in days
-
-				changeUnitVal = 24 * 3600;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 day
-				changeUnit = " &#951;% / day";
-
-			} else if( timeto_date.getTime() - timefrom_date.getTime() > 600 * 1000 ) {
-
-				changeUnitVal = 3600;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 hour
-				changeUnit = " &#951;% / hour";
-
-			}  else if( timeto_date.getTime() - timefrom_date.getTime() > 300 * 1000 ) {
-
-				changeUnitVal = 60;
-				//prev_time = timeto_date.getTime() - changeUnitVal * 1000; // 1 minute
-				changeUnit = " &#951;% / minute";
-			}
-
-
+		
 			if( results[ 3 ] && results[ 3 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.voc = Math.round( results[ 3 ].series[ 0 ].values[ 0 ][ 1 ] * 1000 ) / 1000;
 			}	
@@ -557,7 +597,7 @@ class TrackerDevice extends React.Component {
 					return;
 				}
 
-				let valueIndex = 2;
+				let valueIndex = 1;
 
 				values.forEach( ( value, index ) => {
 					
@@ -571,6 +611,7 @@ class TrackerDevice extends React.Component {
 						time = ( date.getTime() - offset ) / 1000;
 					}
 
+					//value[ valueIndex ] += 2;
 					if( this.state.serverState.tracking_mode == 1 ) {
 						if( value[ valueIndex ] > 35 || value[ valueIndex ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
 							return;
@@ -608,6 +649,7 @@ class TrackerDevice extends React.Component {
 				newState.highest_value = Math.round( highest_value * 100 ) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
+				
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -621,19 +663,24 @@ class TrackerDevice extends React.Component {
 
 				newState.ff = Math.round( newState.power / serverState.cellArea / ( newState.voc * newState.jsc / 1000 ) * 100 );
 				newState.updating = false;
-				this.setState( newState );
+				
 
 			}).catch( ( error ) => {
 				
 				console.error( "Could not process influx DB request." );
 				console.error( error );
 
+			}).then( () => {
+
+				this.setState( newState );
 			});
 
 		}).catch( ( error ) => {
 
 			console.error( "Could not process influx DB request." );
 			console.error( error );
+
+			this.setState( newState );
 			
 		}).then( () => {
 
@@ -643,14 +690,14 @@ class TrackerDevice extends React.Component {
 
 	processCurrent( value ) {
 
-		if( isNaN( value ) ) {
+		if( isNaN( value ) || value === false ) {
 			return;
 		}
 
 		if( Math.abs( value ) < 0.1 ) {
-			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toFixed( 1 ) }&mu;Acm<sup>-2</sup></span> );
+			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toFixed( 1 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
 		} else {
-			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toFixed( 1 ) }mAcm<sup>-2</sup></span> );
+			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toFixed( 1 ) }&nbsp;mA&nbsp;cm<sup>-2</sup></span> );
 		}
 	}
 
@@ -724,258 +771,269 @@ class TrackerDevice extends React.Component {
 		const j_currentdensity = this.processCurrent( this.state.currentdensity );
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
 
-		return (
-			<div ref={ ( el ) => this.wrapper = el } className={'cell ' + ( this.state.unknown ? 'cell-unknown' : ( active ? 'cell-running' : 'cell-stopped' ) ) + ( this.state.showDetails && active ? ' show-details' : '' ) }>
+		if( active ) {
 
+			let ellapsed = { 
+				time: ! isNaN( this.state.ellapsed ) ? this.state.ellapsed * 1000 : this.state.wsEllapsed 
+			};
 			
-				<div className="cell-name cell-main-info">
+			return (
+				<div ref={ ( el ) => this.wrapper = el } className={'cell ' + ( active ? 'cell-running' : 'cell-stopped' ) + ' show-details' }>
+
+					<div className="col-lg-7">
+
+						<div className="cell-name cell-main-info row">
+								
+							<div className="col-lg-9">
 					
-					<div className="col-lg-9">
-						<span>
-							<input type="checkbox" className="channel-check" onClick={ this.props.toggleChannelCheck } checked={ !! this.props.channelChecked } /> 
-						</span>
-						<span className="label">
-							<span className="glyphicon glyphicon-tags"></span>
-						</span>
-						<span className="value">{ this.state.serverState.cellName || "Ch " + this.state.serverState.chanId }</span> { this.state.serverState.cellArea ? <span className="cell-area">( { this.state.serverState.cellArea } cm<sup>2</sup> )</span> :"" }
+								<span>
+									<input type="checkbox" className="channel-check" onClick={ this.props.toggleChannelCheck } checked={ !! this.props.channelChecked } /> 
+								</span>
+								<span className="label">
+									<span className="glyphicon glyphicon-tags"></span>
+								</span>
+								<span className="value">{ this.state.serverState.cellName }</span> { this.state.serverState.cellArea ? <span className="cell-area">( { this.state.serverState.cellArea } cm<sup>2</sup> )</span> :"" }				
+							</div>
+						</div>
+
+						<div className="cell-timing row">
+						
+							<div className="col-lg-1">
+								<div>Last data</div>
+								<div><Timer precision={1} direction="ascending" timerValue={ this.state.timer_aquisition } /></div>
+							</div>
+
+							<div className="col-lg-1">
+								<div className="record">
+									<span className="glyphicon glyphicon-record" onClick={ this.recordIV }></span>
+								</div>
+								<div>Next IV curve</div>
+								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextIV } /></div>
+								
+							</div>
+
+							<div className="col-lg-1">
+								<div className="record">
+									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
+								</div>
+								<div>Next Voc</div>
+								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextVoc } /></div>
+								
+							</div>
+
+							<div className="col-lg-1">
+								<div className="record">
+									<span className="glyphicon glyphicon-record" onClick={ this.recordJsc }></span>
+								</div>
+								<div>Next Jsc</div>
+								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextJsc } /></div>
+							</div>
+						</div>
+						
+						<div className="cell-summary row">
+							
+
+							<div className={ `col-lg-1 cell-status ${ active ? 'active' : ''}`}>
+								<div>{ active ? <span className="glyphicon glyphicon-record"></span> : <span className="glyphicon glyphicon-stop"></span> }</div>
+								{ trackingMode }
+							</div>
+
+							<div className="col-lg-1 propElement">
+								
+								<div>
+									<div className="label">
+										<span className="glyphicon glyphicon-hourglass"></span>
+									</div>
+									<div className="value">
+									{ ( ellapsed.time ) ?
+										<Timer precision={1} maxLevel={3} spacer=" " direction="ascending" timerValue={ ellapsed } /> : 'N/A'
+									}
+									</div>
+								</div>
+							</div>
+							
+							<div className="col-lg-1 propElement">
+								
+								<div>
+									<div className="label">&eta;</div>
+									<div className="value">
+										<strong>
+											{ ( ! isNaN( this.state.efficiency ) && this.state.efficiency !== false ) ? <span>{ this.state.efficiency } { this.unit.efficiency }</span> : 'N/A' } 
+										</strong>
+									</div>
+								</div>
+							</div>
+							<div className="col-lg-1 propElement">
+								
+								<div>
+									<div className="label">
+										<span className="glyphicon glyphicon-scale"></span>
+									</div>
+									<div className="value">
+										{ ( ! isNaN( this.state.sun ) && this.state.sun !== false ) ? <span>{ this.state.sun } {this.unit.sun}</span> : 'N/A' }
+									</div>
+								</div>
+							</div>
+							<div className="col-lg-1 propElement">
+								<div className="record">
+									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
+								</div>
+								<div className="label">
+									V<sub>oc</sub>
+								</div>
+								<div className="value">
+									{ ( !isNaN( this.state.voc ) && this.state.voc !== false ) ? <span>{ this.state.voc } { this.unit.voltage }</span> : 'N/A' }
+								</div>
+								
+							</div>
+
+							<div className="col-xs-1 propElement">
+								<div className="record">
+									<span className="glyphicon glyphicon-record"  onClick={ this.recordJsc }></span>
+								</div>
+								<div className="label">
+									J<sub>sc</sub>
+								</div>
+								<div className="value">
+									{ jsc_currentdensity || 'N/A' }
+								</div>
+								
+							</div>
+
+							<div className="col-xs-1 propElement">
+								<div className="label">FF</div>
+								<div className="value">
+									{ ( ! isNaN( this.state.ff )  && this.state.ff !== false ) ?  this.state.ff : 'N/A' }
+								</div>
+							</div>
+
+
+
+
+							<div className="col-xs-1 propElement">
+								<div className="label">V<sub>now</sub></div>
+								<div className="value">
+									{  ( !isNaN( this.state.voltage ) && this.state.voltage !== false ) ? <span>{ this.state.voltage } { this.unit.voltage }</span> : 'N/A' }
+								</div>
+							</div>
+
+
+
+							<div className="col-xs-1 propElement">
+								<div className="label">J<sub>now</sub></div>
+								<div className="value">
+									{ j_currentdensity || 'N/A' }
+								</div>
+							</div>
+							
 		
+							<div className="col-lg-1 propElement">
+								<div>
+									<div className="label">
+										<span className="glyphicon glyphicon-grain"></span>
+									</div>
+									<div className="value">
+										{ this.state.temperature_junction && this.state.temperature_junction > 0 ? <span>{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+									</div>
+								</div>
+							</div>
+							<div className="col-lg-1 propElement">
+								<div>
+									<div className="label">
+										<span className="glyphicon glyphicon-tint"></span>
+									</div>
+									<div className="value">
+										{ this.state.humidity && this.state.humidity > 0 ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
+									</div>
+								</div>
+							</div>
+
+						
+							<div className="cell-efficiency col-lg-6">
+
+								<StatusGraph 
+									shown={ true } 
+									width="720" 
+									height="60" 
+									mode="default" 
+									key={ this.props.instrumentId + this.props.chanId + "_graph" } 
+									data={ this.state.data } 
+									data_sun={ this.state.data_sun } 
+									data_humidity={ this.state.data_humidity } 
+									data_temperature={ this.state.data_temperature } 
+									flag1={startVal} 
+									flag1_pos={startValPos} 
+									unit={unit} 
+									axisLabel={statusGraphAxisLabel}
+									axisUnit={statusGraphAxisUnit}
+									serieLabelLegend={statusGraphSerieLabelLegend}
+									flag2={currVal} />
+							
+							</div>
+						
+						</div>
+
+						<div className="row cell-actions">
+							
+							<div className="col-lg-1 label">
+								Actions
+							</div>
+							<div className="col-lg-8">
+								<button className="btn btn-cl" onClick={ this.downloadData }><span className="glyphicon glyphicon-download-alt"></span> Download</button>
+								<button className="btn btn-cl" onClick={ this.stop }><span className="glyphicon glyphicon-stop"></span> Stop</button>
+								<button className="btn btn-cl" onClick={ this.cfg }><span className="glyphicon glyphicon-cog"></span> Configure</button>
+							</div>
+						</div>
 					</div>
 
-
-					<div className="cell-iv pull-right col-lg-3">
-
+					<div className="col-lg-2 cell-iv">
+						
 						<StatusIV 
 							width="290"
-							height="190"
+							height="230"
 							shown={ true } 
 							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
 							data={ this.state.ivCurves } 
 							dataIV={ this.state.data_IV } 
 							voltage={ this.state.voltage } 
 							current={ this.state.current } 
-							cellarea={ this.props.serverState.cellArea }
+							cellarea={ this.state.serverState.cellArea }
 							/>
-
-					</div>
-
-				</div>
-
-{/*	
-				<div className="row">
-				
-					<div className="col-lg-1">
-						<div>Last data</div>
-						<div><Timer latest={ this.state.latest } /></div>
-					</div>
-
-					<div className="col-lg-1">
-						<div>Next IV curve</div>
-						<div><Timer latest={ this.state.latest } /></div>
-					</div>
-
-					<div className="col-lg-1">
-						<div>Next Voc</div>
-						<div><Timer latest={ this.state.latest } /></div>
-					</div>
-
-					<div className="col-lg-1">
-						<div>Next Jsc</div>
-						<div><Timer latest={ this.state.latest } /></div>
-					</div>
-				</div>
-				*/ }
-
-
-				<div className="cell-summary">
 					
+					</div>
+				</div> );
+			} else {
 
-					<div className={ `col-lg-1 cell-status ${ active ? 'active' : ''}`}>
-						<div>{ active ? <span className="glyphicon glyphicon-record"></span> : <span className="glyphicon glyphicon-stop"></span> }</div>
-						{ trackingMode }
-					</div>
+				return (
+				<div ref={ ( el ) => this.wrapper = el } className="cell  cell-unknown">
 
-					<div className="col-lg-1 propElement">{ 
-						! ! this.state.ellapsed && 
-						<div>
-							<div className="label">
-								<span className="glyphicon glyphicon-hourglass"></span>
-							</div>
-							<div className="value">
-								{this.state.ellapsed}{ this.state.ellapsedUnit }
-							</div>
-						</div> }
-					</div>
-					<div className="col-lg-1 propElement">
-						<div className="record">
-							<span className="glyphicon glyphicon-record"></span>
-						</div>
-
-						{ 
-						!!this.state.sun && 
-						<div>
-							<div className="label">
-								<span className="glyphicon glyphicon-scale"></span>
-							</div>
-							<div className="value">
-								{ this.state.sun } {this.unit.sun}
-							</div>
-						</div>} 
-					</div>
-					<div className="col-lg-1 propElement">{ 
-						! isNaN( this.state.efficiency ) && 
-						<div>
-							<div className="label">&eta;</div>
-							<div className="value">{ this.state.efficiency }{ this.unit.efficiency }</div>
-						</div> }
-					</div>
-					<div className="col-lg-1 propElement">
-						<div className="record">
-							<span className="glyphicon glyphicon-record"></span>
-						</div>
-						<div className="label">
-							V<sub>oc</sub>
-						</div>
-						<div className="value">
-							{ !!this.state.voc ? <span>{ this.state.voc }{ this.unit.voltage }</span> : 'N/A' }
-						</div>
+						<div className="cell-name cell-main-info row">						
+							<div className="col-lg-4">
 						
-					</div>
-
-					<div className="col-xs-1 propElement">
-						<div className="record">
-							<span className="glyphicon glyphicon-record"></span>
-						</div>
-						<div className="label">
-							J<sub>sc</sub>
-						</div>
-						<div className="value">
-							{ !!this.state.jsc ? jsc_currentdensity : 'N/A' }
-						</div>
-						
-					</div>
-
-					<div className="col-xs-1 propElement">
-						<div className="label">FF</div>
-						<div className="value">
-							{ !!this.state.ff ?  this.state.ff : 'N/A' }
-						</div>
-					</div>
-
-
-
-
-					<div className="col-xs-1 propElement">
-						<div className="label">V<sub>now</sub></div>
-						<div className="value">
-							{ this.state.voltage } { this.unit.voltage }
-						</div>
-					</div>
-
-
-
-					<div className="col-xs-1 propElement">
-						<div className="label">J<sub>now</sub></div>
-						<div className="value">
-							{ j_currentdensity }
-						</div>
-					</div>
-					
-{ /*
-				<div className="row cell-element">
-
-					<div className="col-sm-3">
-						<table cellPadding="0" cellSpacing="0" className="parameters">
-							<tbody>
-								
-								<tr>
-									<td>PCE</td>
-									<td>{ this.state.efficiency ? <span>{this.state.efficiency} {this.unit.efficiency}</span> : notavailable }</td>
-								</tr>
-								<tr>
-									<td>Humidity</td>
-									<td>{ ! isNaN( this.state.humidity )  && this.state.humidity !== -1 ? this.state.humidity + "%" : "N/A"}</td>
-								</tr>
-								<tr>
-									<td>Board temp.</td>
-									<td>{ ! isNaN( this.state.temperature_base ) && this.state.temperature_base !== -1 ? this.state.temperature_base + "\u00B0C" : "N/A"}</td>
-								</tr>
-									
-								<tr>
-									<td>Est. junction temp.</td>
-									<td>{ ! isNaN( this.state.temperature_junction ) && this.state.temperature_junction !== -1 ? this.state.temperature_junction + "\u00B0C" : "N/A"}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-*/ }
-						
-
-					<div className="col-lg-1 propElement">
-						<div>
-							<div className="label">
-								<span className="glyphicon glyphicon-grain"></span>
+								<span>
+									<input type="checkbox" className="channel-check" onClick={ this.props.toggleChannelCheck } checked={ !! this.props.channelChecked } /> 
+								</span>
+								<span className="label">
+									<span className="glyphicon glyphicon-tags"></span>
+								</span>
+								<span className="value">{ ! this.state.serverState.cellName ? <span>Channel #{ this.props.chanId }</span> : this.state.serverState.cellName }</span>
 							</div>
-							<div className="value">
-								{ this.state.temperature_junction ? <span>{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+							<div className="col-lg-4">
+								<button className="btn btn-cl btn-sm" onClick={ this.cfg }><span className="glyphicon glyphicon-cog"></span> Configure</button>
+								{ 
+									!!( this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && ! active && this.state.serverState.tracking_mode > 0 )
+									&&
+									<button className="btn btn-cl btn-sm" onClick={ this.start }><span className="glyphicon glyphicon-start"></span> Start</button> 
+								}
 							</div>
-						</div>
-					</div>
-					<div className="col-lg-1 propElement">
-						<div>
-							<div className="label">
-								<span className="glyphicon glyphicon-tint"></span>
-							</div>
-							<div className="value">
-								{ this.state.humidity ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
-							</div>
+
 						</div>
 					</div>
 
-				
-					<div className="cell-efficiency col-lg-6">
+				);
 
-						<StatusGraph 
-							shown={ true } 
-							width="600" 
-							height="60" 
-							mode="default" 
-							key={ this.props.instrumentId + this.props.chanId + "_graph" } 
-							data={ this.state.data } 
-							data_sun={ this.state.data_sun } 
-							data_humidity={ this.state.data_humidity } 
-							data_temperature={ this.state.data_temperature } 
-							flag1={startVal} 
-							flag1_pos={startValPos} 
-							unit={unit} 
-							axisLabel={statusGraphAxisLabel}
-							axisUnit={statusGraphAxisUnit}
-							serieLabelLegend={statusGraphSerieLabelLegend}
-							flag2={currVal} />
-					
-					</div>
-				
-				</div>
+			}
 
-
-				<div className="row cell-actions">
-					
-					<div className="col-lg-1">
-						Actions
-					</div>
-
-
-					<div className="col-lg-1">
-
-						<button className="btn btn-cl"><span className="glyphicon glyphicon-download-alt"></span> Download</button>
-						<button className="btn btn-cl"><span className="glyphicon stop"></span> Stop</button>
-					</div>
-
-
-				</div>
-
-			</div>
-
-		);
 	}
 }
 
