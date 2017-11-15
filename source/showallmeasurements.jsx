@@ -52,7 +52,7 @@ function removeData( measurementName ) {
     	try {
 
     		await fetch(`http://${ data.config.trackerHost }:${ data.config.trackerPort }/dropMeasurement?measurementName=${measurementName}`)
-    		await influxquery(`DROP MEASUREMENT ${ measurementName };`)
+    		await influxquery(`DROP MEASUREMENT ${ measurementName };`, data.configDB.db, data.configDB )
     		render();
 
     	} catch ( e ) { 

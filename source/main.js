@@ -63,6 +63,39 @@ function makeInstrumentMenu() {
   };
 }
 
+function openSocket( instrumentConfig ) {
+
+  const ws = new WebSocket('ws://' + instrumentConfig.trackerHost + ':' + instrumentConfig.trackerPortWS );
+  
+  ws.on('open', function open() {
+    console.log("Socket is open");
+  });
+
+  ws.on('close', function open() {
+    console.log("Socket is closed");
+    setTimeout( () => openSocket( instrumentConfig ), 1000 );
+  });
+
+  ws.on('message', wsIncoming );
+}
+
+
+function wsIncoming( data ) {
+
+  data = JSON.parse( data );
+
+  if( data.instrumentId && windows[ 'instrumentMain' ]) {
+
+    if( data.chanId ) {
+      windows[ 'instrumentMain' ].webContents.send( "channel.update." + data.instrumentId + "." + data.chanId, data ); 
+    }
+
+    if( data.groupName ) {
+      windows[ 'instrumentMain' ].webContents.send( "group.update." + data.instrumentId + "." + data.groupName, data ); 
+    }
+  }
+}
+
 
 
 function doMenu() {
@@ -313,7 +346,6 @@ function openBugReport( event ) {
 function openMPPT( keithleyModel ) {
 
     windows[ 'mppt' ] = new BrowserWindow({width: 1400, height: 1024, center: true, resizable: false })
-
       // and load the index.html of the app.
     windows[ 'mppt' ].loadURL(url.format({
       pathname: path.join(__dirname, 'app/mppt.html'),
@@ -325,17 +357,12 @@ function openMPPT( keithleyModel ) {
 
 async function openCalibratePD( event, data ) {
 
-
-  //await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/light.pause?instrumentId=" + data.instrumentId, { method: 'GET' } );
-  
   openForm( null, "calibratepd", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
     width: 800,
     height: 600,
     resizable: false
   });
 }
-
-
 
 
 async function openScheduleLight( event, data ) {
@@ -417,22 +444,6 @@ function reloadInstruments() {
   doMenu();
 }
 
-function wsIncoming( data ) {
-
-  data = JSON.parse( data );
-
-  if( data.instrumentId && windows[ 'instrumentMain' ]) {
-
-    if( data.chanId ) {
-      windows[ 'instrumentMain' ].webContents.send( "channel.update." + data.instrumentId + "." + data.chanId, data ); 
-    }
-
-    if( data.groupName ) {
-      windows[ 'instrumentMain' ].webContents.send( "group.update." + data.instrumentId + "." + data.groupName, data ); 
-    }
-  }
-}
-
 function addInstrument() {
 
   openForm( null, "instrumentform", {},   {
@@ -502,13 +513,7 @@ function loadInstrument( event, trackerHost ) {
     windows[ 'instrumentMain' ] = null;
   });
   
-  const ws = new WebSocket('ws://' + instrumentConfig.trackerHost + ':' + instrumentConfig.trackerPortWS );
-  
-  ws.on('open', function open() {
-    console.log("Socket is open");
-  });
-
-  ws.on('message', wsIncoming );
+  openSocket( instrumentConfig );
 }
 
 function editInstrument( event, trackerHost ) {
@@ -573,7 +578,7 @@ function editInfluxDB( event ) {
 
 function showAllMeasurements( instrument ) {
   
-  openForm( null, "showallmeasurements", { config: instrument }, { width: 600, height: 700, resizable: false } ).then( ( results ) => {
+  openForm( null, "showallmeasurements", { config: instrument, configDB: config.database }, { width: 600, height: 700, resizable: false } ).then( ( results ) => {
 
   } ).catch( () => {} );
 }

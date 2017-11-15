@@ -149,7 +149,7 @@ function removeData(measurementName) {
 			try {
 
 				await fetch(`http://${data.config.trackerHost}:${data.config.trackerPort}/dropMeasurement?measurementName=${measurementName}`);
-				await Object(__WEBPACK_IMPORTED_MODULE_3__jsx_influx__["a" /* query */])(`DROP MEASUREMENT ${measurementName};`);
+				await Object(__WEBPACK_IMPORTED_MODULE_3__jsx_influx__["a" /* query */])(`DROP MEASUREMENT ${measurementName};`, data.configDB.db, data.configDB);
 				render();
 			} catch (e) {
 
