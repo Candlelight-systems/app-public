@@ -22,7 +22,7 @@ class TrackerGroupDevices extends React.Component {
 
     this.light_calibrate = this.light_calibrate.bind( this );
     this.light_controller_config = this.light_controller_config.bind( this );
-    this.updateGroupStatus = this.updateGroupStatus.bind( this );
+    
 
     this.heatingPowerChange = this.heatingPowerChange.bind( this );
     this.setHeatingPower = this.setHeatingPower.bind( this );
@@ -33,17 +33,10 @@ class TrackerGroupDevices extends React.Component {
     this.togglePause = this.togglePause.bind( this );
     this.wsUpdate = this.wsUpdate.bind( this );
 
-    setInterval( () => {
-      
-      this.updateGroupStatus();
-    }, 60000 );
-
-
-    ipcRenderer.on("light.updated", this.updateGroupStatus );
   }
 
   componentDidMount() {
-    this.updateGroupStatus();
+
     this.initCheckChannels( this.props );
 
     this.setState( {
@@ -61,9 +54,11 @@ class TrackerGroupDevices extends React.Component {
 
   wsUpdate( event, data ) {
 
-    if( data.state.hasOwnProperty( 'paused' ) ) {
+    // Update directly the state
+    this.state( data );
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
-    }
+    }*/
   }
 
 
@@ -73,55 +68,22 @@ class TrackerGroupDevices extends React.Component {
     if( ! this.transformed && this.toggleLightMode ) {
 
       $( this.toggleLightMode ).bootstrapToggle({
-        on: 'Automatic',
-        off: 'Manual'
+        on: 'On',
+        off: 'Off'
       }).change( () => {
 
-        // Propagate the information to the server
-      let saveJSON = {
-        instrumentId: this.props.instrumentId,
-        groupName: this.props.name,
-        lightController: {
-          modeAutomatic: !! this.toggleLightMode.checked
-        }
-      };
+        return fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${ this.toggleLightMode.checked ? 'enable' : 'disable'}?instrumentId=${ this.props.instrumentId }&groupName=${ this.props.name }`, {
+          method: 'GET',
+        } ).then( () => {
 
-      let body = JSON.stringify( saveJSON );
-      var headers = new Headers( {
-        "Content-Type": "application/json",
-        "Content-Length": body.length.toString()
-      });
-
-      return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
-
-        method: 'POST',
-        headers: headers,
-        body: body
-
-      } ).then( () => {
-
-      } ).catch( ( error ) => {
-
-        ipcRenderer.send("reportError", "Unable to change the light mode" );
-
+        } ).catch( ( error ) => {
+          ipcRenderer.send("reportError", "Unable to change the light mode" );
+        } );
       } );
-
-      
-    } );
       this.transformed = true;
     }
   }
-
-  updateGroupStatus() {
- 
-    influxquery( "SELECT time, light1, temperature, humidity FROM \"" + encodeURIComponent( this.props.instrumentId + "_" + this.props.id ) + "\" ORDER BY time DESC limit 1", this.props.configDB.db, this.props.configDB ).then( ( results ) => {
-
-      if( ! results[ 0 ] || !results[ 0 ].series || !results[ 0 ].series[ 0 ] ) {
-        return;
-      }
-
-      let values = results[ 0 ].series[ 0 ].values[ 0 ];
-
+/*
       this.setState( {
 
         sun: Math.round( values[ 1 ] * 100 ) / 100,
@@ -129,12 +91,7 @@ class TrackerGroupDevices extends React.Component {
         humidity: values[ 3 ]
       
       } );
-
-    } ).catch( ( error ) => {
-      console.error( error );
-
-    } );
-  }
+      */
 
   light_calibrate() {
 
@@ -498,21 +455,71 @@ class TrackerGroupDevices extends React.Component {
               </div>
 
               <div className={ this.props.serverState.lightController ? 'visible' : 'hidden' }>
+
+
                 <div className="row">
-                  <div className="col-lg-5"><span className="grey">Setpoint:</span> { this.props.serverState.lightSetpoint } sun</div>
-                  <div className="col-lg-4"><button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }><span className="glyphicon glyphicon-cog"></span> Configure</button></div>
-                </div>
-                <div className="row">
-                  <div className="col-lg-5"><span className="grey">Mode</span></div>
+                  <div className="col-lg-5">
+                    <span className="grey">On/Off:</span>
+                  </div>
                   <div className="col-lg-4">
                     <label className="checkbox-inline">
-                      <input type="checkbox" ref={ ( el ) => this.toggleLightMode = el } checked={ this.props.serverState.lightModeAutomatic } data-width="100" data-height="25" />
+                      <input type="checkbox" ref={ ( el ) => this.toggleLightEnable = el } checked={ this.state.lightOnOff } data-width="100" data-height="25" />
                     </label>
                   </div>
                 </div>
-              </div>
-              
+                
+                { 
+                  this.state.lightOnOffButton !== this.state.lightOnOff ? // In case the light is still off
+                  <div className="row">
+                    <div className="col-lg-9">
+                      <span className="grey"><span className="glyphicon glyphicon-warning"></span> The light interlock looks disabled. Push the button to turn the light on.</span>
+                    </div>
+                  </div> 
+                  : 
+                  null 
+                }
 
+                <div className="row">
+                  <div className="col-lg-5">
+                    <span className="grey">Control mode:</span>
+                  </div>
+                  <div className="col-lg-4">
+                    { this.state.lightMode == 'auto' ? 'Automatic' : 'Manual' }
+                  </div>
+                </div> 
+
+
+                { 
+                  this.state.lightMode == 'auto' ? // In case the light is in automatic mode
+                  <div className="row">
+                    <div className="col-lg-5">
+                      <span className="grey">
+                        Set point:
+                      </span> 
+                        { this.state.lightSetpoint } sun
+                    </div> 
+                  </div>
+                  : 
+                  null 
+                }
+                <div className="row">
+                  <div className="col-lg-5">
+                    <span className="grey">
+                      Current value:
+                    </span> 
+                      { this.state.lightValue } sun
+                  </div> 
+                </div>
+
+                <div className="row">
+                  <div className="col-lg-4">
+                    <button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }>
+                      <span className="glyphicon glyphicon-cog"></span> Configure
+                    </button>
+                  </div>
+                </div>
+
+              </div>
           </div>
 
            

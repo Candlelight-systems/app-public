@@ -26,15 +26,9 @@ class CalibratePD extends React.Component {
 		this.handleInputChange = this.handleInputChange.bind( this );
 		this.handleInputChangeLi = this.handleInputChangeLi.bind( this );
 		this.scalePD = this.scalePD.bind( this );
-		this.close = this.close.bind( this );
-
-		
-		this.setRequestTimeout();
-		
-		
+		this.close = this.close.bind( this );	
+		this.setRequestTimeout();		
 	}
-
-
 
 	close() {
 		this.props.onClose();
@@ -44,59 +38,39 @@ class CalibratePD extends React.Component {
 
 		let scalingFactor;
 
-		if( ! this.state.photodiodes || ! Array.isArray( this.state.photodiodes ) ) {
-			console.error("Cannot rescale photodiodes");
+		if( ! sunValue ) {
+			scalingFactor = this.state.control.factory_scaling;
+		} else {
+			scalingFactor = sunValue / this.state.channelsJsc[ "_pd" ];
 		}
 
-		for( var i = 0; i < this.state.photodiodes.length; i ++ ) {
-			if( this.state.photodiodes[ i ].ref == pdRef ) {
-
-				if( ! sunValue ) {
-					scalingFactor = this.state.photodiodes[ i ].factory_scaling_ma_to_sun;
-				} else {
-					scalingFactor = sunValue / this.state.channelsJsc[ this.state.photodiodes[ i ].ref ];
-				}
-
-				let body = JSON.stringify( {
-					pdRef: this.state.photodiodes[ i ].ref,
-					pdScale: scalingFactor,
-					instrumentId: this.props.instrumentId,
-					groupName: this.props.groupName
-				});
-
-				let headers = new Headers({
-				  "Content-Type": "application/json",
-				  "Content-Length": body.length.toString()
-				});
-
-				await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
-					method: 'POST',
-					headers: headers,
-					body: body
-				} );
-
-				await this.getPD();
-
-				return;
+		let body = JSON.stringify( {
+			instrumentId: this.props.instrumentId,
+			groupName: this.props.groupName,
+			control: {
+				scaling: scalingFactor,
 			}
-		}
+		});
 
+		let headers = new Headers({
+		  "Content-Type": "application/json",
+		  "Content-Length": body.length.toString()
+		});
 
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+			method: 'POST',
+			headers: headers,
+			body: body
+		} );
+
+		await this.getPD();
 	}
 	
 	setRequestTimeout() {
 
 		setTimeout( () => {
 
-			var str = [];
-
-			for( var i = 0; i < this.state.photodiodes.length; i ++ ) {
-				
-				if( this.state[ 'mon_' + this.state.photodiodes[ i ].ref ] ) {
-					console.log('there');
-					str.push( this.state.photodiodes[ i ].ref );
-				}
-			}
+			var str = [ "_pd" ];
 
 			for( var i = 0; i < this.state.channels.length; i ++ ) {
 				if( this.state[ 'mon_' + this.state.channels[ i ].chanId ] ) {
@@ -109,11 +83,8 @@ class CalibratePD extends React.Component {
 				return;
 			}
 
-
-			fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + encodeURIComponent( this.props.instrumentId ) + "&chanIds=" + str.join(","), {
-
+			fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent( this.props.instrumentId )}&groupName=chanIds=${str.join(",")}`, {
 				method: 'GET',
-
 			} ).then( ( values ) => values.json() )
 			   .then( ( json ) => {
 
@@ -164,25 +135,15 @@ class CalibratePD extends React.Component {
 
 	getPD() {
 
-		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPDOptions?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
-
+		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightGetControl?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 			method: 'GET',
-
-		} ).then( ( values ) => values.json() )
-		   .then( ( photodiodes ) => {
-
-		   	this.setState( { photodiodes: photodiodes } );
-		   	
-		   	photodiodes.map( ( pd ) => {
-		   		
-		   		this.setState( ( state ) => ( { [ 'mon_' + pd.ref ]: true } ) );
-		   	});
-		
+		} )
+		.then( ( values ) => values.json() )
+		.then( ( control ) => {
+			this.setState( { control: control } );
 		} ).catch( ( error ) => {
-
-			// Catching JSON or request errors
 			console.error( error );
-			console.error("Error in getting photodiodes JSON");
+			console.error("Error in getting light controller");
 		} );
 	}
 
@@ -228,19 +189,6 @@ class CalibratePD extends React.Component {
 
 	componentWillUpdate( nextProps, nextState ) {
 
-		/*if( this.state.photodiodes && Array.isArray( this.state.photodiodes ) ) {
-			this.state.photodiodes.map( ( pd ) => {
-
-				if( nextState[ "mon_" + pd.ref ] && ! this.state[ "mon_" + pd.ref ] ) {
-					
-					this.enablePD( pd.ref );
-
-				} else if( ! nextState[ "mon_" + pd.ref ] && this.state[ "mon_" + pd.ref ] ) {
-
-					this.disablePD( pf.ref );
-				}
-			});
-		}*/
 
 		if( this.state.channels && Array.isArray( this.state.channels ) ) {
 			for( var i in this.state.channels ) {
@@ -297,6 +245,9 @@ class CalibratePD extends React.Component {
 
 	render() {
 
+		const jsc;
+		const control = this.state.control;
+
 		return (
 			<div className="container-fluid" id="calib_light_list">
 
@@ -321,16 +272,14 @@ class CalibratePD extends React.Component {
 					</div>
 
 						<ul className="list-group">
-
-						{ !! this.state.photodiodes && this.state.photodiodes.map( ( photodiode ) =>
-
-							<li key={ photodiode.ref } data-name={ "mon_" + photodiode.ref } className={ "list-group-item " + ( this.state[ "mon_" + photodiode.ref ] ? 'active' : '' ) } onClick={ this.handleInputChangeLi }>
-								{ this.jsc( photodiode.ref, true, false, photodiode.scaling_ma_to_sun ) }
-								{ photodiode.name }
+						
+						{ control ? 
+							<li key="_photodiode" data-name="_pd" className="list-group-item active">
+								{ this.jsc( "_pd", true, false, control.scaling ) }
+								Photodiode
 							</li>
-
-						) }
-
+							: null
+						}
 
 						{ !! this.state.channels && this.state.channels.map( ( channel ) =>
 
@@ -349,29 +298,19 @@ class CalibratePD extends React.Component {
 						You can also reset the default settings to the factory calibrated reference photodiode short circuit currents.
 					</p>
 
-					{ !! this.state.photodiodes && this.state.photodiodes.map( ( photodiode ) => {
-						
-						let jsc;
+					<div>
+						<div className="form-group">
+							<label>Photodiode</label>
+							<input className="form-control" readOnly="readonly" value={ ( jsc = this.jsc( "_pd", false ) ).toPrecision( 4 ) ? jsc + " mA" : "" } />
+						</div>
 
-						if( ! this.state.channelsJsc[ photodiode.ref ] ) {
-							return;
-						}
-
-						return (
-						<div key={ photodiode.ref }>
-							<div className="form-group">
-								<label>{ photodiode.name }</label>
-								<input className="form-control" readOnly="readonly" value={ ( jsc = this.jsc( photodiode.ref, false ) ).toPrecision( 4 ) ? jsc + " mA" : "" } />
-							</div>
-
-							<div className="form-group">
-								<div className="btn-group">
-									<button className="btn btn-default" type="button" onClick={ () => this.scalePD( photodiode.ref, 1 ) }>Set as 1 sun</button>
-							        <button className="btn btn-default" type="button" onClick={ () => this.scalePD( photodiode.ref ) }>Factory reset ({ Math.round( 100 * this.state.channelsJsc[ photodiode.ref ] * photodiode.factory_scaling_ma_to_sun ) / 100 } sun)</button>
-							    </div>
-							</div>
-						</div> ) }
-					) }
+						<div className="form-group">
+							<div className="btn-group">
+								<button className="btn btn-default" type="button" onClick={ () => this.scalePD( 1 ) }>Set as 1 sun</button>
+						        <button className="btn btn-default" type="button" onClick={ () => this.scalePD( ) } >Factory reset ({ Math.round( 100 * this.state.channelsJsc[ "_pd" ] * control.factory_scaling ) / 100 } sun)</button>
+						    </div>
+						</div>
+					</div>
 
 					<div className="btn-group">
 						<button type="button" className="btn btn-default" onClick={this.close}>Close</button>

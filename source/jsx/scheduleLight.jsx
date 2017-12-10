@@ -42,10 +42,12 @@ class ScheduleLight extends React.Component {
 		let saveJSON = {
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
-			lightController: {
+			control: {
 				setPoint: this.state.fixed_intensity ? parseFloat( this.state.fixed_intensity_val ) : false,
-				schedulingBasis: this.state.schedule_basis,
-				schedulingValues: this.state.schedule_values.split("\n").map( ( val ) => parseFloat( val ) )
+				scheduling: {
+					basis: this.state.schedule_basis,
+					intensities: this.state.schedule_values.split("\n").map( ( val ) => parseFloat( val ) )
+				}
 			}
 		};
 
@@ -62,7 +64,7 @@ class ScheduleLight extends React.Component {
 			success: false 
 		} );
 
-		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
 
 			method: 'POST',
 			headers: headers,
@@ -112,7 +114,7 @@ class ScheduleLight extends React.Component {
 
 		this.setState( { message: "Fetching light controllers..." } );
 
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.getController?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightGetControl?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 
 			method: 'GET',
 
@@ -120,12 +122,10 @@ class ScheduleLight extends React.Component {
 		.then( ( values ) => values.json() )
 		.then( ( controller ) => {
 		   	
-		   	return this.setState( ( state ) => ( {
-
-		   	
+		   	return this.setState( ( state ) => ( {		   	
 		   		error: false,
 		   		controller: controller,
-		   		fixed_intensity: controller.setPoint !== false,
+		   		fixed_intensity: ! controller.scheduling.enable,
 		   		fixed_intensity_val: parseFloat( controller.setPoint ),
 		   		schedule_basis: controller.scheduling.basis,
 		   		schedule_values: controller.scheduling.intensities.join("\n")
