@@ -76,8 +76,37 @@ function openSocket( instrumentConfig ) {
     setTimeout( () => openSocket( instrumentConfig ), 1000 );
   });
 
+  ws.on('error', function error( err ) {
+    console.log("Socket is in error state: " + error.code );
+  });
+
+
   ws.on('message', wsIncoming );
+
+  ws.isAlive = true;
+  ws.on('pong', () => ws.isAlive = true );
+
+  var socketTimeout = () => {
+
+    let interval = setInterval( () => {
+
+      if( !ws.isAlive ) {
+        ws.terminate();
+      }
+
+      if( ws.readyState == WebSocket.CLOSED ) {
+        clearInterval( interval );
+      }
+
+      ws.isAlive = false;
+      ws.ping( '', false, true );
+
+    }, 30000 );
+  }
+
+  socketTimeout();
 }
+
 
 
 function wsIncoming( data ) {
