@@ -55,7 +55,8 @@ class TrackerGroupDevices extends React.Component {
   wsUpdate( event, data ) {
 
     // Update directly the state
-    this.state( data );
+    data.lightUpdating = false;
+    this.setState( data );
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/
@@ -65,19 +66,27 @@ class TrackerGroupDevices extends React.Component {
 
   componentDidUpdate( prevProps ) {
 
-    if( ! this.transformed && this.toggleLightMode ) {
+    if( this.toggleLightEnable ) {
 
-      $( this.toggleLightMode ).bootstrapToggle({
+      $( this.toggleLightEnable ).bootstrapToggle({
         on: 'On',
         off: 'Off'
       }).change( () => {
 
-        return fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${ this.toggleLightMode.checked ? 'enable' : 'disable'}?instrumentId=${ this.props.instrumentId }&groupName=${ this.props.name }`, {
+
+        this.toggleLightEnable.bootstrapToggle('disable');
+
+        return fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${ this.toggleLightEnable.checked ? 'enable' : 'disable'}?instrumentId=${ this.props.instrumentId }&groupName=${ this.props.name }`, {
           method: 'GET',
         } ).then( () => {
 
         } ).catch( ( error ) => {
+
           ipcRenderer.send("reportError", "Unable to change the light mode" );
+
+        } ).finally( () => {
+
+          this.toggleLightEnable.bootstrapToggle('enable');
         } );
       } );
       this.transformed = true;
@@ -398,8 +407,7 @@ class TrackerGroupDevices extends React.Component {
 
     return (
       <div>
-      <h4>Group: { this.props.name }</h4>
-
+      { !!this.props.showHeader && <h4>Group: { this.props.name }</h4> }
 
         <div className="row statuses">
         
@@ -446,14 +454,9 @@ class TrackerGroupDevices extends React.Component {
 
 
           <div className="group-status group-status-light col-lg-2">
-              <h4>Light bias</h4>
-              <div className="row">
-              <div className="col-lg-5">Intensity: { this.state.sun } sun</div>
-              <div className="col-lg-4">
-                <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.light_calibrate }><span className="glyphicon glyphicon-scale"></span> Calibrate</button>
-              </div>
-              </div>
 
+              <h4>Light bias</h4>
+              
               <div className={ this.props.serverState.lightController ? 'visible' : 'hidden' }>
 
 
@@ -462,8 +465,8 @@ class TrackerGroupDevices extends React.Component {
                     <span className="grey">On/Off:</span>
                   </div>
                   <div className="col-lg-4">
-                    <label className="checkbox-inline">
-                      <input type="checkbox" ref={ ( el ) => this.toggleLightEnable = el } checked={ this.state.lightOnOff } data-width="100" data-height="25" />
+                    <label>
+                      <input data-toggle="toggle" type="checkbox" ref={ ( el ) => this.toggleLightEnable = el } checked={ this.state.lightOnOff } data-width="70" data-height="25" />
                     </label>
                   </div>
                 </div>
@@ -490,7 +493,8 @@ class TrackerGroupDevices extends React.Component {
 
 
                 { 
-                  this.state.lightMode == 'auto' ? // In case the light is in automatic mode
+                  this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
+
                   <div className="row">
                     <div className="col-lg-5">
                       <span className="grey">
@@ -502,20 +506,24 @@ class TrackerGroupDevices extends React.Component {
                   : 
                   null 
                 }
-                <div className="row">
-                  <div className="col-lg-5">
-                    <span className="grey">
-                      Current value:
-                    </span> 
-                      { this.state.lightValue } sun
-                  </div> 
-                </div>
+
+                { this.state.lightValue !== undefined ?
+                  <div className="row">
+                    <div className="col-lg-5">
+                      <span className="grey">
+                        Current value:
+                      </span> 
+                        { this.state.lightValue } sun
+                    </div> 
+                  </div> : null 
+                }
 
                 <div className="row">
-                  <div className="col-lg-4">
+                  <div className="col-lg-9">
                     <button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }>
                       <span className="glyphicon glyphicon-cog"></span> Configure
                     </button>
+                    <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.light_calibrate }><span className="glyphicon glyphicon-scale"></span> Calibrate</button>
                   </div>
                 </div>
 
@@ -525,21 +533,60 @@ class TrackerGroupDevices extends React.Component {
            
           <div className="group-status group-status-temperature col-lg-2">
             <h4>Temperature</h4>
-            { this.state.temperature !== -1 && 
+            { this.state.temperature !== -1 &&  this.state.temperature !== undefined && 
               <div>
                 <div className="col-lg-9">Box temperature: { this.state.temperature } &deg;C</div>
               </div> }
 
 
-            { this.props.groupConfig.heatController &&
+            { this.props.groupConfig.heat &&
               <div>
-                <div className="col-lg-5">
-                  Heating power: { this.state.heatingPower == -1 ? 'Off' : Math.round( this.state.heatingPower * 100 ) + " %" }
+
+                <div className="row">
+                  <div className="col-lg-5">
+                    Heater
+                  </div>
+                  <div className="col-lg-4">
+
+                    <label>
+                      <input data-toggle="toggle" type="checkbox" ref={ ( el ) => this.toggleHeater = el } disabled={ this.state.heater_status_updating } checked={ this.state.heater_status } data-width="100" data-height="25" />
+                    </label>
+                  </div>
                 </div>
-                <div className="col-lg-4">
-                    <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
-                    <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
-                </div>
+
+                { this.state.heater_status ? <div>
+                  
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Heating power: { this.state.heating_power + " W" }
+                    </div>
+                
+                    <div className="col-lg-4">
+                        <div className="btn-group">
+                          <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
+                          <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
+                        </div>
+                    </div>
+                
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Current: { this.state.heating_current + " A" }
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Voltage: { this.state.heating_voltage + " V" }
+                    </div>
+                  </div>
+
+                  { heating_problem ? 
+                    <div className="row">
+                      <span className="grey"><span className="glyphicon glyphicon-warning"></span> The calculated heater resistance is off. Check that the pins are properly contacting the window</span>
+                    </div> : null
+                  }
+
+                </div> : null }
             </div>
           }
         </div>

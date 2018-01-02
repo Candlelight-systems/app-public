@@ -289,7 +289,6 @@ function generateWebpackConfig( theme ) {
       fs.writeFileSync( "./css/_theme.scss", fs.readFileSync( "./css/themes/" + theme + ".scss" ) );
       let themeJSON = JSON.parse( fs.readFileSync( "./css/themes/" + theme + ".json" ) );
 
-      console.log( themeJSON );
       generateWebpackConfig( themeJSON );
 
       var env = JSON.parse( fs.readFileSync( "./environments/" + target + ".json" ) );

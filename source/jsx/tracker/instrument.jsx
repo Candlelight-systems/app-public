@@ -88,11 +88,12 @@ class TrackerInstrument extends React.Component {
       method: 'GET'
 
     } )
+    .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
     .then( response => response.json() )
     .catch( error => {
 
       this.setState( {
-        error_tracker: error
+        error: `Error while retrieving the instrument status. The returned error was <em>${ error.toString() }</em>. Try rebooting the instrument`
       } );
     } );
   }
@@ -123,6 +124,7 @@ class TrackerInstrument extends React.Component {
   getConfig( props = this.props ) {
 
     return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET'  } )
+    .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
     .then( ( response ) => response.json() )
     .catch( error => {
 
@@ -182,6 +184,7 @@ class TrackerInstrument extends React.Component {
 
        return <TrackerGroupDevices 
 
+       showHeader={this.state.groups.length > 1}
        key={ group.groupID } 
        instrumentId={ this.props.instrumentId } 
        id={ group.groupID } 
@@ -201,23 +204,27 @@ class TrackerInstrument extends React.Component {
      } );
     }
 
-    if( groupsDoms ) {
+
+    if( this.state.error ) {
+      
+      content = (
+        <div>
+          <Error message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } errorMethods={ this.state.errorMethods } />
+        </div> 
+      );
+
+    } else if( groupsDoms ) {
 
       content = groupsDoms;
 
-    } else if( this.state.error ) {
-
-      content = (
-      <div>
-      <Error message={ this.state.error || this.state.error_influxdb } errorMethods={ this.state.errorMethods } />
-      </div> );
     }
 
     return (
-    <div>
-    <h3>Instrument: { this.props.instrumentId }</h3>
-    {content}
-    </div> );
+      <div>
+        <h3>Instrument: { this.props.instrumentId }</h3>
+        { content }
+      </div> 
+    );
   }
 }
 

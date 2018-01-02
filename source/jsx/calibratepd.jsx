@@ -245,7 +245,7 @@ class CalibratePD extends React.Component {
 
 	render() {
 
-		const jsc;
+		let jsc;
 		const control = this.state.control;
 
 		return (

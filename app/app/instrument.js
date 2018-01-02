@@ -427,10 +427,12 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
       method: 'GET'
 
+    }).then(response => {
+      if (response.status !== 200) throw "500 Internal server error";else return response;
     }).then(response => response.json()).catch(error => {
 
       this.setState({
-        error_tracker: error
+        error: `Error while retrieving the instrument status. The returned error was <em>${error.toString()}</em>. Try rebooting the instrument`
       });
     });
   }
@@ -460,7 +462,9 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
   getConfig(props = this.props) {
 
-    return fetch("http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET' }).then(response => response.json()).catch(error => {
+    return fetch("http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET' }).then(response => {
+      if (response.status !== 200) throw "500 Internal server error";else return response;
+    }).then(response => response.json()).catch(error => {
 
       this.setState({
         error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network",
@@ -488,6 +492,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__group_jsx__["a" /* default */], {
 
+          showHeader: this.state.groups.length > 1,
           key: group.groupID,
           instrumentId: this.props.instrumentId,
           id: group.groupID,
@@ -507,16 +512,16 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       });
     }
 
-    if (groupsDoms) {
-
-      content = groupsDoms;
-    } else if (this.state.error) {
+    if (this.state.error) {
 
       content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "div",
         null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb, errorMethods: this.state.errorMethods })
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, errorMethods: this.state.errorMethods })
       );
+    } else if (groupsDoms) {
+
+      content = groupsDoms;
     }
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -591,7 +596,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
     this.light_calibrate = this.light_calibrate.bind(this);
     this.light_controller_config = this.light_controller_config.bind(this);
-    this.updateGroupStatus = this.updateGroupStatus.bind(this);
 
     this.heatingPowerChange = this.heatingPowerChange.bind(this);
     this.setHeatingPower = this.setHeatingPower.bind(this);
@@ -601,17 +605,10 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
     this.togglePause = this.togglePause.bind(this);
     this.wsUpdate = this.wsUpdate.bind(this);
-
-    setInterval(() => {
-
-      this.updateGroupStatus();
-    }, 60000);
-
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("light.updated", this.updateGroupStatus);
   }
 
   componentDidMount() {
-    this.updateGroupStatus();
+
     this.initCheckChannels(this.props);
 
     this.setState({
@@ -629,71 +626,47 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
   wsUpdate(event, data) {
 
-    if (data.state.hasOwnProperty('paused')) {
-      this.setState({ paused: data.state.paused });
-    }
+    // Update directly the state
+    data.lightUpdating = false;
+    this.setState(data);
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
   }
 
   componentDidUpdate(prevProps) {
 
-    if (!this.transformed && this.toggleLightMode) {
+    if (this.toggleLightEnable) {
 
-      $(this.toggleLightMode).bootstrapToggle({
-        on: 'Automatic',
-        off: 'Manual'
+      $(this.toggleLightEnable).bootstrapToggle({
+        on: 'On',
+        off: 'Off'
       }).change(() => {
 
-        // Propagate the information to the server
-        let saveJSON = {
-          instrumentId: this.props.instrumentId,
-          groupName: this.props.name,
-          lightController: {
-            modeAutomatic: !!this.toggleLightMode.checked
-          }
-        };
+        this.toggleLightEnable.bootstrapToggle('disable');
 
-        let body = JSON.stringify(saveJSON);
-        var headers = new Headers({
-          "Content-Type": "application/json",
-          "Content-Length": body.length.toString()
-        });
-
-        return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
-
-          method: 'POST',
-          headers: headers,
-          body: body
-
+        return fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${this.toggleLightEnable.checked ? 'enable' : 'disable'}?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+          method: 'GET'
         }).then(() => {}).catch(error => {
 
           __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
+        }).finally(() => {
+
+          this.toggleLightEnable.bootstrapToggle('enable');
         });
       });
       this.transformed = true;
     }
   }
-
-  updateGroupStatus() {
-
-    Object(__WEBPACK_IMPORTED_MODULE_4__influx__["b" /* query */])("SELECT time, light1, temperature, humidity FROM \"" + encodeURIComponent(this.props.instrumentId + "_" + this.props.id) + "\" ORDER BY time DESC limit 1", this.props.configDB.db, this.props.configDB).then(results => {
-
-      if (!results[0] || !results[0].series || !results[0].series[0]) {
-        return;
-      }
-
-      let values = results[0].series[0].values[0];
-
-      this.setState({
-
-        sun: Math.round(values[1] * 100) / 100,
-        temperature: values[2],
-        humidity: values[3]
-
-      });
-    }).catch(error => {
-      console.error(error);
-    });
-  }
+  /*
+        this.setState( {
+  
+          sun: Math.round( values[ 1 ] * 100 ) / 100,
+          temperature: values[ 2 ],
+          humidity: values[ 3 ]
+        
+        } );
+        */
 
   light_calibrate() {
 
@@ -972,7 +945,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
       "div",
       null,
-      __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+      !!this.props.showHeader && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "h4",
         null,
         "Group: ",
@@ -1092,27 +1065,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
           ),
           __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
-            { className: "row" },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-5" },
-              "Intensity: ",
-              this.state.sun,
-              " sun"
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-4" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
-                " Calibrate"
-              )
-            )
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
             { className: this.props.serverState.lightController ? 'visible' : 'hidden' },
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
@@ -1123,23 +1075,34 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                   "span",
                   { className: "grey" },
-                  "Setpoint:"
-                ),
-                " ",
-                this.props.serverState.lightSetpoint,
-                " sun"
+                  "On/Off:"
+                )
               ),
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
                 { className: "col-lg-4" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "button",
-                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-                  " Configure"
+                  "label",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightEnable = el, checked: this.state.lightOnOff, "data-width": "70", "data-height": "25" })
                 )
               )
             ),
+            this.state.lightOnOffButton !== this.state.lightOnOff ? // In case the light is still off
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-9" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  { className: "grey" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-warning" }),
+                  " The light interlock looks disabled. Push the button to turn the light on."
+                )
+              )
+            ) : null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
               { className: "row" },
@@ -1149,16 +1112,64 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                   "span",
                   { className: "grey" },
-                  "Mode"
+                  "Control mode:"
                 )
               ),
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
                 { className: "col-lg-4" },
+                this.state.lightMode == 'auto' ? 'Automatic' : 'Manual'
+              )
+            ),
+            this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
+
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-5" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "label",
-                  { className: "checkbox-inline" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { type: "checkbox", ref: el => this.toggleLightMode = el, checked: this.props.serverState.lightModeAutomatic, "data-width": "100", "data-height": "25" })
+                  "span",
+                  { className: "grey" },
+                  "Set point:"
+                ),
+                this.state.lightSetpoint,
+                " sun"
+              )
+            ) : null,
+            this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-5" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  { className: "grey" },
+                  "Current value:"
+                ),
+                this.state.lightValue,
+                " sun"
+              )
+            ) : null,
+            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              { className: "row" },
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-9" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "button",
+                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+                  " Configure"
+                ),
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "button",
+                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
+                  " Calibrate"
                 )
               )
             )
@@ -1172,7 +1183,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
             null,
             "Temperature"
           ),
-          this.state.temperature !== -1 && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          this.state.temperature !== -1 && this.state.temperature !== undefined && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
             null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
@@ -1183,30 +1194,90 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
               " \xB0C"
             )
           ),
-          this.props.groupConfig.heatController && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          this.props.groupConfig.heat && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
             null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-5" },
-              "Heating power: ",
-              this.state.heatingPower == -1 ? 'Off' : Math.round(this.state.heatingPower * 100) + " %"
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-4" },
+              { className: "row" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
-                "+"
+                "div",
+                { className: "col-lg-5" },
+                "Heater"
               ),
-              "\xA0",
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn-sm btn btn-default", onClick: this.decreaseHeatingPower },
-                "-"
+                "div",
+                { className: "col-lg-4" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "label",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleHeater = el, disabled: this.state.heater_status_updating, checked: this.state.heater_status, "data-width": "100", "data-height": "25" })
+                )
               )
-            )
+            ),
+            this.state.heater_status ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              "div",
+              null,
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "row" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-5" },
+                  "Heating power: ",
+                  this.state.heating_power + " W"
+                ),
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-4" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "div",
+                    { className: "btn-group" },
+                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                      "button",
+                      { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
+                      "+"
+                    ),
+                    "\xA0",
+                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                      "button",
+                      { type: "button", className: "btn-sm btn btn-default", onClick: this.decreaseHeatingPower },
+                      "-"
+                    )
+                  )
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "row" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-5" },
+                  "Current: ",
+                  this.state.heating_current + " A"
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "row" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-5" },
+                  "Voltage: ",
+                  this.state.heating_voltage + " V"
+                )
+              ),
+              heating_problem ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "row" },
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "span",
+                  { className: "grey" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-warning" }),
+                  " The calculated heater resistance is off. Check that the pins are properly contacting the window"
+                )
+              ) : null
+            ) : null
           )
         ),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "clearfix" })
@@ -3209,12 +3280,12 @@ class Error extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   render() {
 
     var messages = [];
-    if (this.props.methods) {
+    if (this.props.methods && Array.isArray(this.props.method)) {
 
       for (var i = 0; i < this.props.methods.length; i++) {
         messages.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          null,
+          { key: this.props.methods[i][0] },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "a",
             { href: "#", onClick: this.props.methods[i][1] },

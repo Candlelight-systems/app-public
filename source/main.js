@@ -455,7 +455,7 @@ function removeInstrument( event, trackerHost ) {
 
 function reportError( e ) {
 
-
+  console.log('Error reporting !');
   dialog.showMessageBox( {
     type: 'error',
     message: 'An error has happened: ' + e.toString(),

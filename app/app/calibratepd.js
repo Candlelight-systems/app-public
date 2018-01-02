@@ -197,7 +197,6 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 		this.handleInputChangeLi = this.handleInputChangeLi.bind(this);
 		this.scalePD = this.scalePD.bind(this);
 		this.close = this.close.bind(this);
-
 		this.setRequestTimeout();
 	}
 
@@ -209,57 +208,39 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 		let scalingFactor;
 
-		if (!this.state.photodiodes || !Array.isArray(this.state.photodiodes)) {
-			console.error("Cannot rescale photodiodes");
+		if (!sunValue) {
+			scalingFactor = this.state.control.factory_scaling;
+		} else {
+			scalingFactor = sunValue / this.state.channelsJsc["_pd"];
 		}
 
-		for (var i = 0; i < this.state.photodiodes.length; i++) {
-			if (this.state.photodiodes[i].ref == pdRef) {
-
-				if (!sunValue) {
-					scalingFactor = this.state.photodiodes[i].factory_scaling_ma_to_sun;
-				} else {
-					scalingFactor = sunValue / this.state.channelsJsc[this.state.photodiodes[i].ref];
-				}
-
-				let body = JSON.stringify({
-					pdRef: this.state.photodiodes[i].ref,
-					pdScale: scalingFactor,
-					instrumentId: this.props.instrumentId,
-					groupName: this.props.groupName
-				});
-
-				let headers = new Headers({
-					"Content-Type": "application/json",
-					"Content-Length": body.length.toString()
-				});
-
-				await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
-					method: 'POST',
-					headers: headers,
-					body: body
-				});
-
-				await this.getPD();
-
-				return;
+		let body = JSON.stringify({
+			instrumentId: this.props.instrumentId,
+			groupName: this.props.groupName,
+			control: {
+				scaling: scalingFactor
 			}
-		}
+		});
+
+		let headers = new Headers({
+			"Content-Type": "application/json",
+			"Content-Length": body.length.toString()
+		});
+
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+			method: 'POST',
+			headers: headers,
+			body: body
+		});
+
+		await this.getPD();
 	}
 
 	setRequestTimeout() {
 
 		setTimeout(() => {
 
-			var str = [];
-
-			for (var i = 0; i < this.state.photodiodes.length; i++) {
-
-				if (this.state['mon_' + this.state.photodiodes[i].ref]) {
-					console.log('there');
-					str.push(this.state.photodiodes[i].ref);
-				}
-			}
+			var str = ["_pd"];
 
 			for (var i = 0; i < this.state.channels.length; i++) {
 				if (this.state['mon_' + this.state.channels[i].chanId]) {
@@ -272,10 +253,8 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				return;
 			}
 
-			fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/measureCurrent?instrumentId=" + encodeURIComponent(this.props.instrumentId) + "&chanIds=" + str.join(","), {
-
+			fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent(this.props.instrumentId)}&groupName=chanIds=${str.join(",")}`, {
 				method: 'GET'
-
 			}).then(values => values.json()).then(json => {
 
 				for (var i in json) {
@@ -320,23 +299,13 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 	getPD() {
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPDOptions?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
-
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightGetControl?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 			method: 'GET'
-
-		}).then(values => values.json()).then(photodiodes => {
-
-			this.setState({ photodiodes: photodiodes });
-
-			photodiodes.map(pd => {
-
-				this.setState(state => ({ ['mon_' + pd.ref]: true }));
-			});
+		}).then(values => values.json()).then(control => {
+			this.setState({ control: control });
 		}).catch(error => {
-
-			// Catching JSON or request errors
 			console.error(error);
-			console.error("Error in getting photodiodes JSON");
+			console.error("Error in getting light controller");
 		});
 	}
 
@@ -377,17 +346,6 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 	}
 
 	componentWillUpdate(nextProps, nextState) {
-
-		/*if( this.state.photodiodes && Array.isArray( this.state.photodiodes ) ) {
-  	this.state.photodiodes.map( ( pd ) => {
-  			if( nextState[ "mon_" + pd.ref ] && ! this.state[ "mon_" + pd.ref ] ) {
-  			
-  			this.enablePD( pd.ref );
-  			} else if( ! nextState[ "mon_" + pd.ref ] && this.state[ "mon_" + pd.ref ] ) {
-  				this.disablePD( pf.ref );
-  		}
-  	});
-  }*/
 
 		if (this.state.channels && Array.isArray(this.state.channels)) {
 			for (var i in this.state.channels) {
@@ -459,6 +417,9 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 	render() {
 
+		let jsc;
+		const control = this.state.control;
+
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "container-fluid", id: "calib_light_list" },
@@ -508,12 +469,12 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"ul",
 					{ className: "list-group" },
-					!!this.state.photodiodes && this.state.photodiodes.map(photodiode => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					control ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"li",
-						{ key: photodiode.ref, "data-name": "mon_" + photodiode.ref, className: "list-group-item " + (this.state["mon_" + photodiode.ref] ? 'active' : ''), onClick: this.handleInputChangeLi },
-						this.jsc(photodiode.ref, true, false, photodiode.scaling_ma_to_sun),
-						photodiode.name
-					)),
+						{ key: "_photodiode", "data-name": "_pd", className: "list-group-item active" },
+						this.jsc("_pd", true, false, control.scaling),
+						"Photodiode"
+					) : null,
 					!!this.state.channels && this.state.channels.map(channel => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"li",
 						{ key: channel.chanId, "data-name": "mon_" + channel.chanId, className: "list-group-item " + (this.state["mon_" + channel.chanId] ? 'active' : ''), onClick: this.handleInputChangeLi },
@@ -538,49 +499,40 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
 					"You can also reset the default settings to the factory calibrated reference photodiode short circuit currents."
 				),
-				!!this.state.photodiodes && this.state.photodiodes.map(photodiode => {
-
-					let jsc;
-
-					if (!this.state.channelsJsc[photodiode.ref]) {
-						return;
-					}
-
-					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					null,
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
-						{ key: photodiode.ref },
+						{ className: "form-group" },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							"div",
-							{ className: "form-group" },
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"label",
-								null,
-								photodiode.name
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { className: "form-control", readOnly: "readonly", value: (jsc = this.jsc(photodiode.ref, false)).toPrecision(4) ? jsc + " mA" : "" })
+							"label",
+							null,
+							"Photodiode"
 						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { className: "form-control", readOnly: "readonly", value: (jsc = this.jsc("_pd", false)).toPrecision(4) ? jsc + " mA" : "" })
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "form-group" },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
-							{ className: "form-group" },
+							{ className: "btn-group" },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "btn-group" },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									"button",
-									{ className: "btn btn-default", type: "button", onClick: () => this.scalePD(photodiode.ref, 1) },
-									"Set as 1 sun"
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									"button",
-									{ className: "btn btn-default", type: "button", onClick: () => this.scalePD(photodiode.ref) },
-									"Factory reset (",
-									Math.round(100 * this.state.channelsJsc[photodiode.ref] * photodiode.factory_scaling_ma_to_sun) / 100,
-									" sun)"
-								)
+								"button",
+								{ className: "btn btn-default", type: "button", onClick: () => this.scalePD(1) },
+								"Set as 1 sun"
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"button",
+								{ className: "btn btn-default", type: "button", onClick: () => this.scalePD() },
+								"Factory reset (",
+								Math.round(100 * this.state.channelsJsc["_pd"] * control.factory_scaling) / 100,
+								" sun)"
 							)
 						)
-					);
-				}),
+					)
+				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"div",
 					{ className: "btn-group" },
