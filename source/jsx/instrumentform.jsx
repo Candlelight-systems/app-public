@@ -12,6 +12,7 @@ class InstrumentForm extends React.Component {
 		this.state = {
 
 			trackerPort: 8080,
+			trackerPortWS: 8081,
 			buttonValue: "Add",
 			title: "Add a Candlelight instrument"
 		};

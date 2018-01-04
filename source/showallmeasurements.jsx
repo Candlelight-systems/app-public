@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';	
 import InfluxForm from "./jsx/influxform.jsx"
+import Error from "./jsx/error.jsx"
 import { query as influxquery } from "./jsx/influx";
 import { ipcRenderer, remote } from 'electron';
 const dialog = remote.dialog;
@@ -9,8 +10,8 @@ let data;
 ipcRenderer.on("loadForm", ( event, d ) => {
 
 	data = d;
-	render( );
-});
+	render();
+} );
 
 function onValidate( formData ) {
 
@@ -78,57 +79,73 @@ function formatDate( dateVal ) {
 
 async function render( ) {
 
-	let json = await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/getAllMeasurements", {
-		
-		method: 'GET'
+	try {
 
-	} )
-	.then( ( response ) => response.json() );
+		if( ! data.config ) {
+			throw new Error(`The tracker host is not defined. Open an instrument first before selecting this menu.`);
+		}
 
-	let jsonArray = [];
-	for( var i in json ) {
-		jsonArray.push( { 
-			measurementName: i, 
-			startDate: json[ i ].startDate, 
-			endDate: json[ i ].endDate,
-			cellInfo: json[ i ].cellInfo } );
+		let json = await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/getAllMeasurements", {
+			method: 'GET'
+		})
+		.then( ( response ) => response.json() )
+		.catch( () => {
+			throw new Error(`Error while connecting to the instrument. Check that you are online and that the instrument is available on your network.`);
+		});
+
+		let jsonArray = [];
+		for( var i in json ) {
+			jsonArray.push( { 
+				measurementName: i, 
+				startDate: json[ i ].startDate, 
+				endDate: json[ i ].endDate,
+				cellInfo: json[ i ].cellInfo } );
+		}
+
+		jsonArray.sort( ( a, b ) => {
+
+			return a.startDate - b.startDate;
+		} );
+
+
+		ReactDOM.render(
+			<div className="container-fluid">
+				<ul className="list-group">
+				<li className="list-group-item list-group-item-success list-group-item-heading">
+					All existing measurements
+				</li>
+				{ jsonArray.map( ( val ) => { return (
+
+					<li className="list-group-item" key={ val.measurementName } >
+						
+						<div className="pull-right">
+							<button className="btn btn-sm btn-primary" onClick={ () => downloadData( val.measurementName, val.cellInfo ) }>Download data</button>
+							{ val.endDate && <button className="btn btn-sm btn-danger" onClick={ () => removeData( val.measurementName ) }>Delete data</button> }
+						</div>
+
+						<div>
+							<strong>{ val.cellInfo.cellName }</strong>
+						</div>
+
+						<div>
+							{ formatDate( val.startDate ) } <span className="glyphicon glypicon-arrow-left"></span> { val.endDate ? formatDate( val.endDate ) : '(Running)' }
+						</div>
+						
+					</li> )
+				} ) }
+				</ul>
+			</div>,
+			document.getElementById('root')
+		);
+
+
+	} catch( error ) {
+
+		ReactDOM.render(
+			<div>
+	          <Error message={ error.props } errorMethods={ [ [ "Try again", render ] ] } />
+	        </div> ,
+			document.getElementById('root')
+		);
 	}
-
-	jsonArray.sort( ( a, b ) => {
-
-		return a.startDate - b.startDate;
-	} );
-
-
-	ReactDOM.render(
-		<div className="container-fluid">
-			<ul className="list-group">
-			<li className="list-group-item list-group-item-success list-group-item-heading">
-				All existing measurements
-			</li>
-			{ jsonArray.map( ( val ) => { return (
-
-				<li className="list-group-item" key={ val.measurementName } >
-					
-					<div className="pull-right">
-						<button className="btn btn-sm btn-primary" onClick={ () => downloadData( val.measurementName, val.cellInfo ) }>Download data</button>
-						{ val.endDate && <button className="btn btn-sm btn-danger" onClick={ () => removeData( val.measurementName ) }>Delete data</button> }
-					</div>
-
-					<div>
-						<strong>{ val.cellInfo.cellName }</strong>
-					</div>
-
-					<div>
-						{ formatDate( val.startDate ) } <span className="glyphicon glypicon-arrow-left"></span> { val.endDate ? formatDate( val.endDate ) : '(Running)' }
-					</div>
-					
-				</li> )
-			} ) }
-			</ul>
-		</div>,
-		document.getElementById('root')
-	);
-
-
 }

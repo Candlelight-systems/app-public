@@ -6583,7 +6583,7 @@ button.close {
 div.cell-configure-all {
   margin-bottom: 10px;
 }
-div.cell {
+div.cl-device {
   height: 40px;
   border: 1px solid #8c9aa2;
   overflow-y: hidden;
@@ -6595,40 +6595,40 @@ div.cell {
   padding-left: 0px;
   padding-right: 0px;
 }
-div.cell .label {
+div.cl-device .label {
   color: #1b2d37;
 }
-div.cell.cell-running {
+div.cl-device.cell-running {
   height: 240px;
 }
-div.cell .cell-main-info {
+div.cl-device .cell-main-info {
   font-size: 1.1em;
   height: 40px;
   line-height: 40px;
 }
-div.cell .cell-main-info .cell-area {
+div.cl-device .cell-main-info .cell-area {
   color: #8c9aa2;
   font-size: 0.8em;
 }
-div.cell .cell-main-info .channel-check {
+div.cl-device .cell-main-info .channel-check {
   margin-left: 5px;
 }
-div.cell .cell-main-info input[type="checkbox"] {
+div.cl-device .cell-main-info input[type="checkbox"] {
   position: relative;
   top: -2px;
 }
-div.cell .cell-main-info .btn-cl {
+div.cl-device .cell-main-info .btn-cl {
   margin-top: 4px;
 }
-div.cell .cell-actions > div {
+div.cl-device .cell-actions > div {
   line-height: 28px;
   font-size: 1em;
 }
-div.cell .cell-actions .label {
+div.cl-device .cell-actions .label {
   text-align: center;
   color: #8c9aa2;
 }
-div.cell .record {
+div.cl-device .record {
   float: right;
   margin-right: 3px;
   margin-top: -6px;
@@ -6636,21 +6636,21 @@ div.cell .record {
   font-size: 0.8em;
   cursor: pointer;
 }
-div.cell .cell-summary {
+div.cl-device .cell-summary {
   text-align: center;
 }
-div.cell .cell-summary .cell-status {
+div.cl-device .cell-summary .cell-status {
   background-color: #fafafa;
   font-size: 1.3em;
   height: 120px;
 }
-div.cell .cell-summary .cell-status.active {
+div.cl-device .cell-summary .cell-status.active {
   color: #699f6d;
 }
-div.cell .cell-summary .cell-status > div {
+div.cl-device .cell-summary .cell-status > div {
   margin: 10px;
 }
-div.cell .cell-summary > div {
+div.cl-device .cell-summary > div {
   padding-top: 10px;
   background-color: #fafafa;
   height: 60px;
@@ -6658,58 +6658,61 @@ div.cell .cell-summary > div {
   border-bottom: 2px solid #e9eff3;
   border-right: 2px solid #e9eff3;
 }
-div.cell .cell-summary > div .label {
+div.cl-device .cell-summary > div .label {
   font-size: 1.1em;
 }
-div.cell .cell-summary > div .value {
+div.cl-device .cell-summary > div .value {
   font-size: 1.1em;
   whitespace: no-wrap;
   color: #699f6d;
 }
-div.cell .cell-summary .cell-efficiency {
+div.cl-device .cell-summary .cell-efficiency {
   background-color: #e9eff3;
   padding: 0px;
 }
-div.cell .cell-timing {
+div.cl-device .cell-timing {
   color: #8c9aa2;
   margin-bottom: 4px;
 }
-div.cell .cell-timing div {
+div.cl-device .cell-timing div {
   text-align: center;
 }
-div.cell .cell-actions button {
+div.cl-device .cell-actions button {
   float: left;
 }
-div.cell.toprow {
+div.cl-device.toprow {
   border: 1px solid transparent;
   background-color: transparent;
   height: 33px;
   margin-bottom: 0px;
 }
-div.cell .bar {
+div.cl-device .bar {
   height: 3px;
   width: 100%;
   cursor: pointer;
 }
-div.cell .bar :after {
+div.cl-device .bar :after {
   clear: both;
 }
-div.cell .bar > div {
+div.cl-device .bar > div {
   height: 3px;
   float: left;
   overflow: hidden;
 }
-div.cell .bar .barGreen {
+div.cl-device .bar .barGreen {
   background-color: #195196;
   border-bottom-left-radius: 5px;
   color: white;
 }
-div.cell .bar .barRed {
+div.cl-device .bar .barRed {
   background-color: #bd7117;
   color: white;
 }
-div.cell .action {
+div.cl-device .action {
   cursor: pointer;
+}
+.cl-group {
+  margin-bottom: 20px;
 }
 body {
   height: 100%;
@@ -6748,7 +6751,7 @@ a {
 }
 #root .group-status {
   background-color: #e9eff3;
-  height: 160px;
+  height: 260px;
   margin: 10px;
 }
 #root .group-status .status-error {

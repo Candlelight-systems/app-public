@@ -120,6 +120,7 @@ function wsIncoming( data ) {
     }
 
     if( data.groupName ) {
+      
       windows[ 'instrumentMain' ].webContents.send( "group.update." + data.instrumentId + "." + data.groupName, data ); 
     }
   }

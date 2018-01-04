@@ -9,7 +9,7 @@
 
 @import "./calib_light.scss";
 @import "./cell.scss";
-
+@import "./group.scss";
 
 body {
 
@@ -61,7 +61,7 @@ a {
 	.group-status {
 		
 		background-color: @cell-background;
-		height: 160px;
+		height: 260px;
 		margin: 10px;
 
 		.status-error {

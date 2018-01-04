@@ -135,7 +135,7 @@ if (document.getElementById('footer')) {
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					null,
-					'\xA9 Candlelight systems, 2017'
+					'\xA9 Candlelight systems, 2016-2017'
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
@@ -145,16 +145,6 @@ if (document.getElementById('footer')) {
 						{ onClick: bugReport },
 						'Report a bug'
 					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					null,
-					'Privacy Policy'
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					null,
-					'About'
 				)
 			)
 		),
@@ -185,15 +175,6 @@ if (document.getElementById('footer')) {
 						{ onClick: () => __webpack_require__(1).openExternal("mailto://contact@candlelight-systems.com") },
 						'contact@candlelight-systems.com'
 					)
-				)
-			),
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ className: 'col-xs-3' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'small',
-					null,
-					'+ 41 21 693 2105'
 				)
 			)
 		)
@@ -228,6 +209,7 @@ class InstrumentForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 		this.state = {
 
 			trackerPort: 8080,
+			trackerPortWS: 8081,
 			buttonValue: "Add",
 			title: "Add a Candlelight instrument"
 		};

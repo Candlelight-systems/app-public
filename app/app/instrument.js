@@ -432,7 +432,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     }).then(response => response.json()).catch(error => {
 
       this.setState({
-        error: `Error while retrieving the instrument status. The returned error was <em>${error.toString()}</em>. Try rebooting the instrument`
+        error: `Error while retrieving the instrument status. The returned error was ${error.toString()}. Try rebooting the instrument`
       });
     });
   }
@@ -625,10 +625,14 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
   }
 
   wsUpdate(event, data) {
-
+    console.log(data, "UPDATING !!!");
     // Update directly the state
-    data.lightUpdating = false;
-    this.setState(data);
+    this.setState(data.data);
+
+    // New state means re-enabling
+    if (this.toggleLightEnable) {
+      $(this.toggleLightEnable).bootstrapToggle('enable');
+    }
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/
@@ -636,26 +640,27 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
   componentDidUpdate(prevProps) {
 
-    if (this.toggleLightEnable) {
+    if (this.toggleLightEnable && !this.transformed) {
 
       $(this.toggleLightEnable).bootstrapToggle({
         on: 'On',
         off: 'Off'
       }).change(() => {
 
-        this.toggleLightEnable.bootstrapToggle('disable');
+        $(this.toggleLightEnable).bootstrapToggle('disable');
 
         return fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${this.toggleLightEnable.checked ? 'enable' : 'disable'}?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
           method: 'GET'
         }).then(() => {}).catch(error => {
 
           __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
-        }).finally(() => {
-
-          this.toggleLightEnable.bootstrapToggle('enable');
-        });
+        }).then(() => {});
       });
       this.transformed = true;
+    }
+
+    if (this.toggleLightEnable) {
+      $(this.toggleLightEnable).data('bs.toggle')[this.state.lightOnOff ? 'on' : 'off'](true);
     }
   }
   /*
@@ -944,7 +949,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 
     return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
       "div",
-      null,
+      { className: "cl-group" },
       !!this.props.showHeader && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "h4",
         null,
@@ -1084,74 +1089,101 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                   "label",
                   null,
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightEnable = el, checked: this.state.lightOnOff, "data-width": "70", "data-height": "25" })
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightEnable = el, "data-width": "70", "data-height": "25" })
                 )
               )
             ),
-            this.state.lightOnOffButton !== this.state.lightOnOff ? // In case the light is still off
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "row" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+              null,
+              this.state.lightOnOffButton !== this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
-                { className: "col-lg-9" },
+                { className: "row" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-warning" }),
-                  " The light interlock looks disabled. Push the button to turn the light on."
+                  "div",
+                  { className: "col-lg-9" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    { className: "grey" },
+                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                      "em",
+                      null,
+                      __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                        "small",
+                        null,
+                        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-danger" }),
+                        "The light switch is off. Push it to turn the light on."
+                      )
+                    )
+                  )
                 )
-              )
-            ) : null,
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
+              ) : null,
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
-                { className: "col-lg-5" },
+                { className: "row" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  "Control mode:"
+                  "div",
+                  { className: "col-lg-5" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    { className: "grey" },
+                    "Control mode:"
+                  )
+                ),
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-4" },
+                  this.state.lightMode == 'auto' ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    null,
+                    "Automatic"
+                  ) : __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    null,
+                    "Manual"
+                  )
                 )
               ),
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-4" },
-                this.state.lightMode == 'auto' ? 'Automatic' : 'Manual'
-              )
-            ),
-            this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
+              this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
 
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
               __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
-                { className: "col-lg-5" },
+                { className: "row" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  "Set point:"
+                  "div",
+                  { className: "col-lg-5" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    { className: "grey" },
+                    "Set point:"
+                  )
                 ),
-                this.state.lightSetpoint,
-                " sun"
-              )
-            ) : null,
-            this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-4" },
+                  this.state.lightSetpoint,
+                  " sun"
+                )
+              ) : null,
+              this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
                 "div",
-                { className: "col-lg-5" },
+                { className: "row" },
                 __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  "Current value:"
+                  "div",
+                  { className: "col-lg-5" },
+                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                    "span",
+                    { className: "grey" },
+                    "Current value:"
+                  )
                 ),
-                this.state.lightValue,
-                " sun"
-              )
+                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                  "div",
+                  { className: "col-lg-4" },
+                  this.state.lightValue,
+                  " sun"
+                )
+              ) : null
             ) : null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
@@ -1183,18 +1215,21 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
             null,
             "Temperature"
           ),
-          this.state.temperature !== -1 && this.state.temperature !== undefined && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
             null,
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+            this.state.temperature !== -1 && this.state.temperature !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
               "div",
-              { className: "col-lg-9" },
-              "Box temperature: ",
-              this.state.temperature,
-              " \xB0C"
-            )
+              null,
+              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+                "div",
+                { className: "col-lg-9" },
+                "Box temperature: ",
+                " \xB0C"
+              )
+            ) : null
           ),
-          this.props.groupConfig.heat && __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+          this.props.groupConfig.heat ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
             "div",
             null,
             __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
@@ -1278,7 +1313,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
                 )
               ) : null
             ) : null
-          )
+          ) : null
         ),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "clearfix" })
       ),
@@ -2126,7 +2161,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
-				{ ref: el => this.wrapper = el, className: 'cell ' + (active ? 'cell-running' : 'cell-stopped') + ' show-details' },
+				{ ref: el => this.wrapper = el, className: 'cl-device ' + (active ? 'cell-running' : 'cell-stopped') + ' show-details' },
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
 					{ className: "col-lg-7" },
@@ -2559,7 +2594,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
-				{ ref: el => this.wrapper = el, className: "cell  cell-unknown" },
+				{ ref: el => this.wrapper = el, className: "cl-device cell-unknown" },
 				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 					"div",
 					{ className: "cell-name cell-main-info row" },

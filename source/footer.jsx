@@ -31,17 +31,11 @@ if( document.getElementById('footer') ) {
 
 
 			<div className="pull-right footer-info">
-				<div>&copy; Candlelight systems, 2017</div>
+				<div>&copy; Candlelight systems, 2016-2017</div>
 				<div>
 					<a onClick={ bugReport }>
 						Report a bug
 					</a>
-				</div>
-				<div>
-					Privacy Policy
-				</div>
-				<div>
-					About
 				</div>
 			</div>
 		
@@ -60,12 +54,6 @@ if( document.getElementById('footer') ) {
 					<a onClick={ () => require("shell").openExternal("mailto://contact@candlelight-systems.com") }>contact@candlelight-systems.com</a>
 				</small>
 			</div>
-			<div className="col-xs-3">
-				<small>
-					+ 41 21 693 2105
-				</small>
-			</div>
-
 		</div>
 
 		</div>,

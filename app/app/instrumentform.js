@@ -140,6 +140,7 @@ class InstrumentForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 		this.state = {
 
 			trackerPort: 8080,
+			trackerPortWS: 8081,
 			buttonValue: "Add",
 			title: "Add a Candlelight instrument"
 		};

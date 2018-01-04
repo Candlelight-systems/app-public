@@ -93,7 +93,7 @@ class TrackerInstrument extends React.Component {
     .catch( error => {
 
       this.setState( {
-        error: `Error while retrieving the instrument status. The returned error was <em>${ error.toString() }</em>. Try rebooting the instrument`
+        error: `Error while retrieving the instrument status. The returned error was ${ error.toString() }. Try rebooting the instrument`
       } );
     } );
   }

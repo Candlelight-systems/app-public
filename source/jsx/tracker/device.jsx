@@ -778,7 +778,7 @@ class TrackerDevice extends React.Component {
 			};
 			
 			return (
-				<div ref={ ( el ) => this.wrapper = el } className={'cell ' + ( active ? 'cell-running' : 'cell-stopped' ) + ' show-details' }>
+				<div ref={ ( el ) => this.wrapper = el } className={'cl-device ' + ( active ? 'cell-running' : 'cell-stopped' ) + ' show-details' }>
 
 					<div className="col-lg-7">
 
@@ -1005,7 +1005,7 @@ class TrackerDevice extends React.Component {
 			} else {
 
 				return (
-				<div ref={ ( el ) => this.wrapper = el } className="cell  cell-unknown">
+				<div ref={ ( el ) => this.wrapper = el } className="cl-device cell-unknown">
 
 						<div className="cell-name cell-main-info row">						
 							<div className="col-lg-4">
