@@ -57,6 +57,9 @@ class CellForm extends React.Component {
 	}
 
 	render() {	 
+
+		let active = !! this.state.enable && this.state.tracking_mode > 0;
+
 		return (
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
@@ -72,19 +75,21 @@ class CellForm extends React.Component {
 
 				<div className="tab-pane active" id={ "cell_" + this.state.unique }>
 					<div className="form-group">
-						<label className="col-sm-3">Cell name</label>
+						<label className="col-sm-3">Device name</label>
 						<div className="col-sm-9">
-							<input type="text" name="cellName" id="cellName" className="form-control" placeholder="Device name" value={this.state.cellName} onChange={this.handleInputChange} />
+							<input type="text" name="cellName" id="cellName" className="form-control" placeholder="Device name" disabled={ active } value={this.state.cellName} onChange={this.handleInputChange} />
 						</div>
+						{ active ? <div className="help-block">The device name cannot be changed once the device is in active mode</div> : null }
 					</div>
 
 					<div className="form-group">
-						<label htmlFor="cellarea" className="col-sm-3">Cell area</label>
+						<label htmlFor="cellarea" className="col-sm-3">Device area</label>
 						<div className="col-sm-9">
 							<div className="input-group">
-								<input type="number" step="0.01" name="cellArea" id="cellArea" className="form-control col-sm-9" placeholder="Cell area" value={this.state.cellArea} onChange={this.handleInputChange} />
+								<input type="number" step="0.01" disabled={active} name="cellArea" id="cellArea" className="form-control col-sm-9" placeholder="Cell area" value={this.state.cellArea} onChange={this.handleInputChange} />
 								<span className="input-group-addon">mA cm<sup>-2</sup></span>
 							</div>
+							{ active ? <div className="help-block">The area cannot be changed once the device is in active mode</div> : null }
 						</div>
 					</div>
 

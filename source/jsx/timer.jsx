@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-class Timer extends React.PureComponent {
+class Timer extends React.Component {
 
   constructor( props ) {
     super( props );
@@ -12,8 +12,6 @@ class Timer extends React.PureComponent {
 
   componentDidMount() {
 
-    this.updated = Date.now();
-
     this.interval = setInterval( () => {
 
       if( this.props.timerValue === undefined || isNaN( this.props.timerValue.time ) ) {
@@ -22,18 +20,14 @@ class Timer extends React.PureComponent {
 
       if( this.props.direction == 'ascending' ) {
 
-        if( ! this.updated ) {
-          return;
-        }
-
         this.setState( { 
-          timerValue: ( Date.now() - this.updated ) + this.props.timerValue.time
+          timerValue: ( Date.now() - this.props.timerValue.updated ) + this.props.timerValue.time
         } );  
 
       } else {
 
         this.setState( { 
-          timerValue: this.props.timerValue.time - ( Date.now() - this.updated )
+          timerValue: this.props.timerValue.time - ( Date.now() - this.props.timerValue.updated )
         } );  
       }
     
@@ -46,11 +40,7 @@ class Timer extends React.PureComponent {
 
   componentWillReceiveProps( nextProps ) {
 
-    if( nextProps.timerValue === this.props.timerValue ) {
-      return;
-    }
-
-    this.updated = Date.now();
+    
   }
 
   processTime( value ) {

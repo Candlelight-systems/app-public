@@ -163,9 +163,6 @@ class statusGraph extends GraphComponent {
 			this.serie.setWaveform( this.props.data.setXScale( 1 / 3600 ) );
 			this.serieZone.setWaveform( this.props.data.duplicate( true ).prepend( 0, 0 ).append( ( wave ) => wave.getXRaw( wave.getLength() - 1 ), 0 ) );
 			this.graph.autoscaleAxes();
-
-		
-			this.graph.autoscaleAxes();
 			this.graph.draw();
 			//this.graph.updateLegend();
 

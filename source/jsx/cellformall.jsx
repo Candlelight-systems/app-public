@@ -42,7 +42,10 @@ class CellFormAll extends CellForm {
 		});
 
 		Object.assign( stateObj, props.formState );
-		this.setState( stateObj );
+
+		if( stateObj.entries().length > 0 ) {
+			this.setState( stateObj );
+		}
 	}
 
 	render() {	 
@@ -93,12 +96,12 @@ class CellFormAll extends CellForm {
 								<div className="col-sm-9">
 									<div className="radio">
 										<label>
-											<input type="radio" name="connection" value="group" checked={ this.state.connection == 'group' } /> Cell enclosure
+											<input onClick={ this.handleInputChange } type="radio" name="connection" value="group" checked={ this.state.connection == 'group' } /> Cell enclosure
 										</label>
 									</div>
 									<div className="radio">
 										<label>
-											<input type="radio" name="connection" value="external" checked={ this.state.connection == 'external' } /> External connection
+											<input onClick={ this.handleInputChange } type="radio" name="connection" value="external" checked={ this.state.connection == 'external' } /> External connection
 										</label>
 									</div>
 								</div>

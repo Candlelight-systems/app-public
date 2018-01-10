@@ -24,6 +24,7 @@ class GraphComponent extends React.PureComponent {
 	}
 
 	resize( props ) {
+		console.log( props );
 		this.graph.resize( props.width || 300, props.height || 130 );
 	}
 

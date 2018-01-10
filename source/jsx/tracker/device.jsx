@@ -90,7 +90,7 @@ class TrackerDevice extends React.Component {
 		this.downloadData = this.downloadData.bind( this );
 
 		this.wsUpdate = this.wsUpdate.bind( this );
-		
+			
 	//	this.formChanged = this.formChanged.bind( this );
 		//this.state.tmpServerState = {};		
 	}
@@ -103,8 +103,21 @@ class TrackerDevice extends React.Component {
 	componentWillReceiveProps( nextProps ) {
 
 		this.setState( { updating: false } );
-      	this.setState( { serverState: nextProps.serverState } );
-  	
+
+		/**
+		 *  Norman, 4 January 2017:
+		 *	Some explaining might be useful here.
+		 *  We need to chose the source of truth of the channel status. Either it defines itself (see this.getStatus) or the group and in turn the instrument sets it
+		 *  But it can't be both, otherwise, if they are different (and they can be, at least temporarily), they will overwrite each other
+		 */
+
+    //  	this.setState( { serverState: nextProps.serverState } );
+  		
+  		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
+  		if( this.props.serverState !== nextProps.serverState ) {
+  			this.getStatus();
+  		}
+
       	if( 
       		nextProps.serverState.tracking_mode > 0 && 
       		nextProps.measurementName && 
@@ -159,12 +172,17 @@ class TrackerDevice extends React.Component {
 			newState.voltage = round( data.state.voltage, 2 );
 		}
 
+		if( data.state.voltage && data.state.current && this.state.waveIV ) {
+			this.state.waveIV.append( data.state.voltage, data.state.current * 1000 );			
+			newState.waveIV = this.state.waveIV;
+		}
+
 		if( data.state.power ) {
 			newState.power = round( data.state.power, 2 );
 		}
 
 		if( data.state.voc ) {
-			newState.power = round( data.state.voc, 2 );
+			newState.voc = round( data.state.voc, 2 );
 		}
 		
 		if( data.state.sun ) {
@@ -172,12 +190,15 @@ class TrackerDevice extends React.Component {
 		}
 
 		if( data.state.jsc ) {
-			newState.jsc = data.state.jsc;
+			newState.jsc = data.state.jsc * 1000 / this.state.serverState.cellArea;
 		}
 
-
 		if( data.state.temperature ) {
-			newState.temperature_junction = data.state.temperature;
+			newState.temperature = data.state.temperature;
+		}
+
+		if( data.state.temperature_junction ) {
+			newState.temperature_junction = data.state.temperature_junction;
 		}
 
 		if( data.state.humidity ) {
@@ -185,24 +206,26 @@ class TrackerDevice extends React.Component {
 		}
 
 		if(  ! isNaN( data.timer.iv ) ) {	// Timer for the next IV curve
-			newState.timer_nextIV = { time: data.timer.iv };
+			newState.timer_nextIV = { time: data.timer.iv, updated: Date.now() };
 		}
 
 		if(  ! isNaN( data.timer.jsc ) ) {	// Timer for the next JSC measurement
-			newState.timer_nextJsc = { time: data.timer.jsc };
+			newState.timer_nextJsc = { time: data.timer.jsc, updated: Date.now() };
 		}
 
 		if(  ! isNaN( data.timer.voc ) ) {	// Timer for the next Voc curve
-			newState.timer_nextVoc ={ time: data.timer.voc };
+			newState.timer_nextVoc ={ time: data.timer.voc, updated: Date.now() };
 		}
 
 		if( ! isNaN( data.timer.aquisition ) ) {	// Timer for the last aquisition
-			newState.timer_aquisition = { time: data.timer.aquisition };
+			newState.timer_aquisition = { time: data.timer.aquisition, updated: Date.now() };
 		}
 
-		if( ! isNaN( data.timer.ellapsed ) && ! this.state.ellapsed ) {
-			newState.wsEllapsed = data.timer.ellapsed;
+		if( ! isNaN( data.timer.ellapsed )  ) {
+			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() }
 		}
+
+
 
 		if( data.action.data && this.state.data ) {
 			
@@ -233,12 +256,13 @@ class TrackerDevice extends React.Component {
 		}
 
 		if( data.action.update ) {
-			this.getStatus();
+			await this.getStatus();
 		}
 
 		if( data.action.stopped ) {
 			await this.getStatus();
 			newState = Object.assign( {}, initialState );
+			this.state = newState; // Force-remove all the other state that will pollute the new channel
 		}
 
 		this.setState( newState );
@@ -253,19 +277,12 @@ class TrackerDevice extends React.Component {
 		  "Content-Length": body.length.toString()
 		});
 
-
-
 		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatus", {
-
 			headers: headers,
 			method: 'POST',
 			body: body
-
 		} );
 	}
-
-
-
 
 	resetChannel() {
 
@@ -345,9 +362,7 @@ class TrackerDevice extends React.Component {
 
 	start() {
 		
-		this.state.serverState.measurementName = this.state.serverState.cellName + "_" + Date.now();
-		this.state.serverState.enable = 1;
-		this.saveStatus( this.state.serverState );
+		this.saveStatus( Object.assign( {}, this.state.serverState, { enable: 1, measurementName: this.state.serverState.cellName + "_" + Date.now() } ) );
 	}
 
 	stop() {
@@ -363,7 +378,7 @@ class TrackerDevice extends React.Component {
 		
 		ipcRenderer.once( "channelConfigured", ( event, data ) => {
 
-			if( data.chanId != this.state.serverState.chanId ) {
+			if( data.chanId != this.props.chanId ) {
 				return;
 			}
 
@@ -521,17 +536,16 @@ class TrackerDevice extends React.Component {
 				} ) );
 			}
 
+			// Even if the series don't exist, we can still update the j-V curve
+			// The only thing we have to do is not throw any error and handle gracefully the lack of data
 			if( ! results[ 0 ].series ) {
-				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
+				return;//throw "No measurement with the name " + serverState.measurementName + " or no associated data";
 			}
 
 			let timefrom = results[ 0 ].series[ 0 ].values[ 0 ][ 0 ],
 				timeto = results[ 1 ].series[ 0 ].values[ 0 ][ 0 ],
 				timefrom_date = new Date( timefrom ),
-				timeto_date = new Date( timeto ),
-				last_iv;
-
-
+				timeto_date = new Date( timeto );
 
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
@@ -598,7 +612,7 @@ class TrackerDevice extends React.Component {
 				}
 
 				let valueIndex = 1;
-
+console.log( values.length );
 				values.forEach( ( value, index ) => {
 					
 					let date = new Date( value[ 0 ] ),
@@ -621,8 +635,12 @@ class TrackerDevice extends React.Component {
 					}
 
 					wave.append( time, value[ valueIndex ] );
-					waveSun.append( time, value[ 5 ] );					
-					waveIV.append( value[ 3 ], value[ 4 ] );
+					waveSun.append( time, value[ 5 ] );		
+
+					if( index > values.length * 0.8 ) {			
+						waveIV.append( value[ 3 ], value[ 4 ] );
+					}
+
 					waveTemperature.append( time, value[ 6 ] );
 					waveHumidity.append( time, value[ 7 ] );
 						
@@ -679,10 +697,10 @@ class TrackerDevice extends React.Component {
 
 			console.error( "Could not process influx DB request." );
 			console.error( error );
+	
+		}).then( () => {
 
 			this.setState( newState );
-			
-		}).then( () => {
 
 			this.scheduleRefresh();
 		});
@@ -773,10 +791,6 @@ class TrackerDevice extends React.Component {
 
 		if( active ) {
 
-			let ellapsed = { 
-				time: ! isNaN( this.state.ellapsed ) ? this.state.ellapsed * 1000 : this.state.wsEllapsed 
-			};
-			
 			return (
 				<div ref={ ( el ) => this.wrapper = el } className={'cl-device ' + ( active ? 'cell-running' : 'cell-stopped' ) + ' show-details' }>
 
@@ -845,9 +859,7 @@ class TrackerDevice extends React.Component {
 										<span className="glyphicon glyphicon-hourglass"></span>
 									</div>
 									<div className="value">
-									{ ( ellapsed.time ) ?
-										<Timer precision={1} maxLevel={3} spacer=" " direction="ascending" timerValue={ ellapsed } /> : 'N/A'
-									}
+										<Timer precision={1} maxLevel={3} spacer=" " direction="ascending" timerValue={ this.state.timer_ellapsed } />
 									</div>
 								</div>
 							</div>
@@ -903,7 +915,7 @@ class TrackerDevice extends React.Component {
 							<div className="col-xs-1 propElement">
 								<div className="label">FF</div>
 								<div className="value">
-									{ ( ! isNaN( this.state.ff )  && this.state.ff !== false ) ?  this.state.ff : 'N/A' }
+									{ ( ! isNaN( this.state.ff )  && this.state.ff !== false ) ?  <span>{ this.state.ff } { this.unit.fillfactor }</span> : 'N/A' }
 								</div>
 							</div>
 
@@ -933,7 +945,8 @@ class TrackerDevice extends React.Component {
 										<span className="glyphicon glyphicon-grain"></span>
 									</div>
 									<div className="value">
-										{ this.state.temperature_junction && this.state.temperature_junction > 0 ? <span>{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+										{ this.state.temperature && this.state.temperature > 0 ? <span title="Base temperature (local temperature on the chip just under the device)">{ this.state.temperature }</span> : 'N/A' }&nbsp;/&nbsp;
+										{ this.state.temperature_junction && this.state.temperature_junction > 0 ? <span title="Estimated junction temperature (base temperature + thermopile voltage)">{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
 									</div>
 								</div>
 							</div>

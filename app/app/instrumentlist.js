@@ -392,7 +392,7 @@ module.exports = require("fs");
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"acquisition":{"ADC":{"model":"ADS1259"}}}
 
 /***/ })
 /******/ ]);

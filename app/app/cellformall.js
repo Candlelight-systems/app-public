@@ -79,6 +79,7 @@ module.exports = require("react");
 
 
 
+
 class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 	constructor(props) {
@@ -97,6 +98,8 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 	componentDidUpdate() {}
 
 	render() {
+
+		let active = !!this.props.enable && this.props.tracking_mode > 0;
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
@@ -213,7 +216,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 					{ className: 'col-sm-9' },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'select',
-						{ name: 'tracking_step', id: 'tracking_step', className: 'form-control', value: this.props.tracking_step, onChange: this.handleInputChange },
+						{ name: 'tracking_stepsize', id: 'tracking_stepsize', className: 'form-control', value: this.props.tracking_step, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ key: 'mv1', value: '0.001' },
@@ -292,6 +295,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							'1 sample per hour'
 						)
 					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block col-sm-12' },
+					'This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.'
 				)
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -490,13 +498,13 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				null,
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
-					{ className: 'form-group' },
+					{ className: 'form-group row' },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						null,
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'label',
-							{ className: 'col-sm-14' },
+							{ className: 'col-sm-9' },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'tracking_measure_voc', checked: !!this.props.tracking_measure_voc, onChange: this.handleInputChange }),
 							' Measure V',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -557,13 +565,13 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
-					{ className: 'form-group' },
+					{ className: 'form-group row' },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						null,
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'label',
-							{ className: 'col-sm-14' },
+							{ className: 'col-sm-9' },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'tracking_measure_jsc', checked: !!this.props.tracking_measure_jsc, onChange: this.handleInputChange }),
 							' Measure J',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -924,7 +932,10 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 		});
 
 		Object.assign(stateObj, props.formState);
-		this.setState(stateObj);
+
+		if (stateObj.entries().length > 0) {
+			this.setState(stateObj);
+		}
 	}
 
 	render() {
@@ -1039,7 +1050,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 										"label",
 										null,
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "connection", value: "group", checked: this.state.connection == 'group' }),
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { onClick: this.handleInputChange, type: "radio", name: "connection", value: "group", checked: this.state.connection == 'group' }),
 										" Cell enclosure"
 									)
 								),
@@ -1049,7 +1060,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 										"label",
 										null,
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "connection", value: "external", checked: this.state.connection == 'external' }),
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { onClick: this.handleInputChange, type: "radio", name: "connection", value: "external", checked: this.state.connection == 'external' }),
 										" External connection"
 									)
 								)
@@ -1182,6 +1193,9 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	}
 
 	render() {
+
+		let active = !!this.state.enable && this.state.tracking_mode > 0;
+
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "container-fluid" },
@@ -1231,13 +1245,18 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"label",
 								{ className: "col-sm-3" },
-								"Cell name"
+								"Device name"
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"div",
 								{ className: "col-sm-9" },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", name: "cellName", id: "cellName", className: "form-control", placeholder: "Device name", value: this.state.cellName, onChange: this.handleInputChange })
-							)
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", name: "cellName", id: "cellName", className: "form-control", placeholder: "Device name", disabled: active, value: this.state.cellName, onChange: this.handleInputChange })
+							),
+							active ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "help-block" },
+								"The device name cannot be changed once the device is in active mode"
+							) : null
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
@@ -1245,7 +1264,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"label",
 								{ htmlFor: "cellarea", className: "col-sm-3" },
-								"Cell area"
+								"Device area"
 							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"div",
@@ -1253,7 +1272,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 									"div",
 									{ className: "input-group" },
-									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", step: "0.01", name: "cellArea", id: "cellArea", className: "form-control col-sm-9", placeholder: "Cell area", value: this.state.cellArea, onChange: this.handleInputChange }),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", step: "0.01", disabled: active, name: "cellArea", id: "cellArea", className: "form-control col-sm-9", placeholder: "Cell area", value: this.state.cellArea, onChange: this.handleInputChange }),
 									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 										"span",
 										{ className: "input-group-addon" },
@@ -1264,7 +1283,12 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 											"-2"
 										)
 									)
-								)
+								),
+								active ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "help-block" },
+									"The area cannot be changed once the device is in active mode"
+								) : null
 							)
 						),
 						this.props.instrumentConfig.relayController && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

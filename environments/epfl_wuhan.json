@@ -4,12 +4,19 @@
 
 		"statuses": {
 			"light": {
-				"version": "1.0"
+				"version": "2.0"
 			},
 			"heat": {
-				"version": "1.0"
+				"version": "2.0"
+			}
+		},
+
+		"acquisition": {
+			"ADC": {
+				"model": "ADS1259"
 			}
 		}
+
 	},	
 
 	"development": true,

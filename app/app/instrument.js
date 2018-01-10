@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -88,9 +88,9 @@ module.exports = require("node-jsgraph/dist/jsgraph-es6");
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return query; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ping; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
 
 
@@ -120,10 +120,16 @@ let ping = function (cfg) {
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = require("react-dom");
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"acquisition":{"ADC":{"model":"ADS1259"}}}
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-dom");
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -154,6 +160,7 @@ class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureC
 	}
 
 	resize(props) {
+		console.log(props);
 		this.graph.resize(props.width || 300, props.height || 130);
 	}
 
@@ -169,7 +176,7 @@ class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureC
 /* harmony default export */ __webpack_exports__["a"] = (GraphComponent);
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -255,23 +262,210 @@ class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(8);
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+  @preserve Copyright (c) 2016 Ben Ilegbodu.
+  Licensed under the MIT License (MIT).
+  See: https://github.com/benmvp/url-lib.
+  Adapted from the Uize.Url module, a part of the UIZE JavaScript Framework.
+*/
+(function(factory) {
+    /* istanbul ignore next */
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+    else if (typeof module === 'object' && module.exports) {
+        module.exports = factory();
+    }
+	else {
+        window.urllib = factory();
+    }
+})(function() {
+    'use strict';
+
+    var immutableEmptyObject = {},
+        immutableEmptyArray = [],
+        hasOwnProperty = immutableEmptyObject.hasOwnProperty;
+
+    function _decode(str) {
+        return str != null ? decodeURIComponent(str) : '';
+    }
+
+    function _encode(str) {
+        return encodeURIComponent(str + '');
+    }
+
+    // Simplified Object.assign polyfill
+    function _merge(target) {
+        var output = new Object(target),
+            argNo = 0,
+            source,
+            sourceKey;
+
+        for (; ++argNo < arguments.length;) {
+            source = arguments[argNo];
+
+            if (source) {
+                for (sourceKey in source) {
+                    /* istanbul ignore else  */
+                    if (hasOwnProperty.call(source, sourceKey)) {
+                        output[sourceKey] = source[sourceKey];
+                    }
+                }
+            }
+        }
+
+        return output;
+    }
+
+    function _splitOnQuery(url, favorQuery) {
+        var urlString = (url || '') + '', // default to a string & then coerce to a string
+            queryPos = urlString.indexOf('?');
+
+        // If the URL doesn't have a "?" we have to decide how we want to handle the string.
+        // If favorQuery === true, then we'll assume the entire string is the query string.
+        // If !favorQuery then we set the queryPos to the end of the string (meaning the
+        // query string is empty)
+        if (queryPos < 0 && !favorQuery) {
+            queryPos = urlString.length;
+        }
+
+        return {
+            urlPath: urlString.slice(0, queryPos),
+            queryString: urlString.slice(queryPos + 1)
+        };
+    }
+
+    /**
+    * Serializes the properties of a params object to produce a URL query string.
+    * @param {object|object[]} urlParams - An object (or array of objects) representing the query params to serialize
+    * @returns {string} Serialized query string
+    */
+    function formatQuery(urlParams) {
+        var paramsObj = urlParams;
+
+        if (Array.isArray(paramsObj)) {
+            paramsObj = paramsObj.length < 2
+                ? paramsObj[0]
+                : _merge.apply(null, paramsObj);
+        }
+
+        paramsObj = paramsObj || immutableEmptyObject;
+
+        return Object.keys(paramsObj)
+            .reduce(function(prevUrlParamPairs, paramName) {
+                var urlParamPairs = prevUrlParamPairs,
+                    paramValue;
+
+                if (paramName) {
+                    paramValue = paramsObj[paramName];
+
+                    if (paramValue != null) {
+                        urlParamPairs.push(_encode(paramName) + '=' + _encode(paramValue));
+                    }
+                }
+
+                return urlParamPairs;
+            }, [])
+            .join('&');
+    }
+
+    /**
+    * Parses query parameters from a string, returning the query parameters as an object.
+    * @param {string} strToParse - The string from which to parse query parameters
+    * @param {boolean} [favorQuery=true] - Whether or not to treat the full string to parse as query parameters when it doesn't have "?" in it
+    * @returns {object} Parsed query parameters
+    */
+    function parseQuery(strToParse, favorQuery) {
+        // Ensure that all we parse is a query string
+        var queryString = _splitOnQuery(strToParse, favorQuery !== false).queryString || '';
+
+        return queryString
+            .split('&')
+            .reduce(function(prevUrlParams, serializedUrlParamPair) {
+                var urlParams = prevUrlParams,
+                    urlParamPair = serializedUrlParamPair.split('='),
+                    urlParamNameEncoded = urlParamPair[0];
+
+                if (urlParamNameEncoded) {
+                    urlParams[_decode(urlParamNameEncoded)] = _decode(urlParamPair[1]);
+                }
+
+                return urlParams;
+            }, {});
+    }
+
+    /**
+    * Serializes the specified URL path with properties of a params object to produce a URL.
+    * @param {string | array} urlPath - Base URL path
+    * @param {object | object[]} urlParams - Query params to combine with base URL
+    * @returns {string} Serialized URL
+    */
+    function formatUrl(urlPath, urlParams) {
+        var formattedUrl = urlPath,
+            queryParams = urlParams,
+            parsedQueryParamsFromUrl,
+            normalizedQueryParams,
+            queryString;
+
+        // if they passed an array as the first parameter, separate out the first
+        // element (url) from the other elements (query params list)
+        if (Array.isArray(formattedUrl)) {
+            queryParams = formattedUrl.slice(1).concat(queryParams || immutableEmptyArray);
+            formattedUrl = formattedUrl[0];
+        }
+
+        // Pull out any query params from the URL
+        parsedQueryParamsFromUrl = parseQuery(formattedUrl, false);
+
+        // Convert the query params into an array (if it already isn't)
+        normalizedQueryParams = Array.isArray(queryParams) ? queryParams : [queryParams];
+
+        // Merge the URL query params to the additional query params
+        queryParams = [parsedQueryParamsFromUrl].concat(normalizedQueryParams);
+
+        // Serialize the query params to a query string
+        queryString = formatQuery(queryParams);
+
+        // Finally build the URL by stripping out any query string from the URL and
+        // appending the query string
+        return _splitOnQuery(formattedUrl).urlPath
+            + (queryString ? '?' : '')
+            + queryString;
+    }
+
+    return {
+        parseQuery: parseQuery,
+        formatUrl: formatUrl,
+        formatQuery: formatQuery
+    };
+});
 
 
 /***/ }),
-/* 8 */
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(10);
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 
@@ -325,17 +519,17 @@ function render(cfg) {
 }
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lodash_debounce__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(3);
 
@@ -431,8 +625,14 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       if (response.status !== 200) throw "500 Internal server error";else return response;
     }).then(response => response.json()).catch(error => {
 
+      setTimeout(() => {
+        console.log("trying");
+        this.updateInstrument();
+      }, 3000);
+
       this.setState({
-        error: `Error while retrieving the instrument status. The returned error was ${error.toString()}. Try rebooting the instrument`
+        error: `Error while retrieving the instrument status. The returned error was ${error.toString()}.`,
+        errorMethods: [["Retry", this.updateInstrument]]
       });
     });
   }
@@ -486,7 +686,14 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
     let content;
 
-    if (this.state.groups) {
+    if (this.state.error || !this.state.serverState) {
+
+      content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, errorMethods: this.state.errorMethods })
+      );
+    } else if (this.state.groups) {
 
       var groupsDoms = this.state.groups.map((group, i) => {
 
@@ -510,16 +717,6 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
           paused: this.state.paused
         });
       });
-    }
-
-    if (this.state.error) {
-
-      content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, errorMethods: this.state.errorMethods })
-      );
-    } else if (groupsDoms) {
 
       content = groupsDoms;
     }
@@ -552,7 +749,8 @@ var _initialiseProps = function () {
         serverState: status,
         paused: status.paused,
         error_influxdb: false,
-        error_tracker: false
+        error_tracker: false,
+        error: false
       });
     }).catch(e => {});
   }, 100);
@@ -561,17 +759,23 @@ var _initialiseProps = function () {
 /* harmony default export */ __webpack_exports__["a"] = (TrackerInstrument);
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__influx__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__status_light_main_jsx__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__status_heat_main_jsx__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__status_instrument_main_jsx__ = __webpack_require__(27);
+
+
+
 
 
 
@@ -581,29 +785,16 @@ var _initialiseProps = function () {
 class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.Component {
 
   constructor(props) {
+
     super(props);
     this.state = {
       channelChecked: {}
     };
 
     this.toggleChannelCheck = this.toggleChannelCheck.bind(this);
-
     this.cfgAll = this.cfgAll.bind(this);
-    this.measureIVAll = this.cfgAll.bind(this);
-    this.measureVocAll = this.cfgAll.bind(this);
-    this.measureJscAll = this.cfgAll.bind(this);
     this.checkAll = this.checkAll.bind(this);
-
-    this.light_calibrate = this.light_calibrate.bind(this);
-    this.light_controller_config = this.light_controller_config.bind(this);
-
-    this.heatingPowerChange = this.heatingPowerChange.bind(this);
-    this.setHeatingPower = this.setHeatingPower.bind(this);
-    this.increaseHeatingPower = this.increaseHeatingPower.bind(this);
-    this.decreaseHeatingPower = this.decreaseHeatingPower.bind(this);
     this.resetSlave = this.resetSlave.bind(this);
-
-    this.togglePause = this.togglePause.bind(this);
     this.wsUpdate = this.wsUpdate.bind(this);
   }
 
@@ -617,6 +808,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     });
 
     __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+    this.doEnvironmentalSensing();
   }
 
   componentWillUnmount() {
@@ -625,44 +817,16 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
   }
 
   wsUpdate(event, data) {
-    console.log(data, "UPDATING !!!");
+
     // Update directly the state
     this.setState(data.data);
 
-    // New state means re-enabling
-    if (this.toggleLightEnable) {
-      $(this.toggleLightEnable).bootstrapToggle('enable');
-    }
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/
   }
 
-  componentDidUpdate(prevProps) {
-
-    if (this.toggleLightEnable && !this.transformed) {
-
-      $(this.toggleLightEnable).bootstrapToggle({
-        on: 'On',
-        off: 'Off'
-      }).change(() => {
-
-        $(this.toggleLightEnable).bootstrapToggle('disable');
-
-        return fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${this.toggleLightEnable.checked ? 'enable' : 'disable'}?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
-          method: 'GET'
-        }).then(() => {}).catch(error => {
-
-          __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
-        }).then(() => {});
-      });
-      this.transformed = true;
-    }
-
-    if (this.toggleLightEnable) {
-      $(this.toggleLightEnable).data('bs.toggle')[this.state.lightOnOff ? 'on' : 'off'](true);
-    }
-  }
+  componentDidUpdate(prevProps) {}
   /*
         this.setState( {
   
@@ -672,24 +836,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
         
         } );
         */
-
-  light_calibrate() {
-
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("calibratePD", {
-      instrumentId: this.props.instrumentId,
-      groupName: this.props.name,
-      config: this.props.config
-    });
-  }
-
-  light_controller_config() {
-
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("scheduleLight", {
-      instrumentId: this.props.instrumentId,
-      groupName: this.props.name,
-      config: this.props.config
-    });
-  }
 
   cfgAll() {
 
@@ -753,11 +899,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
   componentWillReceiveProps(nextProps) {
 
     this.initCheckChannels(nextProps);
-
-    this.setState({
-      heatingPower: nextProps.serverState.heatingPower,
-      paused: nextProps.paused
-    });
   }
 
   initCheckChannels(nextProps) {
@@ -792,114 +933,21 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
     }));
   }
 
-  resetSlave() {
-    fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetSlave?instrumentId=" + this.props.instrumentId, {
+  doEnvironmentalSensing() {
+
+    fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/environmentalSensing?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
 
       method: 'GET'
 
     }).then(response => {});
   }
 
-  heatingPowerChange(e) {
+  resetSlave() {
+    fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/resetSlave?instrumentId=${this.props.instrumentId}`, {
 
-    const target = event.target;
-    const value = target.value;
-    const intValue = parseInt(value);
-    const name = target.name;
+      method: 'GET'
 
-    if (value == "" || !isNaN(intValue)) {
-      return;
-    }
-
-    this.setState({ [name]: intValue });
-  }
-
-  setHeatingPower() {
-
-    let power = this.inputHeatingPower.value;
-    power /= 100;
-
-    var data = {
-      instrumentId: this.props.instrumentId,
-      groupName: this.props.name,
-      power: power
-    };
-
-    let body = JSON.stringify(data);
-    let headers = new Headers({
-      "Content-Type": "application/json",
-      "Content-Length": body.length.toString()
-    });
-
-    this.setState({
-      heating_status: 'updating'
-    });
-
-    fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/heat.setPower", {
-
-      method: 'POST',
-      headers: headers,
-      body: body
-
-    }).then(response => response.json()).then(response => {
-
-      this.props.update();
-    }).catch(error => {
-
-      this.setState({
-        heating_status: 'error'
-      });
-    });;
-  }
-
-  increaseHeatingPower() {
-
-    this.setState({
-      heating_status: 'updating'
-    });
-
-    fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/heat.increasePower?instrumentId=" + encodeURIComponent(this.props.instrumentId) + "&groupName=" + encodeURIComponent(this.props.name)).then(response => response.json()).then(response => {
-
-      this.setState({
-        heatingPower: response.heatingPower
-      });
-    }).catch(error => {
-
-      this.setState({
-        heating_status: 'error'
-      });
-    });
-  }
-
-  decreaseHeatingPower() {
-
-    this.setState({
-      heating_status: 'updating'
-    });
-
-    fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/heat.decreasePower?instrumentId=" + encodeURIComponent(this.props.instrumentId) + "&groupName=" + encodeURIComponent(this.props.name)).then(response => response.json()).then(response => {
-
-      this.setState({
-        heatingPower: response.heatingPower
-      });
-    }).catch(error => {
-
-      this.setState({
-        heating_status: 'error'
-      });
-    });
-  }
-
-  togglePause() {
-
-    let url;
-
-    if (this.state.paused) {
-      url = "resumeChannels";
-    } else {
-      url = "pauseChannels";
-    }
-    return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent(this.props.instrumentId), { method: 'GET' });
+    }).then(response => {});
   }
 
   render() {
@@ -959,362 +1007,9 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "div",
         { className: "row statuses" },
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "col-lg-2 group-status group-status-instrument" },
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "h4",
-            null,
-            "Instrument status"
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "row" + (this.props.error_influxdb ? ' status-error' : '') },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-5" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { title: this.state.error_influxdb || "", className: "glyphicon glyphicon-" + (this.state.error_influxdb ? 'warning-sign' : 'check') }),
-              " InfluxDB server"
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-4" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
-                    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInfluxDB");
-                  } },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-                " Configure"
-              )
-            )
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "row" + (this.props.error_tracker ? ' status-error' : '') },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-5" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { title: this.props.error_tracker || "", className: "glyphicon glyphicon-" + (this.props.error_tracker ? 'warning-sign' : 'check') }),
-              " MPP Tracker"
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-4" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
-                    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
-                  } },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-                " Configure"
-              )
-            )
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "row" + (this.state.paused ? ' status-error' : '') },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-5" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? 'warning-sign' : 'check') }),
-              " ",
-              this.state.paused ? "Tracking paused" : "Tracking enabled"
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-4" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.togglePause },
-                this.state.paused ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  null,
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
-                  "Resume"
-                ) : __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  null,
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-pause" }),
-                  "Pause"
-                )
-              )
-            )
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: "row" },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "col-lg-5" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "button",
-                { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.resetSlave },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  null,
-                  "Reset enclosure(s)"
-                )
-              )
-            ),
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "col-lg-4" })
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "group-status group-status-light col-lg-2" },
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "h4",
-            null,
-            "Light bias"
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            { className: this.props.serverState.lightController ? 'visible' : 'hidden' },
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-5" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  "On/Off:"
-                )
-              ),
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-4" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "label",
-                  null,
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightEnable = el, "data-width": "70", "data-height": "25" })
-                )
-              )
-            ),
-            this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              null,
-              this.state.lightOnOffButton !== this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-9" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    { className: "grey" },
-                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                      "em",
-                      null,
-                      __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                        "small",
-                        null,
-                        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-danger" }),
-                        "The light switch is off. Push it to turn the light on."
-                      )
-                    )
-                  )
-                )
-              ) : null,
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    { className: "grey" },
-                    "Control mode:"
-                  )
-                ),
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-4" },
-                  this.state.lightMode == 'auto' ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    null,
-                    "Automatic"
-                  ) : __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    null,
-                    "Manual"
-                  )
-                )
-              ),
-              this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
-
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    { className: "grey" },
-                    "Set point:"
-                  )
-                ),
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-4" },
-                  this.state.lightSetpoint,
-                  " sun"
-                )
-              ) : null,
-              this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "span",
-                    { className: "grey" },
-                    "Current value:"
-                  )
-                ),
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-4" },
-                  this.state.lightValue,
-                  " sun"
-                )
-              ) : null
-            ) : null,
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-9" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "button",
-                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-                  " Configure"
-                ),
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "button",
-                  { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
-                  " Calibrate"
-                )
-              )
-            )
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-          "div",
-          { className: "group-status group-status-temperature col-lg-2" },
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "h4",
-            null,
-            "Temperature"
-          ),
-          __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            null,
-            this.state.temperature !== -1 && this.state.temperature !== undefined ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-9" },
-                "Box temperature: ",
-                " \xB0C"
-              )
-            ) : null
-          ),
-          this.props.groupConfig.heat ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-            "div",
-            null,
-            __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              { className: "row" },
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-5" },
-                "Heater"
-              ),
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "col-lg-4" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "label",
-                  null,
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleHeater = el, disabled: this.state.heater_status_updating, checked: this.state.heater_status, "data-width": "100", "data-height": "25" })
-                )
-              )
-            ),
-            this.state.heater_status ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-              "div",
-              null,
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  "Heating power: ",
-                  this.state.heating_power + " W"
-                ),
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-4" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                    "div",
-                    { className: "btn-group" },
-                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                      "button",
-                      { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
-                      "+"
-                    ),
-                    "\xA0",
-                    __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                      "button",
-                      { type: "button", className: "btn-sm btn btn-default", onClick: this.decreaseHeatingPower },
-                      "-"
-                    )
-                  )
-                )
-              ),
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  "Current: ",
-                  this.state.heating_current + " A"
-                )
-              ),
-              __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "div",
-                  { className: "col-lg-5" },
-                  "Voltage: ",
-                  this.state.heating_voltage + " V"
-                )
-              ),
-              heating_problem ? __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                "div",
-                { className: "row" },
-                __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-                  "span",
-                  { className: "grey" },
-                  __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("span", { className: "glyphicon glyphicon-warning" }),
-                  " The calculated heater resistance is off. Check that the pins are properly contacting the window"
-                )
-              ) : null
-            ) : null
-          ) : null
-        ),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__status_instrument_main_jsx__["a" /* default */], this.props),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__status_light_main_jsx__["a" /* default */], this.props),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6__status_heat_main_jsx__["a" /* default */], this.props),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "clearfix" })
       ),
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
@@ -1352,22 +1047,22 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 /* harmony default export */ __webpack_exports__["a"] = (TrackerGroupDevices);
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pgasettings__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pgasettings__ = __webpack_require__(20);
 
 
 
@@ -1518,7 +1213,20 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 	componentWillReceiveProps(nextProps) {
 
 		this.setState({ updating: false });
-		this.setState({ serverState: nextProps.serverState });
+
+		/**
+   *  Norman, 4 January 2017:
+   *	Some explaining might be useful here.
+   *  We need to chose the source of truth of the channel status. Either it defines itself (see this.getStatus) or the group and in turn the instrument sets it
+   *  But it can't be both, otherwise, if they are different (and they can be, at least temporarily), they will overwrite each other
+   */
+
+		//  	this.setState( { serverState: nextProps.serverState } );
+
+		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
+		if (this.props.serverState !== nextProps.serverState) {
+			this.getStatus();
+		}
 
 		if (nextProps.serverState.tracking_mode > 0 && nextProps.measurementName && nextProps.measurementName !== this.props.measurementName || !this.state.serverState) {
 
@@ -1570,12 +1278,17 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			newState.voltage = round(data.state.voltage, 2);
 		}
 
+		if (data.state.voltage && data.state.current && this.state.waveIV) {
+			this.state.waveIV.append(data.state.voltage, data.state.current * 1000);
+			newState.waveIV = this.state.waveIV;
+		}
+
 		if (data.state.power) {
 			newState.power = round(data.state.power, 2);
 		}
 
 		if (data.state.voc) {
-			newState.power = round(data.state.voc, 2);
+			newState.voc = round(data.state.voc, 2);
 		}
 
 		if (data.state.sun) {
@@ -1583,11 +1296,15 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		}
 
 		if (data.state.jsc) {
-			newState.jsc = data.state.jsc;
+			newState.jsc = data.state.jsc * 1000 / this.state.serverState.cellArea;
 		}
 
 		if (data.state.temperature) {
-			newState.temperature_junction = data.state.temperature;
+			newState.temperature = data.state.temperature;
+		}
+
+		if (data.state.temperature_junction) {
+			newState.temperature_junction = data.state.temperature_junction;
 		}
 
 		if (data.state.humidity) {
@@ -1596,26 +1313,26 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		if (!isNaN(data.timer.iv)) {
 			// Timer for the next IV curve
-			newState.timer_nextIV = { time: data.timer.iv };
+			newState.timer_nextIV = { time: data.timer.iv, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.jsc)) {
 			// Timer for the next JSC measurement
-			newState.timer_nextJsc = { time: data.timer.jsc };
+			newState.timer_nextJsc = { time: data.timer.jsc, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.voc)) {
 			// Timer for the next Voc curve
-			newState.timer_nextVoc = { time: data.timer.voc };
+			newState.timer_nextVoc = { time: data.timer.voc, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.aquisition)) {
 			// Timer for the last aquisition
-			newState.timer_aquisition = { time: data.timer.aquisition };
+			newState.timer_aquisition = { time: data.timer.aquisition, updated: Date.now() };
 		}
 
-		if (!isNaN(data.timer.ellapsed) && !this.state.ellapsed) {
-			newState.wsEllapsed = data.timer.ellapsed;
+		if (!isNaN(data.timer.ellapsed)) {
+			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() };
 		}
 
 		if (data.action.data && this.state.data) {
@@ -1648,12 +1365,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		}
 
 		if (data.action.update) {
-			this.getStatus();
+			await this.getStatus();
 		}
 
 		if (data.action.stopped) {
 			await this.getStatus();
 			newState = Object.assign({}, initialState);
+			this.state = newState; // Force-remove all the other state that will pollute the new channel
 		}
 
 		this.setState(newState);
@@ -1669,11 +1387,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		});
 
 		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatus", {
-
 			headers: headers,
 			method: 'POST',
 			body: body
-
 		});
 	}
 
@@ -1749,9 +1465,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	start() {
 
-		this.state.serverState.measurementName = this.state.serverState.cellName + "_" + Date.now();
-		this.state.serverState.enable = 1;
-		this.saveStatus(this.state.serverState);
+		this.saveStatus(Object.assign({}, this.state.serverState, { enable: 1, measurementName: this.state.serverState.cellName + "_" + Date.now() }));
 	}
 
 	stop() {
@@ -1767,7 +1481,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].once("channelConfigured", (event, data) => {
 
-			if (data.chanId != this.state.serverState.chanId) {
+			if (data.chanId != this.props.chanId) {
 				return;
 			}
 
@@ -1911,15 +1625,16 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				}));
 			}
 
+			// Even if the series don't exist, we can still update the j-V curve
+			// The only thing we have to do is not throw any error and handle gracefully the lack of data
 			if (!results[0].series) {
-				throw "No measurement with the name " + serverState.measurementName + " or no associated data";
+				return; //throw "No measurement with the name " + serverState.measurementName + " or no associated data";
 			}
 
 			let timefrom = results[0].series[0].values[0][0],
 			    timeto = results[1].series[0].values[0][0],
 			    timefrom_date = new Date(timefrom),
-			    timeto_date = new Date(timeto),
-			    last_iv;
+			    timeto_date = new Date(timeto);
 
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
@@ -1987,7 +1702,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				}
 
 				let valueIndex = 1;
-
+				console.log(values.length);
 				values.forEach((value, index) => {
 
 					let date = new Date(value[0]),
@@ -2012,7 +1727,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 					wave.append(time, value[valueIndex]);
 					waveSun.append(time, value[5]);
-					waveIV.append(value[3], value[4]);
+
+					if (index > values.length * 0.8) {
+						waveIV.append(value[3], value[4]);
+					}
+
 					waveTemperature.append(time, value[6]);
 					waveHumidity.append(time, value[7]);
 
@@ -2058,9 +1777,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			console.error("Could not process influx DB request.");
 			console.error(error);
+		}).then(() => {
 
 			this.setState(newState);
-		}).then(() => {
 
 			this.scheduleRefresh();
 		});
@@ -2154,10 +1873,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
 		if (active) {
-
-			let ellapsed = {
-				time: !isNaN(this.state.ellapsed) ? this.state.ellapsed * 1000 : this.state.wsEllapsed
-			};
 
 			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"div",
@@ -2304,7 +2019,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									ellapsed.time ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, maxLevel: 3, spacer: " ", direction: "ascending", timerValue: ellapsed }) : 'N/A'
+									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, maxLevel: 3, spacer: " ", direction: "ascending", timerValue: this.state.timer_ellapsed })
 								)
 							)
 						),
@@ -2425,7 +2140,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "value" },
-								!isNaN(this.state.ff) && this.state.ff !== false ? this.state.ff : 'N/A'
+								!isNaN(this.state.ff) && this.state.ff !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									"span",
+									null,
+									this.state.ff,
+									" ",
+									this.unit.fillfactor
+								) : 'N/A'
 							)
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
@@ -2486,9 +2207,15 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 									"div",
 									{ className: "value" },
+									this.state.temperature && this.state.temperature > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										"span",
+										{ title: "Base temperature (local temperature on the chip just under the device)" },
+										this.state.temperature
+									) : 'N/A',
+									"\xA0/\xA0",
 									this.state.temperature_junction && this.state.temperature_junction > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 										"span",
-										null,
+										{ title: "Estimated junction temperature (base temperature + thermopile voltage)" },
 										this.state.temperature_junction,
 										" ",
 										this.unit.temperature
@@ -2647,16 +2374,16 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 /* harmony default export */ __webpack_exports__["a"] = (TrackerDevice);
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_extend__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__);
@@ -2826,8 +2553,6 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.serie.setWaveform(this.props.data.setXScale(1 / 3600));
 			this.serieZone.setWaveform(this.props.data.duplicate(true).prepend(0, 0).append(wave => wave.getXRaw(wave.getLength() - 1), 0));
 			this.graph.autoscaleAxes();
-
-			this.graph.autoscaleAxes();
 			this.graph.draw();
 			//this.graph.updateLegend();
 
@@ -2886,7 +2611,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 /* harmony default export */ __webpack_exports__["a"] = (statusGraph);
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2979,11 +2704,11 @@ module.exports = function extend() {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
@@ -3155,7 +2880,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 /* harmony default export */ __webpack_exports__["a"] = (statusIV);
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3164,7 +2889,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 
 
-class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent {
+class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   constructor(props) {
     super(props);
@@ -3175,8 +2900,6 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent 
 
   componentDidMount() {
 
-    this.updated = Date.now();
-
     this.interval = setInterval(() => {
 
       if (this.props.timerValue === undefined || isNaN(this.props.timerValue.time)) {
@@ -3185,17 +2908,13 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent 
 
       if (this.props.direction == 'ascending') {
 
-        if (!this.updated) {
-          return;
-        }
-
         this.setState({
-          timerValue: Date.now() - this.updated + this.props.timerValue.time
+          timerValue: Date.now() - this.props.timerValue.updated + this.props.timerValue.time
         });
       } else {
 
         this.setState({
-          timerValue: this.props.timerValue.time - (Date.now() - this.updated)
+          timerValue: this.props.timerValue.time - (Date.now() - this.props.timerValue.updated)
         });
       }
     }, 1000);
@@ -3205,14 +2924,7 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent 
     clearInterval(this.interval);
   }
 
-  componentWillReceiveProps(nextProps) {
-
-    if (nextProps.timerValue === this.props.timerValue) {
-      return;
-    }
-
-    this.updated = Date.now();
-  }
+  componentWillReceiveProps(nextProps) {}
 
   processTime(value) {
 
@@ -3268,19 +2980,19 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent 
 /* harmony default export */ __webpack_exports__["a"] = (Timer);
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = jQuery;
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3297,7 +3009,1158 @@ let pgaValueToRange = (pgaValue, fsr) => {
 };
 
 /***/ }),
-/* 19 */
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lightstatus_1_0_jsx__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lightstatus_2_0_jsx__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_environment_json__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__app_environment_json__);
+
+
+
+
+
+
+class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.light_calibrate = this.light_calibrate.bind(this);
+    this.light_controller_config = this.light_controller_config.bind(this);
+  }
+
+  light_calibrate() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("calibratePD", {
+      instrumentId: this.props.instrumentId,
+      groupName: this.props.name,
+      config: this.props.config
+    });
+  }
+
+  light_controller_config() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("scheduleLight", {
+      instrumentId: this.props.instrumentId,
+      groupName: this.props.name,
+      config: this.props.config
+    });
+  }
+
+  render() {
+
+    let content = null;
+    switch (__WEBPACK_IMPORTED_MODULE_4__app_environment_json___default.a.statuses.light.version) {
+
+      case "1.0":
+        {
+          content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__lightstatus_1_0_jsx__["a" /* default */], this.props);
+          break;
+        }
+
+      default:
+      case "2.0":
+        {
+          content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__lightstatus_2_0_jsx__["a" /* default */], this.props);
+        }
+    };
+
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      { className: "group-status group-status-light col-lg-2" },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "h4",
+        null,
+        "Light bias"
+      ),
+      this.props.serverState.lightController ? content : "No light control is available for this group",
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-9" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "button",
+            { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+            " Configure"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "button",
+            { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
+            " Calibrate"
+          )
+        )
+      )
+    );
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (LightStatus);
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+
+
+
+class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor() {
+
+    super(...arguments);
+    this.state = {};
+    this.wsUpdate = this.wsUpdate.bind(this);
+  }
+
+  componentDidMount() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    // Update directly the state
+    this.setState(data.data);
+
+    // New state means re-enabling
+    if (this.toggleLightMode) {
+      $(this.toggleLightMode).bootstrapToggle('enable');
+    }
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
+  }
+
+  componentDidUpdate(prevProps) {
+
+    if (this.toggleLightMode && !this.transformed) {
+
+      $(this.toggleLightMode).bootstrapToggle({
+        on: 'Auto',
+        off: 'Manual'
+      }).change(() => {
+
+        $(this.toggleLightMode).bootstrapToggle('disable');
+
+        let data = {
+          instrumentId: this.props.instrumentId,
+          groupName: this.props.name,
+          lightController: {
+            modeAutomatic: this.toggleLightMode.checked
+          }
+        };
+
+        let body = JSON.stringify(data);
+        let headers = new Headers({
+          "Content-Type": "application/json",
+          "Content-Length": body.length.toString()
+        });
+
+        fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+
+          headers: headers,
+          method: 'POST',
+          body: body
+
+        }).then(response => {
+
+          $(this.toggleLightMode).bootstrapToggle('enable');
+        }).catch(() => {
+
+          __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
+        });
+      });
+      this.transformed = true;
+    }
+
+    if (this.toggleLightMode) {
+      $(this.toggleLightMode).data('bs.toggle')[this.state.lightAutomatic ? 'on' : 'off'](true);
+    }
+  }
+
+  render() {
+
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "span",
+            { className: "grey" },
+            "Mode:"
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-4" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "label",
+            null,
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightMode = el, "data-width": "100", "data-height": "25" })
+          )
+        )
+      ),
+      this.state.lightAutomatic && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
+
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "span",
+            { className: "grey" },
+            "Set point:"
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-4" },
+          this.state.lightSetpoint,
+          " sun"
+        )
+      ) : null,
+      this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "span",
+            { className: "grey" },
+            "Live value:"
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-4" },
+          this.state.lightValue.map((value, index) => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "span",
+            { key: index },
+            value,
+            " sun"
+          )).reduce((prev, curr) => [prev, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", { key: "-1" }), curr])
+        )
+      ) : null
+    );
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (LightStatus);
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+
+
+
+class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor() {
+    super(...arguments);
+    this.state = {};
+    this.wsUpdate = this.wsUpdate.bind(this);
+  }
+
+  componentDidMount() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    // Update directly the state
+    this.setState(data.data);
+
+    // New state means re-enabling
+    if (this.toggleLightEnable) {
+      $(this.toggleLightEnable).bootstrapToggle('enable');
+    }
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
+  }
+
+  componentDidUpdate(prevProps) {
+
+    if (this.toggleLightEnable && !this.transformed) {
+
+      $(this.toggleLightEnable).bootstrapToggle({
+        on: 'On',
+        off: 'Off'
+      }).change(() => {
+
+        $(this.toggleLightEnable).bootstrapToggle('disable');
+
+        return fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/light.${this.toggleLightEnable.checked ? 'enable' : 'disable'}?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+          method: 'GET'
+        }).then(() => {}).catch(error => {
+
+          __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to change the light mode");
+        }).then(() => {});
+      });
+      this.transformed = true;
+    }
+
+    if (this.toggleLightEnable) {
+      $(this.toggleLightEnable).data('bs.toggle')[this.state.lightOnOff ? 'on' : 'off'](true);
+    }
+  }
+
+  render() {
+
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        { className: "row" },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-5" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "span",
+            { className: "grey" },
+            "On/Off:"
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "col-lg-4" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "label",
+            null,
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.toggleLightEnable = el, "data-width": "70", "data-height": "25" })
+          )
+        )
+      ),
+      this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        null,
+        this.state.lightOnOffButton !== this.state.lightOnOff ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-9" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              { className: "grey" },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "em",
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "small",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-danger" }),
+                  "The light switch is off. Push it to turn the light on."
+                )
+              )
+            )
+          )
+        ) : null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-5" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              { className: "grey" },
+              "Control mode:"
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-4" },
+            this.state.lightMode == 'auto' ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              null,
+              "Automatic"
+            ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              null,
+              "Manual"
+            )
+          )
+        ),
+        this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
+
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-5" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              { className: "grey" },
+              "Set point:"
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-4" },
+            this.state.lightSetpoint,
+            " sun"
+          )
+        ) : null,
+        this.state.lightValue !== undefined ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-5" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              { className: "grey" },
+              "Current value:"
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-4" },
+            this.state.lightValue,
+            " sun"
+          )
+        ) : null
+      ) : null
+    );
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (LightStatus);
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__heatstatus_1_0_jsx__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__heatstatus_2_0_jsx__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_environment_json__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__app_environment_json__);
+
+
+
+
+
+
+class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor(props) {
+    super(...arguments);
+    this.state = {};
+    this.wsUpdate = this.wsUpdate.bind(this);
+  }
+
+  componentDidMount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    // Update directly the state
+    this.setState(data.data);
+
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
+  }
+
+  render() {
+
+    let content = null;
+
+    switch (__WEBPACK_IMPORTED_MODULE_4__app_environment_json___default.a.statuses.heat.version) {
+
+      case "1.0":
+        {
+          content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__heatstatus_1_0_jsx__["a" /* default */], this.props);
+          break;
+        }
+
+      default:
+      case "2.0":
+        {
+          content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__heatstatus_2_0_jsx__["a" /* default */], this.props);
+        }
+    };
+
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      { className: "group-status group-status-temperature col-lg-2" },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "h4",
+        null,
+        "Temperature & Heating"
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        null,
+        this.state.temperature !== undefined && this.state.temperature !== false ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-5" },
+            "Environment temperature:"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-4" },
+            this.state.temperature,
+            " \xB0C"
+          )
+        ) : null
+      ),
+      content || null
+    );
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
+
+
+
+
+class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor() {
+
+    super(...arguments);
+    this.state = {};
+    this.wsUpdate = this.wsUpdate.bind(this);
+
+    // Heat change methods. Bind them to this
+    this.increaseHeatingPower = this.increaseHeatingPower.bind(this);
+    this.decreaseHeatingPower = this.decreaseHeatingPower.bind(this);
+  }
+
+  increaseHeatingPower() {
+
+    this.setState({
+      heating_status: 'updating'
+    });
+
+    fetch(__WEBPACK_IMPORTED_MODULE_2_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.increasePower`, {
+      instrumentId: this.props.instrumentId,
+      groupName: this.props.name
+    })).then(() => {
+      this.setState({
+        heater_error: false
+      });
+    }).catch(error => {
+      this.setState({
+        heater_error: 'Cannot increase the heating power. Internal error'
+      });
+    });
+  }
+
+  decreaseHeatingPower() {
+
+    this.setState({
+      heating_status: 'updating'
+    });
+
+    fetch(__WEBPACK_IMPORTED_MODULE_2_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.decreasePower`, {
+      instrumentId: this.props.instrumentId,
+      groupName: this.props.name
+    })).then(() => {
+      this.setState({
+        heater_error: false
+      });
+    }).catch(error => {
+      this.setState({
+        heater_error: 'Cannot decrease the heating power. Internal error'
+      });
+    });
+  }
+
+  componentDidMount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    // Update directly the state
+    this.setState(data.data);
+
+    // New state means re-enabling
+    if (this.toggleHeater) {
+      $(this.toggleHeater).bootstrapToggle('enable');
+    }
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
+  }
+
+  componentDidUpdate(prevProps) {
+
+    if (this.toggleHeater && !this.transformed) {
+
+      $(this.toggleHeater).bootstrapToggle({
+        on: 'On',
+        off: 'Off'
+      }).change(() => {
+
+        $(this.toggleHeater).bootstrapToggle('disable');
+
+        fetch(__WEBPACK_IMPORTED_MODULE_2_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.${this.toggleHeater.checked ? 'enable' : 'disable'}`, {
+          instrumentId: this.props.instrumentId,
+          groupName: this.props.name
+        })).then(response => {
+
+          $(this.toggleHeater).bootstrapToggle('enable');
+        }).catch(() => {
+
+          __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to change the heater state");
+        });
+      });
+
+      this.transformed = true;
+    }
+
+    if (this.toggleHeater) {
+      $(this.toggleHeater).data('bs.toggle')[this.state.heater_status ? 'on' : 'off'](true);
+    }
+  }
+
+  render() {
+
+    console.log(this.state);
+    return this.props.serverState.heatController ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'row' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'col-lg-5' },
+          'Heater'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'col-lg-4' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'label',
+            null,
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { 'data-toggle': 'toggle', type: 'checkbox', ref: el => this.toggleHeater = el, disabled: this.state.heater_status_updating, checked: this.state.heater_status, 'data-width': '100', 'data-height': '25' })
+          )
+        )
+      ),
+      this.state.heater_error ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'error' },
+        this.state.heater_error
+      ) : null,
+      this.state.heater_status ? this.state.heater_power !== undefined ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'row' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'col-lg-5' },
+            'Heating power: ',
+            Math.round(this.state.heater_power * 100) + " %"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'col-lg-4' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'btn-group' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'button',
+                { type: 'button', className: 'btn-sm btn btn-default', onClick: this.increaseHeatingPower },
+                '+'
+              ),
+              '\xA0',
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'button',
+                { type: 'button', className: 'btn-sm btn btn-default', onClick: this.decreaseHeatingPower },
+                '-'
+              )
+            )
+          )
+        )
+      ) : null : null
+    ) : null;
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
+
+/***/ }),
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+
+
+
+class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+  constructor() {
+
+    super(...arguments);
+    this.state = {};
+    this.wsUpdate = this.wsUpdate.bind(this);
+  }
+
+  componentDidMount() {
+
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  componentWillUnmount() {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  wsUpdate(event, data) {
+
+    // Update directly the state
+    this.setState(data.data);
+
+    // New state means re-enabling
+    /*if( this.toggleLightMode ) {
+      $( this.toggleLightMode ).bootstrapToggle('enable');
+    }*/
+    /*if( data.state.hasOwnProperty( 'paused' ) ) {
+      this.setState( { paused: data.state.paused } );
+    }*/
+  }
+
+  componentDidUpdate(prevProps) {
+    /*
+        if( this.toggleLightMode && ! this.transformed ) {
+    
+          $( this.toggleLightMode ).bootstrapToggle({
+            on: 'Auto',
+            off: 'Manual'
+          }).change( () => {
+    
+            $( this.toggleLightMode ).bootstrapToggle('disable');
+    
+            let data = {
+              instrumentId: this.props.instrumentId,
+              groupName: this.props.name,
+              lightController: {
+                modeAutomatic: this.toggleLightMode.checked
+              }  
+            };
+    
+            let body = JSON.stringify( data );
+            let headers = new Headers({
+              "Content-Type": "application/json",
+              "Content-Length": body.length.toString()
+            });
+    
+    
+            fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+    
+              headers: headers,
+              method: 'POST',
+              body: body
+    
+            } ).then( ( response ) => {
+    
+              $( this.toggleLightMode ).bootstrapToggle('enable');
+    
+              
+            } ).catch( () => {
+    
+              ipcRenderer.send("reportError", "Unable to change the light mode" );
+    
+            } );
+          } );      
+          this.transformed = true;
+        }
+    
+        if( this.toggleLightMode ) {
+         $( this.toggleLightMode ).data('bs.toggle')[( this.state.lightAutomatic ? 'on' : 'off' ) ]( true );
+        }*/
+  }
+
+  render() {
+
+    return null;
+
+    /*
+    return (
+          { this.props.serverState.heatController ?
+            <div>
+              <div className="row">
+                <div className="col-lg-5">
+                  Heater
+                </div>
+                <div className="col-lg-4">
+                   <label>
+                    <input data-toggle="toggle" type="checkbox" ref={ ( el ) => this.toggleHeater = el } disabled={ this.state.heater_status_updating } checked={ this.state.heater_status } data-width="100" data-height="25" />
+                  </label>
+                </div>
+              </div>
+               { this.state.heater_status ? 
+                 <div>
+                
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Heating power: { this.state.heating_power + " W" }
+                    </div>
+                
+                    <div className="col-lg-4">
+                        <div className="btn-group">
+                          <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
+                          <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
+                        </div>
+                    </div>
+                
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Current: { this.state.heating_current + " A" }
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-5">
+                      Voltage: { this.state.heating_voltage + " V" }
+                    </div>
+                  </div>
+                   { heating_problem ? 
+                    <div className="row">
+                      <span className="grey"><span className="glyphicon glyphicon-warning"></span> The calculated heater resistance is off. Check that the pins are properly contacting the window</span>
+                    </div> : null
+                  }
+              </div> : null }
+          </div>
+        : null }
+        );*/
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
+
+/***/ }),
+/* 27 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
+
+
+
+
+
+
+//import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
+
+
+let speedOptions;
+
+/*
+	ADS1259
+	0b00000000 ==> 10SPS
+	0b00000001 ==> 16SPS
+	0b00000010 ==> 50SPS
+	0b00000011 ==> 60SPS
+	0b00000100 ==> 400SPS
+	0b00000101 ==> 1.2kSPS
+	0b00000110 ==> 3.6kSPS
+	0b00000111 ==> 14kSPS
+
+	ADS1147
+	0b00000000 ==> 5SPS
+	0b00000001 ==> 10SPS
+	0b00000010 ==> 20SPS
+	0b00000011 ==> 40SPS
+	0b00000100 ==> 80SPS
+	0b00000101 ==> 160SPS
+	0b00000110 ==> 320SPS
+	0b00000111 ==> 640SPS
+	0b00000111 ==> 1000SPS
+	0b00000111 ==> 2000SPS
+*/
+switch (__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.acquisition.ADC.model) {
+
+		case 'ADS1259':
+				speedOptions = [0, 2, 4, 5, 7];
+				break;
+
+		default:
+		case 'ADS1147':
+				speedOptions = [1, 3, 6, 8, 9];
+				break;
+}
+
+class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+		constructor() {
+
+				super(...arguments);
+				this.state = {};
+				this.togglePause = this.togglePause.bind(this);
+				this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind(this);
+		}
+
+		async changeAcquisitionSpeed(event) {
+
+				let val = event.target.value;
+				let result = await fetch(__WEBPACK_IMPORTED_MODULE_3_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/instrument.setAcquisitionSpeed`, {
+
+						instrumentId: this.props.instrumentId,
+						speed: val
+				}));
+				console.log(result);
+				await this.props.update();
+		}
+
+		togglePause() {
+
+				let url;
+				if (this.state.paused) {
+						url = "resumeChannels";
+				} else {
+						url = "pauseChannels";
+				}
+				return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent(this.props.instrumentId), { method: 'GET' });
+		}
+
+		render() {
+
+				return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "col-lg-2 group-status group-status-instrument" },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"h4",
+								null,
+								"Instrument status"
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "row" + (this.props.error_influxdb ? ' status-error' : '') },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-5" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_influxdb || "", className: "glyphicon glyphicon-" + (this.props.error_influxdb ? 'warning-sign' : 'check') }),
+										" InfluxDB server"
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-4" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"button",
+												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+																__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInfluxDB");
+														} },
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+												" Configure"
+										)
+								)
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "row" + (this.props.error_tracker ? ' status-error' : '') },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-5" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_tracker || "", className: "glyphicon glyphicon-" + (this.props.error_tracker ? 'warning-sign' : 'check') }),
+										" MPP Tracker"
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-4" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"button",
+												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+																__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
+														} },
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+												" Configure"
+										)
+								)
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "row" + (this.state.paused ? ' status-error' : '') },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-5" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? 'warning-sign' : 'check') }),
+										" ",
+										this.state.paused ? "Tracking paused" : "Tracking enabled"
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-4" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"button",
+												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.togglePause },
+												this.state.paused ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"span",
+														null,
+														__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+														"Resume"
+												) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"span",
+														null,
+														__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-pause" }),
+														"Pause"
+												)
+										)
+								)
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "row" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-lg-5" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"button",
+												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.resetSlave },
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"span",
+														null,
+														"Reset enclosure(s)"
+												)
+										)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "col-lg-4" })
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "form-group" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										{ htmlFor: "tracking_speed", className: "col-sm-9" },
+										"Acquisition speed ",
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"sup",
+												{ title: "This option directly affects the acquisition speed of the instrument, and therefore has a significant impact on the tracking efficiency when the light bias is noisy. The slower the better for the convergence, but it will limit the overall tracking speed." },
+												"?"
+										)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"div",
+										{ className: "col-sm-9" },
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+												"select",
+												{ name: "tracking_speed", id: "tracking_speed", className: "form-control", value: this.props.serverState.acquisition_speed, onChange: this.changeAcquisitionSpeed },
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"option",
+														{ key: "0", value: speedOptions[4] },
+														"Maximum"
+												),
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"option",
+														{ key: "1", value: speedOptions[3] },
+														"Fast"
+												),
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"option",
+														{ key: "2", value: speedOptions[2] },
+														"Average"
+												),
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"option",
+														{ key: "3", value: speedOptions[1] },
+														"Slow"
+												),
+												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+														"option",
+														{ key: "4", value: speedOptions[0] },
+														"Very slow"
+												)
+										)
+								)
+						)
+				);
+		}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (InstrumentStatus);
+
+/***/ }),
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3350,7 +4213,7 @@ class Error extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Error);
 
 /***/ }),
-/* 20 */
+/* 29 */
 /***/ (function(module, exports) {
 
 /**

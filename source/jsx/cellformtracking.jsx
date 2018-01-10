@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 class CellFormTracking extends React.Component {
@@ -23,6 +24,8 @@ class CellFormTracking extends React.Component {
 
 	render() {	 
 
+		let active = !! this.props.enable && this.props.tracking_mode > 0;
+		
 		return (
 			<div>
 				<div className="form-group">
@@ -58,7 +61,7 @@ class CellFormTracking extends React.Component {
 				<div className="form-group">
 					<label htmlFor="tracking_step" className="col-sm-3">Tracking step</label>
 					<div className="col-sm-9">
-						<select name="tracking_step" id="tracking_step" className="form-control" value={this.props.tracking_step} onChange={this.handleInputChange}>
+						<select name="tracking_stepsize" id="tracking_stepsize" className="form-control" value={this.props.tracking_step} onChange={this.handleInputChange}>
 								<option key="mv1" value="0.001">1 mV</option>
 								<option key="mv2" value="0.002">2 mV</option>
 								<option key="mv3" value="0.003">3 mV</option>
@@ -80,6 +83,9 @@ class CellFormTracking extends React.Component {
 							<option key="600000sps" value="600000">6 samples per hour</option>
 							<option key="3600000sps" value="3600000">1 sample per hour</option>
 						</select>
+					</div>
+					<div className="help-block col-sm-12">
+						This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.
 					</div>
 				</div>
 
@@ -141,9 +147,9 @@ class CellFormTracking extends React.Component {
 				{ !! this.props.tracking_mode == 1 &&
 
 					<div>
-					<div className="form-group">
+					<div className="form-group row">
 						<div>
-							<label className="col-sm-14"><input type="checkbox" name="tracking_measure_voc" checked={ !! this.props.tracking_measure_voc } onChange={ this.handleInputChange } /> Measure V<sub>oc</sub> periodically</label>
+							<label className="col-sm-9"><input type="checkbox" name="tracking_measure_voc" checked={ !! this.props.tracking_measure_voc } onChange={ this.handleInputChange } /> Measure V<sub>oc</sub> periodically</label>
 						</div>
 					</div>
 
@@ -163,9 +169,9 @@ class CellFormTracking extends React.Component {
 					</div> }
 			
 
-					<div className="form-group">
+					<div className="form-group row">
 						<div>
-							<label className="col-sm-14"><input type="checkbox" name="tracking_measure_jsc" checked={ !! this.props.tracking_measure_jsc } onChange={ this.handleInputChange } /> Measure J<sub>sc</sub> periodically</label>
+							<label className="col-sm-9"><input type="checkbox" name="tracking_measure_jsc" checked={ !! this.props.tracking_measure_jsc } onChange={ this.handleInputChange } /> Measure J<sub>sc</sub> periodically</label>
 						</div>
 					</div>
 

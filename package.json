@@ -36,7 +36,8 @@
     "pdfkit": "^0.8.3",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "shell": "^0.3.2"
+    "shell": "^0.3.2",
+    "url-lib": "^2.0.2"
   },
   "scripts": {
     "pack": "electron-builder --dir",

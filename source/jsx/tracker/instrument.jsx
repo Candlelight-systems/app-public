@@ -92,9 +92,17 @@ class TrackerInstrument extends React.Component {
     .then( response => response.json() )
     .catch( error => {
 
+
+      setTimeout( () => {
+        console.log( "trying" ); 
+        this.updateInstrument();
+      }, 3000 );
+
       this.setState( {
-        error: `Error while retrieving the instrument status. The returned error was ${ error.toString() }. Try rebooting the instrument`
+        error: `Error while retrieving the instrument status. The returned error was ${ error.toString() }.`,
+        errorMethods: [ [ "Retry", this.updateInstrument ] ] 
       } );
+
     } );
   }
 
@@ -133,6 +141,8 @@ class TrackerInstrument extends React.Component {
         errorMethods: [ [ "Edit the instrument config", this.editInstrument ], [ "Retry", this.updateInstrument ] ] 
       } ); 
 
+
+
       return Promise.reject();
     } );
   }
@@ -159,7 +169,8 @@ class TrackerInstrument extends React.Component {
           serverState: status,
           paused: status.paused,
           error_influxdb: false,
-          error_tracker: false
+          error_tracker: false,
+          error: false
         } );
 
       } ).catch( ( e ) => { } );
@@ -178,42 +189,42 @@ class TrackerInstrument extends React.Component {
 
     let content;
     
-    if( this.state.groups ) {
-
-      var groupsDoms = this.state.groups.map( ( group, i ) => {
-
-       return <TrackerGroupDevices 
-
-       showHeader={this.state.groups.length > 1}
-       key={ group.groupID } 
-       instrumentId={ this.props.instrumentId } 
-       id={ group.groupID } 
-       name={ group.groupName }
-       channels={ group.channels }
-       groupConfig={ group }
-       config={ this.props.config } 
-       configDB={ this.props.configDB } 
-       serverState={ this.state.serverState[ group.groupName ] }
-       update={ this.updateInstrument }
-       getStatus={ this.updateStatus }
-
-       error_influxdb={ this.state.error_influxdb }
-       error_tracker={ this.state.error_tracker }
-       paused={ this.state.paused }
-       />
-     } );
-    }
 
 
-    if( this.state.error ) {
+    if( this.state.error || ! this.state.serverState ) {
       
       content = (
         <div>
-          <Error message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } errorMethods={ this.state.errorMethods } />
+          <Error message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } methods={ this.state.errorMethods } />
         </div> 
       );
 
-    } else if( groupsDoms ) {
+    } else if( this.state.groups ) {
+
+
+        var groupsDoms = this.state.groups.map( ( group, i ) => {
+
+         return <TrackerGroupDevices 
+
+         showHeader={this.state.groups.length > 1}
+         key={ group.groupID } 
+         instrumentId={ this.props.instrumentId } 
+         id={ group.groupID } 
+         name={ group.groupName }
+         channels={ group.channels }
+         groupConfig={ group }
+         config={ this.props.config } 
+         configDB={ this.props.configDB } 
+         serverState={ this.state.serverState[ group.groupName ] }
+         update={ this.updateInstrument }
+         getStatus={ this.updateStatus }
+
+         error_influxdb={ this.state.error_influxdb }
+         error_tracker={ this.state.error_tracker }
+         paused={ this.state.paused }
+         />
+       } );
+    
 
       content = groupsDoms;
 
