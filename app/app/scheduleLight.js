@@ -178,6 +178,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			control: {
 				setPoint: this.state.fixed_intensity ? parseFloat(this.state.fixed_intensity_val) : false,
 				scheduling: {
+					enable: !this.state.fixed_intensity,
 					basis: this.state.schedule_basis,
 					intensities: this.state.schedule_values.split("\n").map(val => parseFloat(val))
 				}
@@ -197,7 +198,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			success: false
 		});
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSetControl", {
 
 			method: 'POST',
 			headers: headers,
@@ -249,6 +250,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			method: 'GET'
 
 		}).then(values => values.json()).then(controller => {
+			console.log(controller);
 
 			return this.setState(state => ({
 				error: false,
@@ -369,7 +371,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
-				{ className: 'col-sm-6' },
+				{ className: 'col-sm-4' },
 				!!this.state.controller && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					null,
@@ -477,7 +479,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
-				{ className: 'col-sm-6' },
+				{ className: 'col-sm-5' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'label',
 					null,

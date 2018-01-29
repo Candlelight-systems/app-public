@@ -78,6 +78,22 @@ div.cl-device {
 		cursor: pointer;
 	}
 
+
+	.propElement {
+
+		&.processing {
+			background-color: @cell-background-processing;
+			
+			.record {
+				display: none;
+			}
+		}
+
+		&.processing-error {
+			background-color: @cell-background-error;
+		}
+
+	}
 	.cell-summary {
 
 
@@ -112,6 +128,7 @@ div.cl-device {
 				whitespace: no-wrap;
 				color: @green;
 			}
+
 
 
 			background-color: @page-background;

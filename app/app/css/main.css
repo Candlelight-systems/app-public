@@ -6636,6 +6636,15 @@ div.cl-device .record {
   font-size: 0.8em;
   cursor: pointer;
 }
+div.cl-device .propElement.processing {
+  background-color: #bfe0ca;
+}
+div.cl-device .propElement.processing .record {
+  display: none;
+}
+div.cl-device .propElement.processing-error {
+  background-color: #e0c5bf;
+}
 div.cl-device .cell-summary {
   text-align: center;
 }

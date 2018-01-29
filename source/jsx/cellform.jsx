@@ -129,7 +129,7 @@ class CellForm extends React.Component {
 
 				<div className="tab-pane" id={ "tracker_" + this.state.unique }>
 
-					<CellFormTracking {...this.state} onFormChange={ this.subFormChanged } />
+					<CellFormTracking {...this.props} {...this.state} onFormChange={ this.subFormChanged } />
 				</div>
 
 				<div className="tab-pane" id={ "iv_" + this.state.unique }>

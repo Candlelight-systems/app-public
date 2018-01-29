@@ -120,7 +120,7 @@ let ping = function (cfg) {
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"acquisition":{"ADC":{"model":"ADS1259"}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30},"Small modules":{"ADC":{"model":"ADS1147"},"fsr":100}}}
 
 /***/ }),
 /* 5 */
@@ -626,7 +626,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     }).then(response => response.json()).catch(error => {
 
       setTimeout(() => {
-        console.log("trying");
+
         this.updateInstrument();
       }, 3000);
 
@@ -691,7 +691,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "div",
         null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, errorMethods: this.state.errorMethods })
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, methods: this.state.errorMethods })
       );
     } else if (this.state.groups) {
 
@@ -1278,9 +1278,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			newState.voltage = round(data.state.voltage, 2);
 		}
 
-		if (data.state.voltage && data.state.current && this.state.waveIV) {
-			this.state.waveIV.append(data.state.voltage, data.state.current * 1000);
-			newState.waveIV = this.state.waveIV;
+		if (data.state.voltage && data.state.current && this.state.data_IV) {
+
+			this.state.data_IV.append(data.state.voltage, data.state.current);
+			newState.data_IV = this.state.data_IV;
 		}
 
 		if (data.state.power) {
@@ -1332,6 +1333,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		}
 
 		if (!isNaN(data.timer.ellapsed)) {
+
 			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() };
 		}
 
@@ -1410,16 +1412,40 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		});
 	}
 
-	recordIV() {
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId);
+	async recordIV() {
+
+		if (this.state.processing_iv) {
+			return;
+		}
+		this.setState({ processing_iv: true, error_iv: false });
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+			this.setState({ error_iv: true });
+		});
+		this.setState({ processing_iv: false });
 	}
 
-	recordVoc() {
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId + "&extend=" + !!!this.state.voc);
+	async recordVoc() {
+
+		if (this.state.processing_voc) {
+			return;
+		}
+		this.setState({ processing_voc: true, error_voc: false });
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+			this.setState({ error_voc: true });
+		});
+		this.setState({ processing_voc: false });
 	}
 
-	recordJsc() {
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId);
+	async recordJsc() {
+
+		if (this.state.processing_jsc) {
+			return;
+		}
+		this.setState({ processing_jsc: true, error_jsc: false });
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+			this.setState({ error_jsc: true });
+		});
+		this.setState({ processing_jsc: false });
 	}
 
 	//formChanged( name, value ) {
@@ -1702,7 +1728,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				}
 
 				let valueIndex = 1;
-				console.log(values.length);
+
 				values.forEach((value, index) => {
 
 					let date = new Date(value[0]),
@@ -1922,7 +1948,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						{ className: "cell-timing row" },
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1" },
+							{ className: "col-xs-1" },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								null,
@@ -1936,7 +1962,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1" },
+							{ className: "col-xs-1 propElement" + (this.state.processing_iv ? ' processing' : '') + (this.state.error_iv ? ' processing-error' : '') },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "record" },
@@ -1955,7 +1981,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1" },
+							{ className: "col-xs-1 propElement" + (this.state.processing_voc ? ' processing' : '') + (this.state.error_voc ? ' processing-error' : '') },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "record" },
@@ -1974,7 +2000,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1" },
+							{ className: "col-xs-1 propElement" + (this.state.processing_jsc ? ' processing' : '') + (this.state.error_jsc ? ' processing-error' : '') },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "record" },
@@ -2025,7 +2051,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1 propElement" },
+							{ className: "col-xs-1 propElement" },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								null,
@@ -2053,7 +2079,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1 propElement" },
+							{ className: "col-xs-1 propElement" },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								null,
@@ -2077,7 +2103,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-lg-1 propElement" },
+							{ className: "col-xs-1 propElement" + (this.state.processing_voc ? ' processing' : '') + (this.state.error_voc ? ' error' : '') },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "record" },
@@ -2107,7 +2133,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						),
 						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 							"div",
-							{ className: "col-xs-1 propElement" },
+							{ className: "col-xs-1 propElement" + (this.state.processing_jsc ? ' processing' : '') + (this.state.error_jsc ? ' error' : '') },
 							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 								"div",
 								{ className: "record" },
@@ -3166,7 +3192,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         let data = {
           instrumentId: this.props.instrumentId,
           groupName: this.props.name,
-          lightController: {
+          control: {
             modeAutomatic: this.toggleLightMode.checked
           }
         };
@@ -3177,7 +3203,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
           "Content-Length": body.length.toString()
         });
 
-        fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+        fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSetControl", {
 
           headers: headers,
           method: 'POST',
@@ -3262,12 +3288,8 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
           { className: "col-lg-4" },
-          this.state.lightValue.map((value, index) => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "span",
-            { key: index },
-            value,
-            " sun"
-          )).reduce((prev, curr) => [prev, __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", { key: "-1" }), curr])
+          Math.round(this.state.lightValue[0] * 100) / 100,
+          " sun"
         )
       ) : null
     );
@@ -3460,7 +3482,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "col-lg-4" },
-            this.state.lightValue,
+            Math.round(this.state.lightValue * 100) / 100,
             " sun"
           )
         ) : null
@@ -3934,7 +3956,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 //import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
 
 
-let speedOptions;
+let speedOptions = [];
 
 /*
 	ADS1259
@@ -3959,202 +3981,206 @@ let speedOptions;
 	0b00000111 ==> 1000SPS
 	0b00000111 ==> 2000SPS
 */
-switch (__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.acquisition.ADC.model) {
-
-		case 'ADS1259':
-				speedOptions = [0, 2, 4, 5, 7];
-				break;
-
-		default:
-		case 'ADS1147':
-				speedOptions = [1, 3, 6, 8, 9];
-				break;
-}
 
 class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
-		constructor() {
+	constructor() {
 
-				super(...arguments);
-				this.state = {};
-				this.togglePause = this.togglePause.bind(this);
-				this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind(this);
+		super(...arguments);
+		this.state = {};
+		this.togglePause = this.togglePause.bind(this);
+		this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind(this);
+	}
+
+	componentDidMount() {
+
+		switch (__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument[this.props.instrumentId].ADC.model) {
+
+			case 'ADS1259':
+				speedOptions = [0, 2, 4, 5, 7];
+				break;
+
+			default:
+			case 'ADS1147':
+				speedOptions = [1, 3, 6, 8, 9];
+				break;
 		}
+	}
+	async changeAcquisitionSpeed(event) {
 
-		async changeAcquisitionSpeed(event) {
+		let val = event.target.value;
+		let result = await fetch(__WEBPACK_IMPORTED_MODULE_3_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/instrument.setAcquisitionSpeed`, {
 
-				let val = event.target.value;
-				let result = await fetch(__WEBPACK_IMPORTED_MODULE_3_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/instrument.setAcquisitionSpeed`, {
+			instrumentId: this.props.instrumentId,
+			speed: val
+		}));
+		console.log(result);
+		await this.props.update();
+	}
 
-						instrumentId: this.props.instrumentId,
-						speed: val
-				}));
-				console.log(result);
-				await this.props.update();
+	togglePause() {
+
+		let url;
+		if (this.state.paused) {
+			url = "resumeChannels";
+		} else {
+			url = "pauseChannels";
 		}
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent(this.props.instrumentId), { method: 'GET' });
+	}
 
-		togglePause() {
+	render() {
 
-				let url;
-				if (this.state.paused) {
-						url = "resumeChannels";
-				} else {
-						url = "pauseChannels";
-				}
-				return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent(this.props.instrumentId), { method: 'GET' });
-		}
-
-		render() {
-
-				return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"div",
-						{ className: "col-lg-2 group-status group-status-instrument" },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"h4",
-								null,
-								"Instrument status"
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "row" + (this.props.error_influxdb ? ' status-error' : '') },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-5" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_influxdb || "", className: "glyphicon glyphicon-" + (this.props.error_influxdb ? 'warning-sign' : 'check') }),
-										" InfluxDB server"
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-4" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"button",
-												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
-																__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInfluxDB");
-														} },
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-												" Configure"
-										)
-								)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "row" + (this.props.error_tracker ? ' status-error' : '') },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-5" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_tracker || "", className: "glyphicon glyphicon-" + (this.props.error_tracker ? 'warning-sign' : 'check') }),
-										" MPP Tracker"
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-4" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"button",
-												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
-																__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
-														} },
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
-												" Configure"
-										)
-								)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "row" + (this.state.paused ? ' status-error' : '') },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-5" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? 'warning-sign' : 'check') }),
-										" ",
-										this.state.paused ? "Tracking paused" : "Tracking enabled"
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-4" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"button",
-												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.togglePause },
-												this.state.paused ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"span",
-														null,
-														__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
-														"Resume"
-												) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"span",
-														null,
-														__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-pause" }),
-														"Pause"
-												)
-										)
-								)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "row" },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-lg-5" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"button",
-												{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.resetSlave },
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"span",
-														null,
-														"Reset enclosure(s)"
-												)
-										)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "col-lg-4" })
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "form-group" },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"label",
-										{ htmlFor: "tracking_speed", className: "col-sm-9" },
-										"Acquisition speed ",
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"sup",
-												{ title: "This option directly affects the acquisition speed of the instrument, and therefore has a significant impact on the tracking efficiency when the light bias is noisy. The slower the better for the convergence, but it will limit the overall tracking speed." },
-												"?"
-										)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-										"div",
-										{ className: "col-sm-9" },
-										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-												"select",
-												{ name: "tracking_speed", id: "tracking_speed", className: "form-control", value: this.props.serverState.acquisition_speed, onChange: this.changeAcquisitionSpeed },
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"option",
-														{ key: "0", value: speedOptions[4] },
-														"Maximum"
-												),
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"option",
-														{ key: "1", value: speedOptions[3] },
-														"Fast"
-												),
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"option",
-														{ key: "2", value: speedOptions[2] },
-														"Average"
-												),
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"option",
-														{ key: "3", value: speedOptions[1] },
-														"Slow"
-												),
-												__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-														"option",
-														{ key: "4", value: speedOptions[0] },
-														"Very slow"
-												)
-										)
-								)
+		console.log(this.props, __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument);
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			{ className: "col-lg-2 group-status group-status-instrument" },
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"h4",
+				null,
+				"Instrument status"
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "row" + (this.props.error_influxdb ? ' status-error' : '') },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-5" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_influxdb || "", className: "glyphicon glyphicon-" + (this.props.error_influxdb ? 'warning-sign' : 'check') }),
+					" InfluxDB server"
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-4" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"button",
+						{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+								__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInfluxDB");
+							} },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+						" Configure"
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "row" + (this.props.error_tracker ? ' status-error' : '') },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-5" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { title: this.props.error_tracker || "", className: "glyphicon glyphicon-" + (this.props.error_tracker ? 'warning-sign' : 'check') }),
+					" MPP Tracker"
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-4" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"button",
+						{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => {
+								__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
+							} },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+						" Configure"
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "row" + (this.state.paused ? ' status-error' : '') },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-5" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-" + (this.state.paused ? 'warning-sign' : 'check') }),
+					" ",
+					this.state.paused ? "Tracking paused" : "Tracking enabled"
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-4" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"button",
+						{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.togglePause },
+						this.state.paused ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"span",
+							null,
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+							"Resume"
+						) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"span",
+							null,
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-pause" }),
+							"Pause"
 						)
-				);
-		}
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "row" },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-5" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"button",
+						{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.resetSlave },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"span",
+							null,
+							"Reset enclosure(s)"
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "col-lg-4" })
+			),
+			speedOptions.length > 0 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "form-group" },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"label",
+					{ htmlFor: "tracking_speed", className: "col-sm-9" },
+					"Acquisition speed ",
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"sup",
+						{ title: "This option directly affects the acquisition speed of the instrument, and therefore has a significant impact on the tracking efficiency when the light bias is noisy. The slower the better for the convergence, but it will limit the overall tracking speed." },
+						"?"
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-sm-9" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"select",
+						{ name: "tracking_speed", id: "tracking_speed", className: "form-control", value: this.props.serverState.acquisition_speed, onChange: this.changeAcquisitionSpeed },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"option",
+							{ key: "0", value: speedOptions[4] },
+							"Maximum"
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"option",
+							{ key: "1", value: speedOptions[3] },
+							"Fast"
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"option",
+							{ key: "2", value: speedOptions[2] },
+							"Average"
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"option",
+							{ key: "3", value: speedOptions[1] },
+							"Slow"
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"option",
+							{ key: "4", value: speedOptions[0] },
+							"Very slow"
+						)
+					)
+				)
+			)
+		);
+	}
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (InstrumentStatus);

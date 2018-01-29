@@ -4,32 +4,23 @@
 
 		"statuses": {
 			"light": {
-				"version": "2.0"
+				"version": "1.0"
 			},
 			"heat": {
-				"version": "2.0"
+				"version": "1.0"
 			}
 		},
 
 		"instrument": {
 
-			"Small cells": {
-				"ADC": {
-					"model": "ADS1259"
-				},
-
-				"fsr": 30
-			},
-
-			"Small modules": {
+			"Tracker 1": {
 				"ADC": {
 					"model": "ADS1147"
 				},
 
-				"fsr": 100
+				"fsr": 30
 			}
 		}
-
 	},	
 
 	"development": true,
@@ -37,17 +28,17 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "128.178.16.63",
+				"trackerHost": "192.168.0.100",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "influxdb2.epfl.ch",
-			"username": "lpi",
-			"password": "lpi77",
-			"port": 80,
+			"host": "192.168.0.101",
+			"username": "",
+			"password": "",
+			"port": 8086,
 			"db": "matahari"
 		},
 

@@ -76,6 +76,8 @@ module.exports = require("react");
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_environment_json__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__app_environment_json__);
 
 
 
@@ -100,6 +102,35 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 	render() {
 
 		let active = !!this.props.enable && this.props.tracking_mode > 0;
+
+		let gainOptions = [];
+
+		switch (__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].ADC.model) {
+
+			case 'ADS1259':
+				gainOptions = [[0, 1 / 8], [1, 1 / 4], [2, 1 / 2], [3, 1], [4, 2], [5, 4], [6, 8], [7, 16], [8, 32], [9, 64], [10, 128]];
+				break;
+
+			case 'ADS1147':
+				gainOptions = [[1, 1], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]];
+				break;
+		}
+
+		gainOptions = gainOptions.map(([code, gain], index) => {
+			return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'option',
+				{ key: index, value: code },
+				'+/- ',
+				parseFloat((__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].fsr / gain).toPrecision(2)),
+				' mA'
+			);
+		});
+
+		gainOptions.unshift(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			'option',
+			{ key: 'auto', value: '-1' },
+			'Auto'
+		));
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
@@ -155,51 +186,19 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'select',
 						{ name: 'tracking_gain', id: 'tracking_gain', className: 'form-control', value: this.props.tracking_gain, onChange: this.handleInputChange },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '0', value: '-1' },
-							'Auto'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '1', value: '1' },
-							'+/- 20mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '2', value: '2' },
-							'+/- 10mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '3', value: '4' },
-							'+/- 5mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '4', value: '8' },
-							'+/- 2.5mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '5', value: '16' },
-							'+/- 1.25mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '6', value: '32' },
-							'+/- 0.625mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '7', value: '64' },
-							'+/- 0.313mA'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '8', value: '128' },
-							'+/- 0.156mA'
-						)
+						gainOptions
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block col-sm-9' },
+					'This value is independent of the maximumm current output of your device. Any gain range is safe to use, but ',
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'text-danger' },
+						'do not exceed the current capabilities of your device (+/- ',
+						__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].fsr,
+						' mA)'
 					)
 				)
 			),
@@ -298,7 +297,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
-					{ className: 'help-block col-sm-12' },
+					{ className: 'help-block col-sm-9' },
 					'This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.'
 				)
 			),
@@ -841,7 +840,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-const { ipcRenderer } = __webpack_require__(8);
+const { ipcRenderer } = __webpack_require__(9);
 
 //var arg = ipcRenderer.sendSync("loadCellForm");
 
@@ -863,9 +862,9 @@ function render(data) {
 
 	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_cellformall_jsx__["a" /* default */], {
 		instrumentConfig: data.instrumentConfig,
-		allStatuses: data.allStatuses,
+		allStatuses: data.channelsState,
 		channelIds: data.channelIds,
-		formState: data.cellData,
+		formState: data.channelState,
 		onValidate: onValidate,
 		onClose: onClose }), document.getElementById('root'));
 }
@@ -885,7 +884,7 @@ module.exports = require("react-dom");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__ = __webpack_require__(8);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -931,11 +930,11 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 			}
 		});
 
-		Object.assign(stateObj, props.formState);
+		if (props.formState) {
+			Object.assign(stateObj, props.formState);
+		}console.log(props);
 
-		if (stateObj.entries().length > 0) {
-			this.setState(stateObj);
-		}
+		this.setState(stateObj);
 	}
 
 	render() {
@@ -1098,7 +1097,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
 						{ className: "tab-pane", id: "tracker_" + unique },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__["a" /* default */], _extends({}, this.state, { onFormChange: this.subFormChanged }))
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__["a" /* default */], _extends({}, this.state, this.props, { onFormChange: this.subFormChanged }))
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
@@ -1129,6 +1128,12 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30},"Small modules":{"ADC":{"model":"ADS1147"},"fsr":100}}}
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1356,7 +1361,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
 						{ className: "tab-pane", id: "tracker_" + this.state.unique },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__["a" /* default */], _extends({}, this.state, { onFormChange: this.subFormChanged }))
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__["a" /* default */], _extends({}, this.props, this.state, { onFormChange: this.subFormChanged }))
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
@@ -1386,7 +1391,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (CellForm);
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("electron");

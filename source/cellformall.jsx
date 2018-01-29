@@ -27,9 +27,9 @@ function render( data ) {
 	ReactDOM.render(
 	<CellFormAll 
 		instrumentConfig={ data.instrumentConfig } 
-		allStatuses={ data.allStatuses } 
+		allStatuses={ data.channelsState } 
 		channelIds={ data.channelIds } 
-		formState={ data.cellData } 
+		formState={ data.channelState } 
 		onValidate={ onValidate } 
 		onClose={ onClose } />,
 	document.getElementById('root')

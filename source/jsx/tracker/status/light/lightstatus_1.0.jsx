@@ -49,7 +49,7 @@ class LightStatus extends React.Component {
         let data = {
           instrumentId: this.props.instrumentId,
           groupName: this.props.name,
-          lightController: {
+          control: {
             modeAutomatic: this.toggleLightMode.checked
           }  
         };
@@ -61,7 +61,7 @@ class LightStatus extends React.Component {
         });
 
 
-        fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
+        fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSetControl", {
 
           headers: headers,
           method: 'POST',
@@ -127,8 +127,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-
-                  { this.state.lightValue.map( ( value, index ) => <span key={ index }>{ value } sun</span> ).reduce( ( prev, curr ) => [ prev, <br key="-1"  />, curr ] ) }
+                  { Math.round( this.state.lightValue[0] * 100 ) / 100 } sun
                 </div>
               </div> : null 
             }

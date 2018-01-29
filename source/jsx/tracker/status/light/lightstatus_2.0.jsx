@@ -15,7 +15,7 @@ class LightStatus extends React.Component {
   }
 
   componentWillUnmount() {
-    
+
     ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
   }
 
@@ -131,7 +131,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-                  { this.state.lightValue } sun
+                  { Math.round( this.state.lightValue * 100 ) / 100 } sun
                 </div>
               </div> : null 
             }

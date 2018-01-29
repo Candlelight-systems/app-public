@@ -386,12 +386,15 @@ function openMPPT( keithleyModel ) {
 
 
 async function openCalibratePD( event, data ) {
-
+console.log( data );
   openForm( null, "calibratepd", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
     width: 800,
     height: 600,
     resizable: false
-  });
+  }, async () => {
+
+    var channelConfig = await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/resetAllChannels?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
+  } );
 }
 
 
@@ -659,10 +662,10 @@ async function configChannels( event, data ) {
   var channelsState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() );
-  
+  console.log( data.chanIds );
   return openForm( null, "cellformall", { 
 
-    channelState: channelState[ data.groupName ].channels[ data.chanId ], 
+    channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ], 
     channelsState: channelsState[ data.groupName ].channels, 
     instrumentConfig: instrumentConfig,
     channelIds: data.chanIds

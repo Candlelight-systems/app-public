@@ -41,11 +41,13 @@ class CellFormAll extends CellForm {
 			}			
 		});
 
-		Object.assign( stateObj, props.formState );
+		if( props.formState ) {
+			Object.assign( stateObj, props.formState );
 
-		if( stateObj.entries().length > 0 ) {
-			this.setState( stateObj );
-		}
+		}console.log( props );
+	
+		this.setState( stateObj );
+				
 	}
 
 	render() {	 
@@ -126,7 +128,7 @@ class CellFormAll extends CellForm {
 
 					<div className="tab-pane" id={ "tracker_" + unique }>
 
-						<CellFormTracking {...this.state} onFormChange={ this.subFormChanged } />
+						<CellFormTracking {...this.state} {...this.props } onFormChange={ this.subFormChanged } />
 					</div>
 
 					<div className="tab-pane" id={ "iv_" + unique }>

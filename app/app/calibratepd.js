@@ -204,22 +204,24 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 		this.props.onClose();
 	}
 
-	async scalePD(pdRef, sunValue) {
+	async scalePD(sunValue) {
 
 		let scalingFactor;
 
+		this.setState({
+			rescaling_success: false
+		});
+
 		if (!sunValue) {
-			scalingFactor = this.state.control.factory_scaling;
+			scalingFactor = this.state.control.factory_scaling_ma_to_sun;
 		} else {
-			scalingFactor = sunValue / this.state.channelsJsc["_pd"];
+			scalingFactor = sunValue / this.state.channelsJsc["pd"];
 		}
 
 		let body = JSON.stringify({
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
-			control: {
-				scaling: scalingFactor
-			}
+			pdScale: scalingFactor
 		});
 
 		let headers = new Headers({
@@ -227,10 +229,14 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			"Content-Length": body.length.toString()
 		});
 
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
 			method: 'POST',
 			headers: headers,
 			body: body
+		});
+
+		this.setState({
+			rescaling_success: true
 		});
 
 		await this.getPD();
@@ -240,7 +246,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 		setTimeout(() => {
 
-			var str = ["_pd"];
+			var str = [];
 
 			for (var i = 0; i < this.state.channels.length; i++) {
 				if (this.state['mon_' + this.state.channels[i].chanId]) {
@@ -248,18 +254,15 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				}
 			}
 
-			if (str.length == 0) {
-				this.setRequestTimeout();
-				return;
-			}
-
-			fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent(this.props.instrumentId)}&groupName=chanIds=${str.join(",")}`, {
+			fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent(this.props.instrumentId)}&groupName=${this.props.groupName}&chanIds=${str.join(",")}`, {
 				method: 'GET'
 			}).then(values => values.json()).then(json => {
 
 				for (var i in json) {
-					if (i.indexOf('pd') == -1) {
-						json[i] = json[i] * 1000;
+					if (i == 'pd') {
+						json.pd = json.pd[0];
+					} else {
+						json[i] *= 1000;
 					}
 				}
 				this.setState({ channelsJsc: json });
@@ -299,9 +302,10 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 	getPD() {
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightGetControl?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPDOptions?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 			method: 'GET'
 		}).then(values => values.json()).then(control => {
+			console.log(control);
 			this.setState({ control: control });
 		}).catch(error => {
 			console.error(error);
@@ -325,7 +329,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 	async enableChannel(chanId) {
 
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/enableChannel?instrumentId=" + this.props.instrumentId + "&chanId=" + chanId, {
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/enableChannel?instrumentId=" + this.props.instrumentId + "&chanId=" + chanId + "&noIV=true", {
 			method: 'GET'
 		});
 
@@ -371,7 +375,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 				return "";
 			}
 
-			return null;
+			return 0;
 		}
 
 		let val = this.state.channelsJsc[key];
@@ -434,6 +438,17 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					" Switch to manual mode in order to gain control of the light intensity"
 				)
 			),
+			!!this.state.rescaling_success && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "col-sm-9" },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "alert alert-success" },
+					" ",
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-check-sign", "aria-hidden": "true" }),
+					" Successfully updated the photodiode scaling factor"
+				)
+			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
 				{ className: "col-sm-5" },
@@ -471,8 +486,8 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					{ className: "list-group" },
 					control ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"li",
-						{ key: "_photodiode", "data-name": "_pd", className: "list-group-item active" },
-						this.jsc("_pd", true, false, control.scaling),
+						{ key: "_photodiode", "data-name": "pd", className: "list-group-item active" },
+						this.jsc("pd", true, false, control.scaling),
 						"Photodiode"
 					) : null,
 					!!this.state.channels && this.state.channels.map(channel => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -497,7 +512,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 					null,
 					"To calibrate the light intensity with respect to the short circuit of your device, manually adjust the light intensity such that the short circuit current of the solar cells corresponds to the one measured on an AM1.5G source.",
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
-					"You can also reset the default settings to the factory calibrated reference photodiode short circuit currents."
+					"You can also reset the default settings to the factory calibrated reference photodiode short circuit current."
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"div",
@@ -510,7 +525,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 							null,
 							"Photodiode"
 						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { className: "form-control", readOnly: "readonly", value: (jsc = this.jsc("_pd", false)).toPrecision(4) ? jsc + " mA" : "" })
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { className: "form-control", readOnly: "readonly", value: (jsc = this.jsc("pd", false)).toPrecision(4) ? jsc + " mA" : "" })
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"div",
@@ -523,11 +538,11 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 								{ className: "btn btn-default", type: "button", onClick: () => this.scalePD(1) },
 								"Set as 1 sun"
 							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							!!this.state.control && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"button",
 								{ className: "btn btn-default", type: "button", onClick: () => this.scalePD() },
 								"Factory reset (",
-								Math.round(100 * this.state.channelsJsc["_pd"] * control.factory_scaling) / 100,
+								Math.round(100 * this.state.channelsJsc["pd"] * control.factory_scaling_ma_to_sun) / 100,
 								" sun)"
 							)
 						)

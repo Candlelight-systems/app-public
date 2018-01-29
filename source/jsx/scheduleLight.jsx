@@ -45,6 +45,7 @@ class ScheduleLight extends React.Component {
 			control: {
 				setPoint: this.state.fixed_intensity ? parseFloat( this.state.fixed_intensity_val ) : false,
 				scheduling: {
+					enable: ! this.state.fixed_intensity,
 					basis: this.state.schedule_basis,
 					intensities: this.state.schedule_values.split("\n").map( ( val ) => parseFloat( val ) )
 				}
@@ -64,7 +65,7 @@ class ScheduleLight extends React.Component {
 			success: false 
 		} );
 
-		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSetControl", {
 
 			method: 'POST',
 			headers: headers,
@@ -121,7 +122,8 @@ class ScheduleLight extends React.Component {
 		} )
 		.then( ( values ) => values.json() )
 		.then( ( controller ) => {
-		   	
+		   	console.log( controller );
+
 		   	return this.setState( ( state ) => ( {		   	
 		   		error: false,
 		   		controller: controller,
@@ -235,7 +237,7 @@ class ScheduleLight extends React.Component {
 				{ !! this.state.error && <div className="alert alert-danger">{ this.state.error }</div> }
 				{ !! this.state.message && <div className="alert alert-info"><span className="glyphicon glyphicon-info-sign" aria-hidden="true"></span> { this.state.message }</div> }
 
-				<div className="col-sm-6">
+				<div className="col-sm-4">
 
 					{ !! this.state.controller && 
 						<div>
@@ -291,7 +293,7 @@ class ScheduleLight extends React.Component {
 
 					</div>
 					
-					<div className="col-sm-6">
+					<div className="col-sm-5">
 
 						<label>Light profile vs time</label>
 						<div ref={ ( el ) => { this.graphDom = el } }></div>

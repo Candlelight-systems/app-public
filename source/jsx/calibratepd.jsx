@@ -34,22 +34,25 @@ class CalibratePD extends React.Component {
 		this.props.onClose();
 	}
 
-	async scalePD( pdRef, sunValue ) {
+	async scalePD( sunValue ) {
 
 		let scalingFactor;
 
+
+		this.setState( {
+			rescaling_success: false
+		});
+
 		if( ! sunValue ) {
-			scalingFactor = this.state.control.factory_scaling;
+			scalingFactor = this.state.control.factory_scaling_ma_to_sun;
 		} else {
-			scalingFactor = sunValue / this.state.channelsJsc[ "_pd" ];
+			scalingFactor = sunValue / this.state.channelsJsc[ "pd" ];
 		}
 
 		let body = JSON.stringify( {
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
-			control: {
-				scaling: scalingFactor,
-			}
+			pdScale: scalingFactor
 		});
 
 		let headers = new Headers({
@@ -57,11 +60,15 @@ class CalibratePD extends React.Component {
 		  "Content-Length": body.length.toString()
 		});
 
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSaveControl", {
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
 			method: 'POST',
 			headers: headers,
 			body: body
 		} );
+
+		this.setState( {
+			rescaling_success: true
+		});
 
 		await this.getPD();
 	}
@@ -70,7 +77,7 @@ class CalibratePD extends React.Component {
 
 		setTimeout( () => {
 
-			var str = [ "_pd" ];
+			var str = [ ];
 
 			for( var i = 0; i < this.state.channels.length; i ++ ) {
 				if( this.state[ 'mon_' + this.state.channels[ i ].chanId ] ) {
@@ -78,19 +85,17 @@ class CalibratePD extends React.Component {
 				}
 			}
 		
-			if( str.length == 0 ) {
-				this.setRequestTimeout();
-				return;
-			}
 
-			fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent( this.props.instrumentId )}&groupName=chanIds=${str.join(",")}`, {
+			fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent( this.props.instrumentId )}&groupName=${ this.props.groupName }&chanIds=${str.join(",")}`, {
 				method: 'GET',
 			} ).then( ( values ) => values.json() )
 			   .then( ( json ) => {
 
 			   	for( var i in json ) {
-			   		if( i.indexOf( 'pd' ) == -1 ) {
-			   			json[ i ] = json[ i ] * 1000
+			   		if( i == 'pd' ) {
+			   			json.pd = json.pd[ 0 ]
+			   		} else {
+			   			json[ i ] *= 1000;
 			   		}
 			   	}
 			   	this.setState( { channelsJsc: json } );
@@ -135,11 +140,12 @@ class CalibratePD extends React.Component {
 
 	getPD() {
 
-		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightGetControl?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
+		return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPDOptions?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 			method: 'GET',
 		} )
 		.then( ( values ) => values.json() )
 		.then( ( control ) => {
+			console.log( control );
 			this.setState( { control: control } );
 		} ).catch( ( error ) => {
 			console.error( error );
@@ -167,7 +173,7 @@ class CalibratePD extends React.Component {
 
 	async enableChannel( chanId ) {
 
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/enableChannel?instrumentId=" + this.props.instrumentId + "&chanId=" + chanId, {
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/enableChannel?instrumentId=" + this.props.instrumentId + "&chanId=" + chanId + "&noIV=true", {
 			method: 'GET'
 		} );
 
@@ -215,7 +221,7 @@ class CalibratePD extends React.Component {
 				return "";
 			}
 
-			return null;
+			return 0;
 		}
 
 		let val = this.state.channelsJsc[ key ];
@@ -254,7 +260,11 @@ class CalibratePD extends React.Component {
 				<div className="col-sm-9">
 					<div className="alert alert-info"> <span className="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Switch to manual mode in order to gain control of the light intensity</div>
 				</div>
-
+				{ !! this.state.rescaling_success &&		
+					<div className="col-sm-9">
+						<div className="alert alert-success"> <span className="glyphicon glyphicon-check-sign" aria-hidden="true"></span> Successfully updated the photodiode scaling factor</div>
+					</div>
+				}
 
 				{/*<div className="row">
 					<div className="alert alert-warning"><span className="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> <strong>Warning !</strong> As long as this page is open, the light intensity will be fixed. Close this window to resume the automatic light program.</div>
@@ -274,8 +284,8 @@ class CalibratePD extends React.Component {
 						<ul className="list-group">
 						
 						{ control ? 
-							<li key="_photodiode" data-name="_pd" className="list-group-item active">
-								{ this.jsc( "_pd", true, false, control.scaling ) }
+							<li key="_photodiode" data-name="pd" className="list-group-item active">
+								{ this.jsc( "pd", true, false, control.scaling ) }
 								Photodiode
 							</li>
 							: null
@@ -295,19 +305,19 @@ class CalibratePD extends React.Component {
 					<h4>2-point calibration</h4>
 					<p>
 						To calibrate the light intensity with respect to the short circuit of your device, manually adjust the light intensity such that the short circuit current of the solar cells corresponds to the one measured on an AM1.5G source.<br />
-						You can also reset the default settings to the factory calibrated reference photodiode short circuit currents.
+						You can also reset the default settings to the factory calibrated reference photodiode short circuit current.
 					</p>
 
 					<div>
 						<div className="form-group">
 							<label>Photodiode</label>
-							<input className="form-control" readOnly="readonly" value={ ( jsc = this.jsc( "_pd", false ) ).toPrecision( 4 ) ? jsc + " mA" : "" } />
+							<input className="form-control" readOnly="readonly" value={ ( jsc = this.jsc( "pd", false ) ).toPrecision( 4 ) ? jsc + " mA" : "" } />
 						</div>
 
 						<div className="form-group">
 							<div className="btn-group">
 								<button className="btn btn-default" type="button" onClick={ () => this.scalePD( 1 ) }>Set as 1 sun</button>
-						        <button className="btn btn-default" type="button" onClick={ () => this.scalePD( ) } >Factory reset ({ Math.round( 100 * this.state.channelsJsc[ "_pd" ] * control.factory_scaling ) / 100 } sun)</button>
+						        { !! this.state.control && <button className="btn btn-default" type="button" onClick={ () => this.scalePD( ) } >Factory reset ({ Math.round( 100 * this.state.channelsJsc[ "pd" ] * control.factory_scaling_ma_to_sun ) / 100 } sun)</button> }
 						    </div>
 						</div>
 					</div>

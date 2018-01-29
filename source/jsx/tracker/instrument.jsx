@@ -94,7 +94,7 @@ class TrackerInstrument extends React.Component {
 
 
       setTimeout( () => {
-        console.log( "trying" ); 
+        
         this.updateInstrument();
       }, 3000 );
 

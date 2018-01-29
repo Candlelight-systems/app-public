@@ -172,9 +172,10 @@ class TrackerDevice extends React.Component {
 			newState.voltage = round( data.state.voltage, 2 );
 		}
 
-		if( data.state.voltage && data.state.current && this.state.waveIV ) {
-			this.state.waveIV.append( data.state.voltage, data.state.current * 1000 );			
-			newState.waveIV = this.state.waveIV;
+		if( data.state.voltage && data.state.current && this.state.data_IV ) {
+
+			this.state.data_IV.append( data.state.voltage, data.state.current );			
+			newState.data_IV = this.state.data_IV;
 		}
 
 		if( data.state.power ) {
@@ -222,6 +223,7 @@ class TrackerDevice extends React.Component {
 		}
 
 		if( ! isNaN( data.timer.ellapsed )  ) {
+
 			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() }
 		}
 
@@ -301,18 +303,37 @@ class TrackerDevice extends React.Component {
 		} );
 	}
 
-	recordIV() {
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId );
+
+	async recordIV() {
+
+		if( this.state.processing_iv ) {
+			return;
+		}
+		this.setState( { processing_iv: true, error_iv: false } );
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).catch( () => { this.setState( { error_iv: true } ); } );
+		this.setState( { processing_iv: false } );
 	}
 
+	async recordVoc() {
 
-	recordVoc() {
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  + "&extend=" + !!! this.state.voc );
+
+		if( this.state.processing_voc ) {
+			return;
+		}
+		this.setState( { processing_voc: true, error_voc: false } );
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  ).catch( () => { this.setState( { error_voc: true } ); } );
+		this.setState( { processing_voc: false } );
 	}
 
+	async recordJsc() {
 
-	recordJsc() {
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId );
+
+		if( this.state.processing_jsc ) {
+			return;
+		}
+		this.setState( { processing_jsc: true, error_jsc: false } );
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).catch( () => { this.setState( { error_jsc: true } ); } );
+		this.setState( { processing_jsc: false } );
 	}
 
 	//formChanged( name, value ) {
@@ -612,7 +633,7 @@ class TrackerDevice extends React.Component {
 				}
 
 				let valueIndex = 1;
-console.log( values.length );
+
 				values.forEach( ( value, index ) => {
 					
 					let date = new Date( value[ 0 ] ),
@@ -812,12 +833,12 @@ console.log( values.length );
 
 						<div className="cell-timing row">
 						
-							<div className="col-lg-1">
+							<div className="col-xs-1">
 								<div>Last data</div>
 								<div><Timer precision={1} direction="ascending" timerValue={ this.state.timer_aquisition } /></div>
 							</div>
 
-							<div className="col-lg-1">
+							<div className={ "col-xs-1 propElement" + ( this.state.processing_iv ? ' processing' : '' ) + ( this.state.error_iv ? ' processing-error' : '' ) }>
 								<div className="record">
 									<span className="glyphicon glyphicon-record" onClick={ this.recordIV }></span>
 								</div>
@@ -826,7 +847,7 @@ console.log( values.length );
 								
 							</div>
 
-							<div className="col-lg-1">
+							<div className={ "col-xs-1 propElement" + ( this.state.processing_voc ? ' processing' : '' ) + ( this.state.error_voc ? ' processing-error' : '' )}>
 								<div className="record">
 									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
 								</div>
@@ -835,7 +856,7 @@ console.log( values.length );
 								
 							</div>
 
-							<div className="col-lg-1">
+							<div className={ "col-xs-1 propElement" + ( this.state.processing_jsc ? ' processing' : '' ) + ( this.state.error_jsc ? ' processing-error' : '' )}>
 								<div className="record">
 									<span className="glyphicon glyphicon-record" onClick={ this.recordJsc }></span>
 								</div>
@@ -864,7 +885,7 @@ console.log( values.length );
 								</div>
 							</div>
 							
-							<div className="col-lg-1 propElement">
+							<div className="col-xs-1 propElement">
 								
 								<div>
 									<div className="label">&eta;</div>
@@ -875,7 +896,7 @@ console.log( values.length );
 									</div>
 								</div>
 							</div>
-							<div className="col-lg-1 propElement">
+							<div className="col-xs-1 propElement">
 								
 								<div>
 									<div className="label">
@@ -886,7 +907,7 @@ console.log( values.length );
 									</div>
 								</div>
 							</div>
-							<div className="col-lg-1 propElement">
+							<div className={ "col-xs-1 propElement"  + ( this.state.processing_voc ? ' processing' : '' ) + ( this.state.error_voc ? ' error' : '' ) }>
 								<div className="record">
 									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
 								</div>
@@ -899,7 +920,7 @@ console.log( values.length );
 								
 							</div>
 
-							<div className="col-xs-1 propElement">
+							<div className={ "col-xs-1 propElement" + ( this.state.processing_jsc ? ' processing' : '' ) + ( this.state.error_jsc ? ' error' : '' ) }>
 								<div className="record">
 									<span className="glyphicon glyphicon-record"  onClick={ this.recordJsc }></span>
 								</div>

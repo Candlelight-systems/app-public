@@ -1,6 +1,6 @@
 
-
 import React from 'react';
+import environment from "../../app/environment.json"
 
 class CellFormTracking extends React.Component {
 	
@@ -26,6 +26,48 @@ class CellFormTracking extends React.Component {
 
 		let active = !! this.props.enable && this.props.tracking_mode > 0;
 		
+		let gainOptions = [];
+		
+		switch( environment.instrument[ this.props.instrumentConfig.instrumentId ].ADC.model ) {
+
+			case 'ADS1259':
+				gainOptions = [
+					[ 0, 1/8 ],
+					[ 1, 1/4 ],
+					[ 2, 1/2 ],
+					[ 3, 1 ],
+					[ 4, 2 ],
+					[ 5, 4 ],
+					[ 6, 8 ],
+					[ 7, 16 ],
+					[ 8, 32 ],
+					[ 9, 64 ],
+					[ 10, 128 ]
+				];
+			break;
+
+
+			case 'ADS1147':
+				gainOptions = [
+					[ 1, 1 ],
+					[ 2, 2 ],
+					[ 4, 4 ],
+					[ 8, 8 ],
+					[ 16, 16 ],
+					[ 32, 32 ],
+					[ 64, 64 ],
+					[ 128, 128 ]
+				];
+			break;
+		}
+
+		gainOptions = gainOptions.map( ( [ code, gain ], index ) => {
+			return <option key={index} value={code}>+/- { parseFloat( ( environment.instrument[ this.props.instrumentConfig.instrumentId ].fsr / gain ).toPrecision( 2 ) ) } mA</option>
+		});
+
+		gainOptions.unshift( <option key="auto" value="-1">Auto</option> );
+
+
 		return (
 			<div>
 				<div className="form-group">
@@ -44,17 +86,14 @@ class CellFormTracking extends React.Component {
 					<label htmlFor="tracking_mode" className="col-sm-3">Current range</label>
 					<div className="col-sm-9">
 						<select name="tracking_gain" id="tracking_gain" className="form-control" value={this.props.tracking_gain} onChange={this.handleInputChange}>
-								<option key="0" value="-1">Auto</option>
-								<option key="1" value="1">+/- 20mA</option>
-								<option key="2" value="2">+/- 10mA</option>
-								<option key="3" value="4">+/- 5mA</option>
-								<option key="4" value="8">+/- 2.5mA</option>
-								<option key="5" value="16">+/- 1.25mA</option>
-								<option key="6" value="32">+/- 0.625mA</option>
-								<option key="7" value="64">+/- 0.313mA</option>
-								<option key="8" value="128">+/- 0.156mA</option>
+							{ gainOptions }
 						</select>
 					</div>
+				
+					<div className="help-block col-sm-9">
+						This value is independent of the maximumm current output of your device. Any gain range is safe to use, but <div className="text-danger">do not exceed the current capabilities of your device (+/- { environment.instrument[ this.props.instrumentConfig.instrumentId ].fsr } mA)</div>
+					</div>
+					
 				</div>
 
 
@@ -84,9 +123,11 @@ class CellFormTracking extends React.Component {
 							<option key="3600000sps" value="3600000">1 sample per hour</option>
 						</select>
 					</div>
-					<div className="help-block col-sm-12">
+					
+					<div className="help-block col-sm-9">
 						This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.
 					</div>
+
 				</div>
 
 
