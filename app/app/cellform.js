@@ -953,7 +953,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30},"Small modules":{"ADC":{"model":"ADS1147"},"fsr":100}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30}}}
 
 /***/ }),
 /* 7 */

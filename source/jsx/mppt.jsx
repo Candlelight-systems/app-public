@@ -4,6 +4,7 @@ import $ from "jquery";
 import fs from "fs";
 import { ipcRenderer } from "electron";
 import KeithleySMU from "../../app/external/keithleySMU";
+import Lamp from "../../app/external/verasol";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import PDFDocument from 'pdfkit'
 import { CSVBuilder, ITXBuilder } from "../../app/util/filebuilder"
@@ -50,24 +51,43 @@ class MPPTJV extends React.Component {
       area: 0.5,
       powin: 1000,
 
-      connected: false
+      connected_keithley: false,
+      connected_lamp: false
     };
   }
 
 
-  async connectToGPIB() {
+  async connectKeithleyToGPIB() {
 
     var resource = this.state.gpib_resource;
     this.instrument = new KeithleySMU( resource );
 
     this.instrument.connect().then( ( message ) => {
     
-      this.setState( { connected: message, connectionerror: false } );  
+      this.setState( { connected_keithley: message, connectionerror_keithley: false } );  
     
     }).catch( ( error ) => {
 
       console.log( error );
-      this.setState( { connectionerror: error.toString(), connected: false } );
+      this.setState( { connectionerror_keithley: error.toString(), connected_keithley: false } );
+    }); 
+  }
+
+
+
+  async connectLampToGPIB() {
+
+    var resource = this.state.gpib_resource;
+    this.instrument_lamp = new Lamp( resource );
+
+    this.instrument_lamp.connect().then( ( message ) => {
+    
+      this.setState( { connected_lamp: message, connectionerror_lamp: false } );  
+    
+    }).catch( ( error ) => {
+
+      console.log( error );
+      this.setState( { connectionerror_lamp: error.toString(), connected_lamp: false } );
     }); 
   }
 
@@ -242,6 +262,9 @@ class MPPTJV extends React.Component {
     var dataiv, poweriv;
 
 
+    await this.instrument_lamp.command("AMPLitude 1");
+    await this.instrument_lamp.command("OUTput ON");
+
     this.setState( { iv_making: true } );
     await this.instrument.command(":STAT:MEAS:ENAB 512; *SRE 1; *CLS");
     //await this.instrument.command(":*SRE 1;");
@@ -297,6 +320,9 @@ class MPPTJV extends React.Component {
     }
 
     await this.instrument.command( ":OUTP:STAT OFF" );
+
+
+    await this.instrument_lamp.command("OUTput OFF");
 
     this.getAverageIVParameters();
 
@@ -363,6 +389,10 @@ class MPPTJV extends React.Component {
   async mppt() {
 
     var settlingTime = 0;
+
+    await this.instrument_lamp.command("AMPLitude 1");
+    await this.instrument_lamp.command("OUTput ON");
+
     await this.instrument.command(":SOUR:DEL " + settlingTime );
     await this.instrument.command(":OUTP:STAT ON");
 
@@ -453,6 +483,8 @@ class MPPTJV extends React.Component {
 
 
     await this.instrument.command(":OUTP:STAT OFF")  
+    await this.instrument_lamp.command("OUTput ON");
+
     this.setState( { running_mpp: false });
   }
 
@@ -538,14 +570,14 @@ class MPPTJV extends React.Component {
 
     this.shape_mpp_backward = this.graph_iv_instance
                                 .newShape( "ellipse" )
-                                .setR( 3, 3 )
+                                .setR( "3px", "3px" )
                                 .setFillColor( 'black' )
                                 .draw()
                                 .setSerie( this.serie_iv_backward_power );
 
     this.shape_mpp_forward = this.graph_iv_instance
                                 .newShape( "ellipse" )
-                                .setR( 3, 3 )
+                                .setR( "3px", "3px" )
                                 .setFillColor( 'black' )
                                 .draw()
                                 .setSerie( this.serie_iv_forward_power );
@@ -709,7 +741,7 @@ this.graph_mppt_instance
         <div className="container-fluid">
 
         <div className="row">
-        <div className="col-sm-4">
+        <div className="col-xs-4">
             <div className="container-fluid">
 
               <h3>j(V) and MPP tracker</h3>
@@ -717,26 +749,50 @@ this.graph_mppt_instance
 
               <form>
                 <div className="form-group row">
-                  <label htmlFor="gpib_resource">GPIB resource</label>
+                  <label htmlFor="gpib_resource">Keithley GPIB resource</label>
                   
                 
                   <div className="input-group">
                     <select name="gpibresource" id="gpib_resource" name="gpib_resource" className="form-control" value={this.state.gpib_resource} onChange={this.form_gpib_change}>
-                      <option value="-1">Select a GPIB resource</option>
+                      <option value="-1">Select the Keithley</option>
                       { list_gpibresources }
                     </select>
                     <div className="input-group-btn">
-                      <button type="button" className="btn btn-primary" onClick={ this.connectToGPIB }>Connect</button>  
+                      <button type="button" className="btn btn-primary" onClick={ this.connectKeithleyToGPIB }>Connect</button>  
                     </div>
                   </div>
                 </div>
                 
               
-                { this.state.connectionerror && 
+                { this.state.connectionerror_keithley && 
                   <p className="bg-danger">Problem connecting to GPIB resource. Check Keithley parameters. The returned error was : { this.state.connectionerror } </p>
                 }
-                { this.state.connected &&
-                  <p className="bg-success">Successfully connected to remote host (IDN { this.state.connected })</p>
+                { this.state.connected_keithley &&
+                  <p className="bg-success">Successfully connected to remote host (IDN { this.state.connected_keithley })</p>
+                }
+
+
+                <div className="form-group row">
+                  <label htmlFor="gpib_resource">Verasol GPIB resource</label>
+                  
+                
+                  <div className="input-group">
+                    <select name="gpibresource" id="gpib_resource" name="gpib_resource" className="form-control" value={this.state.gpib_resource} onChange={this.form_gpib_change}>
+                      <option value="-1">Select the Verasol lamp</option>
+                      { list_gpibresources }
+                    </select>
+                    <div className="input-group-btn">
+                      <button type="button" className="btn btn-primary" onClick={ this.connectLampToGPIB }>Connect</button>  
+                    </div>
+                  </div>
+                </div>
+                
+              
+                { this.state.connectionerror_lamp && 
+                  <p className="bg-danger">Problem connecting to GPIB resource. Check Verasol parameters. The returned error was : { this.state.connectionerror } </p>
+                }
+                { this.state.connected_lamp &&
+                  <p className="bg-success">Successfully connected to remote host (IDN { this.state.connected_lamp })</p>
                 }
               </form>
 
@@ -834,10 +890,10 @@ this.graph_mppt_instance
               <div className="row">
               <div className="btn-group form-group">
                 
-                <button onClick={ this.iv } className={ "btn btn-primary" + ( this.state.iv_making || ! this.state.connected ? ' disabled' : '' ) } type="button"><span className="glyphicon glyphicon-record"></span> Record IV</button>
+                <button onClick={ this.iv } className={ "btn btn-primary" + ( this.state.iv_making || ! this.state.connected_keithley || ! this.state.connected_lamp ? ' disabled' : '' ) } type="button"><span className="glyphicon glyphicon-record"></span> Record IV</button>
                     
                 { ! this.state.running_mpp &&
-                  <button onClick={ this.mppt } className={ "btn btn-primary" + ( ! this.state.connected ? ' disabled' : '' ) } type="button"><span className="glyphicon glyphicon-record"></span> Record MPP</button>
+                  <button onClick={ this.mppt } className={ "btn btn-primary" + ( ! this.state.connected_keithley || ! this.state.connected_lamp ? ' disabled' : '' ) } type="button"><span className="glyphicon glyphicon-record"></span> Record MPP</button>
                 }
                 { !! this.state.running_mpp &&
                   <button onClick={ this.stop_mppt } className="btn btn-danger" type="button"><span className="glyphicon glyphicon-stop"></span> Stop MPP</button>
@@ -862,7 +918,7 @@ this.graph_mppt_instance
         
 
 
-          <div className="col-sm-6">
+          <div className="col-xs-5">
             <div className="row">
               <div className="graph" ref={ ( el ) => { this.graph_iv_dom = el } }></div>
             </div>
@@ -871,7 +927,7 @@ this.graph_mppt_instance
             </div>
           </div>
 
-          <div className="col-sm-3">
+          <div className="col-xs-3">
             <h3>Extracted data</h3>
 
               <div className="form-group">

@@ -120,7 +120,7 @@ let ping = function (cfg) {
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30},"Small modules":{"ADC":{"model":"ADS1147"},"fsr":100}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30}}}
 
 /***/ }),
 /* 5 */
@@ -1585,7 +1585,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		let iv = value.replace("\"", "").split(",").map(el => parseFloat(el)),
 		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
-		for (var i = 0; i < iv.length - 1; i += 2) {
+		for (var i = 2; i < iv.length - 1; i += 2) {
 			wave.append(iv[i], iv[i + 1]);
 		}
 		return wave;
@@ -1817,7 +1817,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			return;
 		}
 
-		if (Math.abs(value) < 0.1) {
+		if (Math.abs(value) < 0.8) {
 			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
 				"span",
 				null,
@@ -1896,6 +1896,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		let notavailable = "N/A";
 
 		const j_currentdensity = this.processCurrent(this.state.currentdensity);
+
 		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
 		if (active) {
@@ -3482,7 +3483,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "col-lg-4" },
-            Math.round(this.state.lightValue * 100) / 100,
+            Math.round(this.state.lightValue * 1000) / 1000,
             " sun"
           )
         ) : null
@@ -3531,6 +3532,8 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
   wsUpdate(event, data) {
 
     // Update directly the state
+
+    console.log(data);
     this.setState(data.data);
 
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
@@ -3800,6 +3803,9 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
     super(...arguments);
     this.state = {};
     this.wsUpdate = this.wsUpdate.bind(this);
+
+    this.increaseHeatingPower = this.increaseHeatingPower.bind(this);
+    this.decreaseHeatingPower = this.decreaseHeatingPower.bind(this);
   }
 
   componentDidMount() {
@@ -3809,6 +3815,36 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
   componentWillUnmount() {
     __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+  }
+
+  increaseHeatingPower() {
+
+    fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.increasePower?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+
+      method: 'GET'
+
+    }).then(response => {
+
+      $(this.enableDCDC).bootstrapToggle('enable');
+    }).catch(() => {
+
+      __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to enable / disable the heater");
+    });
+  }
+
+  decreaseHeatingPower() {
+
+    fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.decreasePower?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+
+      method: 'GET'
+
+    }).then(response => {
+
+      $(this.enableDCDC).bootstrapToggle('enable');
+    }).catch(() => {
+
+      __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to enable / disable the heater");
+    });
   }
 
   wsUpdate(event, data) {
@@ -3826,109 +3862,132 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
   }
 
   componentDidUpdate(prevProps) {
-    /*
-        if( this.toggleLightMode && ! this.transformed ) {
-    
-          $( this.toggleLightMode ).bootstrapToggle({
-            on: 'Auto',
-            off: 'Manual'
-          }).change( () => {
-    
-            $( this.toggleLightMode ).bootstrapToggle('disable');
-    
-            let data = {
-              instrumentId: this.props.instrumentId,
-              groupName: this.props.name,
-              lightController: {
-                modeAutomatic: this.toggleLightMode.checked
-              }  
-            };
-    
-            let body = JSON.stringify( data );
-            let headers = new Headers({
-              "Content-Type": "application/json",
-              "Content-Length": body.length.toString()
-            });
-    
-    
-            fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.saveController", {
-    
-              headers: headers,
-              method: 'POST',
-              body: body
-    
-            } ).then( ( response ) => {
-    
-              $( this.toggleLightMode ).bootstrapToggle('enable');
-    
-              
-            } ).catch( () => {
-    
-              ipcRenderer.send("reportError", "Unable to change the light mode" );
-    
-            } );
-          } );      
-          this.transformed = true;
-        }
-    
-        if( this.toggleLightMode ) {
-         $( this.toggleLightMode ).data('bs.toggle')[( this.state.lightAutomatic ? 'on' : 'off' ) ]( true );
-        }*/
+
+    if (this.enableDCDC && !this.transformed) {
+
+      $(this.enableDCDC).bootstrapToggle({
+        on: 'On',
+        off: 'Off'
+      }).change(() => {
+
+        $(this.enableDCDC).bootstrapToggle('disable');
+
+        fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.${this.enableDCDC.checked ? 'enable' : 'disable'}?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+
+          method: 'GET'
+
+        }).then(response => {
+
+          $(this.enableDCDC).bootstrapToggle('enable');
+        }).catch(() => {
+
+          __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to enable / disable the heater");
+        });
+      });
+      this.transformed = true;
+    }
+
+    if (this.enableDCDC) {
+      $(this.enableDCDC).data('bs.toggle')[this.state.heater_status ? 'on' : 'off'](true);
+    }
   }
 
   render() {
-
-    return null;
-
-    /*
-    return (
-          { this.props.serverState.heatController ?
-            <div>
-              <div className="row">
-                <div className="col-lg-5">
-                  Heater
-                </div>
-                <div className="col-lg-4">
-                   <label>
-                    <input data-toggle="toggle" type="checkbox" ref={ ( el ) => this.toggleHeater = el } disabled={ this.state.heater_status_updating } checked={ this.state.heater_status } data-width="100" data-height="25" />
-                  </label>
-                </div>
-              </div>
-               { this.state.heater_status ? 
-                 <div>
-                
-                  <div className="row">
-                    <div className="col-lg-5">
-                      Heating power: { this.state.heating_power + " W" }
-                    </div>
-                
-                    <div className="col-lg-4">
-                        <div className="btn-group">
-                          <button type="button" className="btn-sm btn btn-default" onClick={ this.increaseHeatingPower }>+</button>&nbsp;
-                          <button type="button" className="btn-sm btn btn-default" onClick={ this.decreaseHeatingPower }>-</button>
-                        </div>
-                    </div>
-                
-                  </div>
-                  <div className="row">
-                    <div className="col-lg-5">
-                      Current: { this.state.heating_current + " A" }
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-lg-5">
-                      Voltage: { this.state.heating_voltage + " V" }
-                    </div>
-                  </div>
-                   { heating_problem ? 
-                    <div className="row">
-                      <span className="grey"><span className="glyphicon glyphicon-warning"></span> The calculated heater resistance is off. Check that the pins are properly contacting the window</span>
-                    </div> : null
-                  }
-              </div> : null }
-          </div>
-        : null }
-        );*/
+    console.log(this.state);
+    let heating_problem = this.state.heating_voltage / this.state.heating_current > 20;
+    if (this.state.heating_voltage < 1 || !this.state.heating_voltage) {
+      // For low voltage, let's not flag anything
+      heating_problem = false;
+    }
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "div",
+      null,
+      this.props.serverState.heatController ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        "div",
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          { className: "row" },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-5" },
+            "Heater"
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "col-lg-4" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "label",
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { "data-toggle": "toggle", type: "checkbox", ref: el => this.enableDCDC = el, checked: this.state.heater_status, "data-width": "100", "data-height": "25" })
+            )
+          )
+        ),
+        this.state.heater_status ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "div",
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "row" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              "Heating power: ",
+              this.state.heater_power + " W"
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "col-lg-4" },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "div",
+                { className: "btn-group" },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "button",
+                  { type: "button", className: "btn-sm btn btn-default", onClick: this.increaseHeatingPower },
+                  "+"
+                ),
+                "\xA0",
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "button",
+                  { type: "button", className: "btn-sm btn btn-default", onClick: this.decreaseHeatingPower },
+                  "-"
+                )
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "row" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              "Current: ",
+              this.state.heater_current + " A"
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "row" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "div",
+              { className: "col-lg-5" },
+              "Voltage: ",
+              this.state.heater_voltage + " V"
+            )
+          ),
+          heating_problem ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            "div",
+            { className: "row" },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              "span",
+              { className: "grey" },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-warning" }),
+              " The calculated heater resistance is off. Check that the pins are properly contacting the window"
+            )
+          ) : null
+        ) : null
+      ) : null
+    );
   }
 }
 

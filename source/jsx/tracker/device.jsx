@@ -484,7 +484,7 @@ class TrackerDevice extends React.Component {
 		let iv = value.replace("\"", "").split(",").map( (el) => parseFloat( el ) ),
 			wave = Graph.newWaveform();
 
-		for( var i = 0; i < iv.length - 1; i += 2 ) {
+		for( var i = 2; i < iv.length - 1; i += 2 ) {
 			wave.append( iv[ i ], iv[ i + 1 ] );
 		}
 		return wave;
@@ -733,7 +733,7 @@ class TrackerDevice extends React.Component {
 			return;
 		}
 
-		if( Math.abs( value ) < 0.1 ) {
+		if( Math.abs( value ) < 0.8 ) {
 			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toFixed( 1 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
 		} else {
 			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toFixed( 1 ) }&nbsp;mA&nbsp;cm<sup>-2</sup></span> );
@@ -808,6 +808,7 @@ class TrackerDevice extends React.Component {
 		let notavailable = "N/A";
 
 		const j_currentdensity = this.processCurrent( this.state.currentdensity );
+
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
 
 		if( active ) {

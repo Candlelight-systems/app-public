@@ -198,13 +198,17 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			success: false
 		});
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/lightSetControl", {
+		return fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/lightSetControl`, {
 
 			method: 'POST',
 			headers: headers,
 			body: body
 
-		}).then(() => {
+		}).then(response => {
+
+			if (!response.ok) {
+				throw Error(response.statusText);
+			}
 
 			this.setState({
 				error: false,

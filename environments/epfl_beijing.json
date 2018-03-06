@@ -4,12 +4,24 @@
 
 		"statuses": {
 			"light": {
-				"version": "1.0"
+				"version": "2.0"
 			},
 			"heat": {
-				"version": "1.0"
+				"version": "2.0"
+			}
+		},
+
+		"instrument": {
+
+			"Small cells": {
+				"ADC": {
+					"model": "ADS1259"
+				},
+
+				"fsr": 30
 			}
 		}
+
 	},	
 
 	"development": true,
@@ -17,7 +29,7 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "localhost",
+				"trackerHost": "128.178.16.172",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
