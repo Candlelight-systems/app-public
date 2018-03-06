@@ -1130,7 +1130,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"1.0"},"heat":{"version":"1.0"}}}
 
 /***/ }),
 /* 8 */

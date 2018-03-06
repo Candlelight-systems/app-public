@@ -26,7 +26,9 @@ class MPPTJV extends React.Component {
 
 
 
-    this.connectToGPIB = this.connectToGPIB.bind( this );
+    this.connectKeithleyToGPIB = this.connectKeithleyToGPIB.bind( this );
+
+    this.connectLampToGPIB = this.connectLampToGPIB.bind( this );
     this.iv = this.iv.bind( this );
     this.mppt = this.mppt.bind( this );
     this.stop_mppt = this.stop_mppt.bind( this );
@@ -59,7 +61,7 @@ class MPPTJV extends React.Component {
 
   async connectKeithleyToGPIB() {
 
-    var resource = this.state.gpib_resource;
+    var resource = this.state.gpib_resource_keithley;
     this.instrument = new KeithleySMU( resource );
 
     this.instrument.connect().then( ( message ) => {
@@ -77,7 +79,7 @@ class MPPTJV extends React.Component {
 
   async connectLampToGPIB() {
 
-    var resource = this.state.gpib_resource;
+    var resource = this.state.gpib_resource_lamp;
     this.instrument_lamp = new Lamp( resource );
 
     this.instrument_lamp.connect().then( ( message ) => {
@@ -498,7 +500,11 @@ class MPPTJV extends React.Component {
     this.graph_iv_instance = new Graph( this.graph_iv_dom );
     this.graph_iv_instance.resize( iv_width, iv_height );
 
-    this.legend = this.graph_iv_instance.makeLegend();
+    this.legend = this.graph_iv_instance.makeLegend({
+      frame: false,
+      backgroundColor: "transparent"
+    });
+
     this.legend.setAutoPosition( 'bottom' );
     this.legend.notHideable();
 
@@ -741,7 +747,7 @@ this.graph_mppt_instance
         <div className="container-fluid">
 
         <div className="row">
-        <div className="col-xs-4">
+        <div className="col-xs-2">
             <div className="container-fluid">
 
               <h3>j(V) and MPP tracker</h3>
@@ -753,7 +759,7 @@ this.graph_mppt_instance
                   
                 
                   <div className="input-group">
-                    <select name="gpibresource" id="gpib_resource" name="gpib_resource" className="form-control" value={this.state.gpib_resource} onChange={this.form_gpib_change}>
+                    <select name="gpibresource" id="gpib_resource_keithley" name="gpib_resource_keithley" className="form-control" value={this.state.gpib_resource_keithley} onChange={this.form_gpib_change}>
                       <option value="-1">Select the Keithley</option>
                       { list_gpibresources }
                     </select>
@@ -777,7 +783,7 @@ this.graph_mppt_instance
                   
                 
                   <div className="input-group">
-                    <select name="gpibresource" id="gpib_resource" name="gpib_resource" className="form-control" value={this.state.gpib_resource} onChange={this.form_gpib_change}>
+                    <select name="gpibresource" id="gpib_resource_lamp" name="gpib_resource_lamp" className="form-control" value={this.state.gpib_resource_lamp} onChange={this.form_gpib_change}>
                       <option value="-1">Select the Verasol lamp</option>
                       { list_gpibresources }
                     </select>
@@ -909,8 +915,9 @@ this.graph_mppt_instance
                 <button onClick={ this.downloadITX } className={ "btn btn-default" } type="button"><span className="glyphicon glyphicon-download"></span> Download ITX</button>
                 {/*button onClick={ this.downloadCSV } className={ "btn btn-default" } type="button"><span className="glyphicon glyphicon-download"></span> Download CSV</button>*/}
                    
-                 <div className="clearfix visible-xs-block"></div>
               </div>
+
+                 <div className="clearfix visible-xs-block"></div>  
               </div>
 
             </div>
@@ -918,7 +925,7 @@ this.graph_mppt_instance
         
 
 
-          <div className="col-xs-5">
+          <div className="col-xs-4">
             <div className="row">
               <div className="graph" ref={ ( el ) => { this.graph_iv_dom = el } }></div>
             </div>

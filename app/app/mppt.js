@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,40 +73,46 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = require("electron");
+module.exports = require("path");
 
 /***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = require("path");
+module.exports = require("electron");
 
 /***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = require("node-jsgraph/dist/jsgraph-es6");
+module.exports = require("python-shell");
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(5);
-
+module.exports = require("node-jsgraph/dist/jsgraph-es6");
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(6);
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_header_jsx__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__jsx_mppt_jsx__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_header_jsx__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__jsx_mppt_jsx__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
 
 
@@ -126,21 +132,21 @@ function render() {
 render();
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_path__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url__);
 
 
@@ -185,32 +191,33 @@ class Header extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* unused harmony default export */ var _unused_webpack_default_export = (Header);
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_external_keithleySMU__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_pdfkit__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_pdfkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_pdfkit__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__app_util_filebuilder__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_util_svgToPDF__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__app_util_iv__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_external_keithleySMU__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_external_verasol__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_pdfkit__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_pdfkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_pdfkit__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_util_filebuilder__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__app_util_svgToPDF__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_util_iv__ = __webpack_require__(18);
 
 
 
@@ -223,7 +230,8 @@ module.exports = require("url");
 
 
 
-const { dialog } = __webpack_require__(1).remote;
+
+const { dialog } = __webpack_require__(2).remote;
 
 let iv_height = 400,
     iv_width = 550;
@@ -236,7 +244,9 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     // List all GPIB resources
 
 
-    this.connectToGPIB = this.connectToGPIB.bind(this);
+    this.connectKeithleyToGPIB = this.connectKeithleyToGPIB.bind(this);
+
+    this.connectLampToGPIB = this.connectLampToGPIB.bind(this);
     this.iv = this.iv.bind(this);
     this.mppt = this.mppt.bind(this);
     this.stop_mppt = this.stop_mppt.bind(this);
@@ -260,22 +270,38 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
       area: 0.5,
       powin: 1000,
 
-      connected: false
+      connected_keithley: false,
+      connected_lamp: false
     };
   }
 
-  async connectToGPIB() {
+  async connectKeithleyToGPIB() {
 
-    var resource = this.state.gpib_resource;
+    var resource = this.state.gpib_resource_keithley;
     this.instrument = new __WEBPACK_IMPORTED_MODULE_4__app_external_keithleySMU__["a" /* default */](resource);
 
     this.instrument.connect().then(message => {
 
-      this.setState({ connected: message, connectionerror: false });
+      this.setState({ connected_keithley: message, connectionerror_keithley: false });
     }).catch(error => {
 
       console.log(error);
-      this.setState({ connectionerror: error.toString(), connected: false });
+      this.setState({ connectionerror_keithley: error.toString(), connected_keithley: false });
+    });
+  }
+
+  async connectLampToGPIB() {
+
+    var resource = this.state.gpib_resource_lamp;
+    this.instrument_lamp = new __WEBPACK_IMPORTED_MODULE_5__app_external_verasol__["a" /* default */](resource);
+
+    this.instrument_lamp.connect().then(message => {
+
+      this.setState({ connected_lamp: message, connectionerror_lamp: false });
+    }).catch(error => {
+
+      console.log(error);
+      this.setState({ connectionerror_lamp: error.toString(), connected_lamp: false });
     });
   }
 
@@ -290,7 +316,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   async downloadPDF() {
 
-    var pdfdoc = new __WEBPACK_IMPORTED_MODULE_6_pdfkit___default.a({
+    var pdfdoc = new __WEBPACK_IMPORTED_MODULE_7_pdfkit___default.a({
       autoFirstPage: false
     });
 
@@ -298,9 +324,9 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
     pdfdoc.addPage({ layout: 'landscape' });
 
-    pdfdoc.image((await Object(__WEBPACK_IMPORTED_MODULE_8__app_util_svgToPDF__["a" /* default */])(this.graph_iv_dom, iv_width, iv_height)), 200, 15, { width: iv_width });
+    pdfdoc.image((await Object(__WEBPACK_IMPORTED_MODULE_9__app_util_svgToPDF__["a" /* default */])(this.graph_iv_dom, iv_width, iv_height)), 200, 15, { width: iv_width });
     if (this.state.mppt_j) {
-      pdfdoc.image((await Object(__WEBPACK_IMPORTED_MODULE_8__app_util_svgToPDF__["a" /* default */])(this.graph_mppt_dom, mppt_width, mppt_height)), 200, 150, { width: iv_width });
+      pdfdoc.image((await Object(__WEBPACK_IMPORTED_MODULE_9__app_util_svgToPDF__["a" /* default */])(this.graph_mppt_dom, mppt_width, mppt_height)), 200, 150, { width: iv_width });
     }
 
     pdfdoc.font("Times-Roman");
@@ -326,7 +352,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   downloadITX() {
 
     var outputfile;
-    outputfile = new __WEBPACK_IMPORTED_MODULE_7__app_util_filebuilder__["a" /* ITXBuilder */]();
+    outputfile = new __WEBPACK_IMPORTED_MODULE_8__app_util_filebuilder__["a" /* ITXBuilder */]();
 
     if (this.state.data_iv_forward) {
       outputfile.addWaveform(this.state.data_iv_forward, {
@@ -395,6 +421,9 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
     var dataiv, poweriv;
 
+    await this.instrument_lamp.command("AMPLitude 1");
+    await this.instrument_lamp.command("OUTput ON");
+
     this.setState({ iv_making: true });
     await this.instrument.command(":STAT:MEAS:ENAB 512; *SRE 1; *CLS");
     //await this.instrument.command(":*SRE 1;");
@@ -447,6 +476,8 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
     await this.instrument.command(":OUTP:STAT OFF");
 
+    await this.instrument_lamp.command("OUTput OFF");
+
     this.getAverageIVParameters();
 
     this.setState({ iv_making: false });
@@ -474,7 +505,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   getIVParameters(waveform, powerwaveform) {
 
-    return Object(__WEBPACK_IMPORTED_MODULE_9__app_util_iv__["a" /* getIVParameters */])(waveform, powerwaveform);
+    return Object(__WEBPACK_IMPORTED_MODULE_10__app_util_iv__["a" /* getIVParameters */])(waveform, powerwaveform);
   }
 
   setVoltage(v) {
@@ -510,6 +541,10 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   async mppt() {
 
     var settlingTime = 0;
+
+    await this.instrument_lamp.command("AMPLitude 1");
+    await this.instrument_lamp.command("OUTput ON");
+
     await this.instrument.command(":SOUR:DEL " + settlingTime);
     await this.instrument.command(":OUTP:STAT ON");
 
@@ -524,9 +559,9 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
     //{ dataiv, poweriv } = iv( from, to, 10 );
 
-    let mppt_j = __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-        mppt_v = __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-        mppt_p = __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+    let mppt_j = __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+        mppt_v = __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+        mppt_p = __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
     // Clear Buffer
     let vfrom = 0,
         vto,
@@ -600,6 +635,8 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     }
 
     await this.instrument.command(":OUTP:STAT OFF");
+    await this.instrument_lamp.command("OUTput ON");
+
     this.setState({ running_mpp: false });
   }
 
@@ -610,10 +647,14 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   componentDidMount() {
 
-    this.graph_iv_instance = new __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default.a(this.graph_iv_dom);
+    this.graph_iv_instance = new __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default.a(this.graph_iv_dom);
     this.graph_iv_instance.resize(iv_width, iv_height);
 
-    this.legend = this.graph_iv_instance.makeLegend();
+    this.legend = this.graph_iv_instance.makeLegend({
+      frame: false,
+      backgroundColor: "transparent"
+    });
+
     this.legend.setAutoPosition('bottom');
     this.legend.notHideable();
 
@@ -634,11 +675,11 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
     this.serie_iv_backward_power = this.graph_iv_instance.newSerie("pow-bw").setLabel("P(V) bw").autoAxis().setYAxis(this.graph_iv_instance.getRightAxis()).setLineColor('red').setLineStyle(2);
 
-    this.shape_mpp_backward = this.graph_iv_instance.newShape("ellipse").setR(3, 3).setFillColor('black').draw().setSerie(this.serie_iv_backward_power);
+    this.shape_mpp_backward = this.graph_iv_instance.newShape("ellipse").setR("3px", "3px").setFillColor('black').draw().setSerie(this.serie_iv_backward_power);
 
-    this.shape_mpp_forward = this.graph_iv_instance.newShape("ellipse").setR(3, 3).setFillColor('black').draw().setSerie(this.serie_iv_forward_power);
+    this.shape_mpp_forward = this.graph_iv_instance.newShape("ellipse").setR("3px", "3px").setFillColor('black').draw().setSerie(this.serie_iv_forward_power);
 
-    this.graph_mppt_instance = new __WEBPACK_IMPORTED_MODULE_5_node_jsgraph_dist_jsgraph_es6___default.a(this.graph_mppt_dom);
+    this.graph_mppt_instance = new __WEBPACK_IMPORTED_MODULE_6_node_jsgraph_dist_jsgraph_es6___default.a(this.graph_mppt_dom);
     this.graph_mppt_instance.resize(550, 300);
 
     this.graph_mppt_instance.getLeftAxis(0).setUnit("A").setUnitWrapper("(", ")").setUnitDecade(true).setScientific(true).gridsOff().setLabel("Current");
@@ -767,7 +808,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
         { className: "row" },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "col-sm-4" },
+          { className: "col-xs-2" },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "container-fluid" },
@@ -785,18 +826,18 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   "label",
                   { htmlFor: "gpib_resource" },
-                  "GPIB resource"
+                  "Keithley GPIB resource"
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   "div",
                   { className: "input-group" },
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     "select",
-                    { name: "gpibresource", id: "gpib_resource", name: "gpib_resource", className: "form-control", value: this.state.gpib_resource, onChange: this.form_gpib_change },
+                    { name: "gpibresource", id: "gpib_resource_keithley", name: "gpib_resource_keithley", className: "form-control", value: this.state.gpib_resource_keithley, onChange: this.form_gpib_change },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       "option",
                       { value: "-1" },
-                      "Select a GPIB resource"
+                      "Select the Keithley"
                     ),
                     list_gpibresources
                   ),
@@ -805,24 +846,70 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
                     { className: "input-group-btn" },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       "button",
-                      { type: "button", className: "btn btn-primary", onClick: this.connectToGPIB },
+                      { type: "button", className: "btn btn-primary", onClick: this.connectKeithleyToGPIB },
                       "Connect"
                     )
                   )
                 )
               ),
-              this.state.connectionerror && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              this.state.connectionerror_keithley && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "p",
                 { className: "bg-danger" },
                 "Problem connecting to GPIB resource. Check Keithley parameters. The returned error was : ",
                 this.state.connectionerror,
                 " "
               ),
-              this.state.connected && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              this.state.connected_keithley && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 "p",
                 { className: "bg-success" },
                 "Successfully connected to remote host (IDN ",
-                this.state.connected,
+                this.state.connected_keithley,
+                ")"
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "div",
+                { className: "form-group row" },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "label",
+                  { htmlFor: "gpib_resource" },
+                  "Verasol GPIB resource"
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "div",
+                  { className: "input-group" },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "select",
+                    { name: "gpibresource", id: "gpib_resource_lamp", name: "gpib_resource_lamp", className: "form-control", value: this.state.gpib_resource_lamp, onChange: this.form_gpib_change },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      "option",
+                      { value: "-1" },
+                      "Select the Verasol lamp"
+                    ),
+                    list_gpibresources
+                  ),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "div",
+                    { className: "input-group-btn" },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      "button",
+                      { type: "button", className: "btn btn-primary", onClick: this.connectLampToGPIB },
+                      "Connect"
+                    )
+                  )
+                )
+              ),
+              this.state.connectionerror_lamp && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "p",
+                { className: "bg-danger" },
+                "Problem connecting to GPIB resource. Check Verasol parameters. The returned error was : ",
+                this.state.connectionerror,
+                " "
+              ),
+              this.state.connected_lamp && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "p",
+                { className: "bg-success" },
+                "Successfully connected to remote host (IDN ",
+                this.state.connected_lamp,
                 ")"
               )
             ),
@@ -1007,13 +1094,13 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
                 { className: "btn-group form-group" },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   "button",
-                  { onClick: this.iv, className: "btn btn-primary" + (this.state.iv_making || !this.state.connected ? ' disabled' : ''), type: "button" },
+                  { onClick: this.iv, className: "btn btn-primary" + (this.state.iv_making || !this.state.connected_keithley || !this.state.connected_lamp ? ' disabled' : ''), type: "button" },
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
                   " Record IV"
                 ),
                 !this.state.running_mpp && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   "button",
-                  { onClick: this.mppt, className: "btn btn-primary" + (!this.state.connected ? ' disabled' : ''), type: "button" },
+                  { onClick: this.mppt, className: "btn btn-primary" + (!this.state.connected_keithley || !this.state.connected_lamp ? ' disabled' : ''), type: "button" },
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
                   " Record MPP"
                 ),
@@ -1037,15 +1124,15 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
                   { onClick: this.downloadITX, className: "btn btn-default", type: "button" },
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-download" }),
                   " Download ITX"
-                ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "clearfix visible-xs-block" })
-              )
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "clearfix visible-xs-block" })
             )
           )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "col-sm-6" },
+          { className: "col-xs-4" },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "row" },
@@ -1063,7 +1150,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
-          { className: "col-sm-3" },
+          { className: "col-xs-3" },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "h3",
             null,
@@ -1188,27 +1275,27 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (MPPTJV);
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = jQuery;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_node_jsgraph_dist_jsgraph_es6__);
 
-const PythonShell = __webpack_require__(13);
-const path = __webpack_require__(2);
+const PythonShell = __webpack_require__(3);
+const path = __webpack_require__(1);
 
 
 class KeithleySMU {
@@ -1401,19 +1488,183 @@ class KeithleySMU {
 /* harmony default export */ __webpack_exports__["a"] = (KeithleySMU);
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports) {
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = require("python-shell");
+"use strict";
+
+const PythonShell = __webpack_require__(3);
+const path = __webpack_require__(1);
+
+class KeithleySMU {
+
+	static list() {
+
+		return new Promise((resolver, rejecter) => {
+
+			var list = new PythonShell('script.list', {
+
+				pythonOptions: ['-m'],
+				cwd: path.join(__dirname.replace("app.asar", "app.asar.unpacked"), '../util/pyvisa/'),
+				mode: "text" // Text mode
+			});
+
+			list.once("error", error => {
+				error = error.toString('utf-8');
+				list.removeAllListeners("message");
+				rejecter(error);
+			});
+
+			list.once("message", results => {
+
+				results = results.toString('utf-8');
+
+				list.removeAllListeners("error");
+				if (Array.isArray(results)) {
+					results = results[0];
+				}
+
+				let resultsParsed = /\((.*)\)/gim.exec(results);
+
+				if (!resultsParsed || !resultsParsed[1]) {
+					return rejecter();
+				}
+
+				if (resultsParsed[1].length == 0) {
+					rejecter();
+					return;
+				}
+
+				resultsParsed = resultsParsed[1].split(',').map(result => {
+
+					result = /u'(.*)'/g.exec(result);
+
+					if (!result || !result[1]) {
+						return null;
+					}
+
+					return result[1];
+				});
+
+				resolver(resultsParsed);
+			});
+		});
+	}
+
+	constructor(host) {
+		this.host = host;
+	}
+
+	connect() {
+
+		if (this.visaShell) {
+			this.visaShell.removeAllListeners("message");
+			this.visaShell.removeAllListeners("error");
+			this.visaShell = null;
+		}
+
+		return new Promise((resolver, rejecter) => {
+
+			var timeout = setTimeout(() => {
+
+				this.visaShell.end(() => {
+
+					rejecter("Cannot connect");
+				});
+			}, 1000);
+
+			try {
+
+				this.visaShell = new PythonShell('script.iovisa', {
+
+					cwd: path.join(__dirname.replace("app.asar", "app.asar.unpacked"), '../util/pyvisa/'),
+					pythonOptions: ['-m'],
+					args: [this.host], // Pass the VISA address
+					mode: "text" // Text mode
+
+				});
+			} catch (error) {
+
+				clearTimeout(timeout);
+				rejecter(error);
+				return;
+			}
+
+			this.visaShell.once("error", error => {
+				//	this.visaShell.removeAllListeners("message");
+
+				error = error.toString('utf-8');
+				clearTimeout(timeout);
+				rejecter(error);
+			});
+
+			this.visaShell.once("message", async message => {
+
+				message = message.toString('utf-8');
+				this.visaShell.removeAllListeners("error");
+
+				clearTimeout(timeout);
+				resolver(message);
+			});
+
+			this.visaShell.send("connect");
+		});
+	}
+
+	delay(time) {
+		return new Promise((resolver, rejecter) => {
+			setTimeout(() => {
+				resolver();
+			}, time);
+		});
+	}
+
+	command(command) {
+
+		return new Promise((resolver, rejecter) => {
+
+			this.visaShell.once("message", async message => {
+				message = message.toString('utf-8');
+				await this.delay(20);
+				resolver(message);
+			});
+
+			this.visaShell.send(command);
+		});
+	}
+
+	query(command) {
+
+		return new Promise((resolver, rejecter) => {
+
+			this.visaShell.once("message", async message => {
+				message = message.toString('utf-8');
+				await this.delay(20);
+
+				if (message.indexOf("ERROR") > -1) {
+					rejecter(message);
+					return;
+				}
+
+				resolver(message);
+			});
+
+			this.visaShell.send(command);
+		});
+	}
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (KeithleySMU);
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = require("pdfkit");
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1573,7 +1824,7 @@ class CSVBuilder extends FileBuilder {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1581,31 +1832,31 @@ class CSVBuilder extends FileBuilder {
 
 function svgToPDF(domElement, width, height) {
 
-  return new Promise((resolver, rejecter) => {
+    return new Promise((resolver, rejecter) => {
 
-    var canvas = document.createElement('canvas');
-    canvas.width = width * 4;
-    canvas.height = height * 4;
-    var ctx = canvas.getContext('2d');
+        var canvas = document.createElement('canvas');
+        canvas.width = width * 4;
+        canvas.height = height * 4;
+        var ctx = canvas.getContext('2d');
 
-    var DOMURL = window.URL || window.webkitURL || window;
+        var DOMURL = window.URL || window.webkitURL || window;
 
-    var img = new Image();
-    var svg = new Blob([domElement.innerHTML], { type: 'image/svg+xml' });
-    var url = DOMURL.createObjectURL(svg);
+        var img = new Image();
+        var svg = new Blob([domElement.innerHTML], { type: 'image/svg+xml' });
+        var url = DOMURL.createObjectURL(svg);
 
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, width * 4, height * 4);
-      resolver(canvas.toDataURL());
-      DOMURL.revokeObjectURL(url);
-    };
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, width * 4, height * 4);
+            resolver(canvas.toDataURL());
+            DOMURL.revokeObjectURL(url);
+        };
 
-    img.src = url;
-  });
+        img.src = url;
+    });
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1613,34 +1864,34 @@ function svgToPDF(domElement, width, height) {
 
 let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) => {
 
-  let jsc = waveform.getY(waveform.getIndexFromX(0));
-  let voc = waveform.getX(waveform.findLevel(0));
+    let jsc = waveform.getY(waveform.getIndexFromX(0));
+    let voc = waveform.getX(waveform.findLevel(0));
 
-  let maxpower;
+    let maxpower;
 
-  if (inverted) {
-    maxpower = powerwaveform.getMaxY();
-  } else {
-    maxpower = powerwaveform.getMinY();
-  }
+    if (inverted) {
+        maxpower = powerwaveform.getMaxY();
+    } else {
+        maxpower = powerwaveform.getMinY();
+    }
 
-  let ff = maxpower / (jsc * voc);
-  let pce = Math.round(maxpower * 1000 / area / (powin / 10) * 100 * 100) / 100 * (inverted ? 1 : -1);
+    let ff = maxpower / (jsc * voc);
+    let pce = Math.round(maxpower * 1000 / area / (powin / 10) * 100 * 100) / 100 * (inverted ? 1 : -1);
 
-  let maxIndex = powerwaveform.findLevel(maxpower);
-  let vmax = powerwaveform.getX(maxIndex);
+    let maxIndex = powerwaveform.findLevel(maxpower);
+    let vmax = powerwaveform.getX(maxIndex);
 
-  return {
-    isc: jsc * 1000 * (inverted ? 1 : -1),
-    jsc: jsc / area * 1000 * (inverted ? 1 : -1),
-    voc: voc,
-    ff: ff * 100,
-    powerin: powin,
-    power: maxpower * 1000,
-    pce: pce,
-    jmax: 0,
-    vmax: vmax
-  };
+    return {
+        isc: jsc * 1000 * (inverted ? 1 : -1),
+        jsc: jsc / area * 1000 * (inverted ? 1 : -1),
+        voc: voc,
+        ff: ff * 100,
+        powerin: powin,
+        power: maxpower * 1000,
+        pce: pce,
+        jmax: 0,
+        vmax: vmax
+    };
 };
 
 /***/ })

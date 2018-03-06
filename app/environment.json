@@ -2,18 +2,10 @@
 	"ageing": true,
 	"statuses": {
 		"light": {
-			"version": "2.0"
+			"version": "1.0"
 		},
 		"heat": {
-			"version": "2.0"
-		}
-	},
-	"instrument": {
-		"Small cells": {
-			"ADC": {
-				"model": "ADS1259"
-			},
-			"fsr": 30
+			"version": "1.0"
 		}
 	}
 }
