@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -120,7 +120,7 @@ let ping = function (cfg) {
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"1.0"},"heat":{"version":"1.0"}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5}}}
 
 /***/ }),
 /* 5 */
@@ -177,6 +177,99 @@ class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureC
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[name] = extend(deep, clone, copy);
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						target[name] = copy;
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -262,7 +355,7 @@ class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -449,14 +542,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -465,7 +558,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 
@@ -482,50 +575,50 @@ let db;
 
 __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("reloadDB", (event, cfg) => {
 
-		db = cfg.db;
-		render();
+	db = cfg.db;
+	render();
 });
 
 __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("loadInstrument", (event, cfg) => {
 
-		tracker = cfg.tracker;
-		db = cfg.db;
-		render();
+	tracker = cfg.tracker;
+	db = cfg.db;
+	render();
 });
 
 function render(cfg) {
 
-		fetch("http://" + tracker.trackerHost + ":" + tracker.trackerPort + "/getInstruments", {
-				method: 'GET'
-		}).then(response => response.json()).then(json => {
+	fetch("http://" + tracker.trackerHost + ":" + tracker.trackerPort + "/getInstruments", {
+		method: 'GET'
+	}).then(response => response.json()).then(json => {
 
-				let trackers = [];
+		let trackers = [];
 
-				for (var i in json) {
+		for (var i in json) {
 
-						trackers.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ key: i, className: 'container-fluid' },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__["a" /* default */], { instrumentId: i, trackerConfig: json, fullScaleCurrent: json.fullScaleCurrent, config: tracker, configDB: db })
-						));
-				}
+			trackers.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ key: i, className: 'container-fluid' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__["a" /* default */], { instrumentId: i, trackerConfig: json, fullScaleCurrent: json.fullScaleCurrent, config: tracker, configDB: db })
+			));
+		}
 
-				__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						null,
-						trackers
-				), document.getElementById('root'));
-		});
+		__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			'div',
+			null,
+			trackers
+		), document.getElementById('root'));
+	});
 }
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
@@ -759,14 +852,14 @@ var _initialiseProps = function () {
 /* harmony default export */ __webpack_exports__["a"] = (TrackerInstrument);
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__influx__ = __webpack_require__(3);
@@ -1047,22 +1140,25 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 /* harmony default export */ __webpack_exports__["a"] = (TrackerGroupDevices);
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pgasettings__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_extend__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__influx__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pgasettings__ = __webpack_require__(20);
+
 
 
 
@@ -1118,7 +1214,7 @@ function round(value, digits) {
 	return Math.round(value * 10 ** digits) / 10 ** digits;
 }
 
-class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Component {
+class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_7_react___default.a.Component {
 
 	/**
   *	@param props.name The name of the cell
@@ -1127,64 +1223,64 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		super(props);
 
 		this.unit = {
-			"voltage": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"voltage": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"V"
 			),
-			"currentdensity": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"currentdensity": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"mA cm",
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"sup",
 					null,
 					"-2"
 				)
 			),
-			"current": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"current": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"mA"
 			),
-			"efficiency": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"efficiency": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"%"
 			),
-			"fillfactor": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"fillfactor": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"%"
 			),
-			"sun": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"sun": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"sun"
 			),
-			"area": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"area": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"cm",
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"sup",
 					null,
 					"2"
 				)
 			),
-			"temperature": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"temperature": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"\xB0C"
 			),
-			"humidity": __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			"humidity": __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				"%"
 			)
 		};
 
-		this.state = Object.assign({}, initialState);
+		this.state = __WEBPACK_IMPORTED_MODULE_5_extend___default()(true, {}, initialState);
 		this.state.data = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
 		this.cfg = this.cfg.bind(this);
@@ -1243,7 +1339,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			this.updateInfluxData(this.props.serverState);
 		}
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].on("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
+		__WEBPACK_IMPORTED_MODULE_8_electron__["ipcRenderer"].on("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
 	}
 
 	componentWillUnmount() {
@@ -1253,7 +1349,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			this.refreshInterval = true;
 		}
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].removeListener("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
+		__WEBPACK_IMPORTED_MODULE_8_electron__["ipcRenderer"].removeListener("channel.update." + this.props.instrumentId + "." + this.props.chanId, this.wsUpdate);
 	}
 
 	async wsUpdate(event, data) {
@@ -1343,7 +1439,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			if (this.state.data.getLength && this.state.data.getLength() > 0) {
 				lastTime = this.state.data.xdata.data[this.state.data.getLength() - 1];
-				lastTime += this.state.serverState.tracking_record_interval / 1000;
+				lastTime += this.state.serverState.tracking_record_interval / 1000 / 3600;
 			} else {
 				lastTime = 0;
 			}
@@ -1372,7 +1468,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		if (data.action.stopped) {
 			await this.getStatus();
-			newState = Object.assign({}, initialState);
+			newState = __WEBPACK_IMPORTED_MODULE_5_extend___default()(true, {}, initialState);
 			this.state = newState; // Force-remove all the other state that will pollute the new channel
 		}
 
@@ -1441,6 +1537,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		if (this.state.processing_jsc) {
 			return;
 		}
+
 		this.setState({ processing_jsc: true, error_jsc: false });
 		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
 			this.setState({ error_jsc: true });
@@ -1457,32 +1554,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	downloadData() {
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("downloadData", this.state.serverState, this.props.chanId, this.state.serverState.measurementName);
+		__WEBPACK_IMPORTED_MODULE_8_electron__["ipcRenderer"].send("downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId);
 	}
 
-	componentDidUpdate() {
-
-		//		this.getStatus();
-
-		this.scheduleRefresh();
-	}
-
-	scheduleRefresh() {
-
-		if (this.refreshInterval) {
-			return;
-		}
-
-		this.refreshInterval = setTimeout(() => {
-
-			this.refreshInterval = false;
-			if (this.state.updating) {
-				return;
-			}
-
-			this.updateInfluxData();
-		}, this.props.refreshRate * 1000 || 60000);
-	}
+	componentDidUpdate() {}
 
 	pause() {
 		this.state.serverState.enable = 0;
@@ -1505,7 +1580,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 	cfg() {
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].once("channelConfigured", (event, data) => {
+		__WEBPACK_IMPORTED_MODULE_8_electron__["ipcRenderer"].once("channelConfigured", (event, data) => {
 
 			if (data.chanId != this.props.chanId) {
 				return;
@@ -1514,7 +1589,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			this.saveStatus(data);
 		});
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("configChannel", {
+		__WEBPACK_IMPORTED_MODULE_8_electron__["ipcRenderer"].send("configChannel", {
 
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
@@ -1629,12 +1704,12 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 				break;
 		}
 
-		let queries = ["SELECT time, efficiency FROM \"" + serverState.measurementName + "\" ORDER BY time ASC limit 1", "SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM \"" + serverState.measurementName + "\" ORDER BY time DESC limit 1", `SELECT time, iv FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, "SELECT jsc FROM \"" + serverState.measurementName + "_jsc\" ORDER BY time DESC LIMIT 1"];
+		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
 
-		Object(__WEBPACK_IMPORTED_MODULE_5__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
-
+		Object(__WEBPACK_IMPORTED_MODULE_6__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
+			console.log(results[2]);
 			if (results[2].series && results[2].series[0]) {
 
 				newState.ivCurves = this.state.ivCurves.splice(0);
@@ -1709,7 +1784,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
-			queue.push(Object(__WEBPACK_IMPORTED_MODULE_5__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
+			queue.push(Object(__WEBPACK_IMPORTED_MODULE_6__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
 
 				let values = results[0].series[0].values,
 				    offset,
@@ -1738,7 +1813,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 						offset = date.getTime();
 						time = 0;
 					} else {
-						time = (date.getTime() - offset) / 1000;
+						time = (date.getTime() - offset) / 1000 / 3600;
 					}
 
 					//value[ valueIndex ] += 2;
@@ -1807,7 +1882,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 			this.setState(newState);
 
-			this.scheduleRefresh();
+			//			this.scheduleRefresh();
 		});
 	}
 
@@ -1818,24 +1893,24 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 		}
 
 		if (Math.abs(value) < 0.8) {
-			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			return __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				(Math.round(value * 10000) / 10).toFixed(1),
 				"\xA0\u03BCA\xA0cm",
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"sup",
 					null,
 					"-2"
 				)
 			);
 		} else {
-			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			return __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"span",
 				null,
 				(Math.round(value * 100) / 100).toFixed(1),
 				"\xA0mA\xA0cm",
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"sup",
 					null,
 					"-2"
@@ -1901,41 +1976,41 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 
 		if (active) {
 
-			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			return __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"div",
 				{ ref: el => this.wrapper = el, className: 'cl-device ' + (active ? 'cell-running' : 'cell-stopped') + ' show-details' },
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"div",
 					{ className: "col-lg-7" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "cell-name cell-main-info row" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-9" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"span",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"span",
 								{ className: "label" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"span",
 								{ className: "value" },
 								this.state.serverState.cellName
 							),
 							" ",
-							this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							this.state.serverState.cellArea ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"span",
 								{ className: "cell-area" },
 								"( ",
 								this.state.serverState.cellArea,
 								" cm",
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"sup",
 									null,
 									"2"
@@ -1944,130 +2019,130 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 							) : ""
 						)
 					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "cell-timing row" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
 								"Last data"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, direction: "ascending", timerValue: this.state.timer_aquisition })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, direction: "ascending", timerValue: this.state.timer_aquisition })
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" + (this.state.processing_iv ? ' processing' : '') + (this.state.error_iv ? ' processing-error' : '') },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "record" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordIV })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordIV })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
 								"Next IV curve"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextIV })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { negative: "Overdue", precision: 2, direction: "descending", timerValue: this.state.timer_nextIV })
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" + (this.state.processing_voc ? ' processing' : '') + (this.state.error_voc ? ' processing-error' : '') },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "record" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
 								"Next Voc"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextVoc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { negative: "Overdue", precision: 2, direction: "descending", timerValue: this.state.timer_nextVoc })
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" + (this.state.processing_jsc ? ' processing' : '') + (this.state.error_jsc ? ' processing-error' : '') },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "record" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
 								"Next Jsc"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 2, direction: "descending", timerValue: this.state.timer_nextJsc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { negative: "Overdue", precision: 2, direction: "descending", timerValue: this.state.timer_nextJsc })
 							)
 						)
 					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "cell-summary row" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: `col-lg-1 cell-status ${active ? 'active' : ''}` },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								active ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }) : __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
+								active ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }) : __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
 							),
 							trackingMode
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "label" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-hourglass" })
 								),
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, maxLevel: 3, spacer: " ", direction: "ascending", timerValue: this.state.timer_ellapsed })
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__timer_jsx__["a" /* default */], { precision: 1, maxLevel: 3, spacer: " ", direction: "ascending", timerValue: this.state.timer_ellapsed })
 								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "label" },
 									"\u03B7"
 								),
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 										"strong",
 										null,
-										!isNaN(this.state.efficiency) && this.state.efficiency !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+										!isNaN(this.state.efficiency) && this.state.efficiency !== false ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 											"span",
 											null,
 											this.state.efficiency,
@@ -2078,21 +2153,21 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "label" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" })
 								),
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									!isNaN(this.state.sun) && this.state.sun !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									!isNaN(this.state.sun) && this.state.sun !== false ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 										"span",
 										null,
 										this.state.sun,
@@ -2102,28 +2177,28 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" + (this.state.processing_voc ? ' processing' : '') + (this.state.error_voc ? ' error' : '') },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "record" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordVoc })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "label" },
 								"V",
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"sub",
 									null,
 									"oc"
 								)
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "value" },
-								!isNaN(this.state.voc) && this.state.voc !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								!isNaN(this.state.voc) && this.state.voc !== false ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"span",
 									null,
 									this.state.voc,
@@ -2132,42 +2207,42 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								) : 'N/A'
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" + (this.state.processing_jsc ? ' processing' : '') + (this.state.error_jsc ? ' error' : '') },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "record" },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-record", onClick: this.recordJsc })
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "label" },
 								"J",
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"sub",
 									null,
 									"sc"
 								)
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "value" },
 								jsc_currentdensity || 'N/A'
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "label" },
 								"FF"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "value" },
-								!isNaN(this.state.ff) && this.state.ff !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								!isNaN(this.state.ff) && this.state.ff !== false ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"span",
 									null,
 									this.state.ff,
@@ -2176,23 +2251,23 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								) : 'N/A'
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "label" },
 								"V",
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"sub",
 									null,
 									"now"
 								)
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "value" },
-								!isNaN(this.state.voltage) && this.state.voltage !== false ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								!isNaN(this.state.voltage) && this.state.voltage !== false ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"span",
 									null,
 									this.state.voltage,
@@ -2201,46 +2276,46 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								) : 'N/A'
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "label" },
 								"J",
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"sub",
 									null,
 									"now"
 								)
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								{ className: "value" },
 								j_currentdensity || 'N/A'
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "label" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-grain" })
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-grain" })
 								),
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									this.state.temperature && this.state.temperature > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									this.state.temperature && this.state.temperature > 0 ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 										"span",
 										{ title: "Base temperature (local temperature on the chip just under the device)" },
 										this.state.temperature
 									) : 'N/A',
 									"\xA0/\xA0",
-									this.state.temperature_junction && this.state.temperature_junction > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									this.state.temperature_junction && this.state.temperature_junction > 0 ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 										"span",
 										{ title: "Estimated junction temperature (base temperature + thermopile voltage)" },
 										this.state.temperature_junction,
@@ -2250,21 +2325,21 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-1 propElement" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"div",
 								null,
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "label" },
-									__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tint" })
+									__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-tint" })
 								),
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									this.state.humidity && this.state.humidity > 0 ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+									this.state.humidity && this.state.humidity > 0 ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 										"span",
 										null,
 										this.state.humidity,
@@ -2274,10 +2349,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "cell-efficiency col-lg-6" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__["a" /* default */], {
 								shown: true,
 								width: "720",
 								height: "60",
@@ -2296,42 +2371,42 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 								flag2: currVal })
 						)
 					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "row cell-actions" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-1 label" },
 							"Actions"
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-8" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"button",
 								{ className: "btn btn-cl", onClick: this.downloadData },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
 								" Download"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"button",
 								{ className: "btn btn-cl", onClick: this.stop },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" }),
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" }),
 								" Stop"
 							),
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"button",
 								{ className: "btn btn-cl", onClick: this.cfg },
-								__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+								__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
 								" Configure"
 							)
 						)
 					)
 				),
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"div",
 					{ className: "col-lg-2 cell-iv" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__["a" /* default */], {
 						width: "290",
 						height: "230",
 						shown: true,
@@ -2346,29 +2421,29 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 			);
 		} else {
 
-			return __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+			return __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 				"div",
 				{ ref: el => this.wrapper = el, className: "cl-device cell-unknown" },
-				__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 					"div",
 					{ className: "cell-name cell-main-info row" },
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "col-lg-4" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"span",
 							null,
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("input", { type: "checkbox", className: "channel-check", onClick: this.props.toggleChannelCheck, checked: !!this.props.channelChecked })
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"span",
 							{ className: "label" },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-tags" })
 						),
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"span",
 							{ className: "value" },
-							!this.state.serverState.cellName ? __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+							!this.state.serverState.cellName ? __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 								"span",
 								null,
 								"Channel #",
@@ -2376,19 +2451,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 							) : this.state.serverState.cellName
 						)
 					),
-					__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 						"div",
 						{ className: "col-lg-4" },
-						__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"button",
 							{ className: "btn btn-cl btn-sm", onClick: this.cfg },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
 							" Configure"
 						),
-						!!(this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && !active && this.state.serverState.tracking_mode > 0) && __WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement(
+						!!(this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && !active && this.state.serverState.tracking_mode > 0) && __WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement(
 							"button",
 							{ className: "btn btn-cl btn-sm", onClick: this.start },
-							__WEBPACK_IMPORTED_MODULE_6_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+							__WEBPACK_IMPORTED_MODULE_7_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
 							" Start"
 						)
 					)
@@ -2401,7 +2476,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 /* harmony default export */ __webpack_exports__["a"] = (TrackerDevice);
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2410,7 +2485,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_6_react___default.a.Compon
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_extend__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__);
@@ -2541,6 +2616,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.flag1.setSerie(this.serie);
 			this.flag1.setWidth(100);
 			this.flag1.setHeight(100);
+			this.flag1.draw();
 
 			this.flag2 = this.graph.newShape("html");
 			this.flag2.addTransform("translate", this.graph.newPosition({ dx: "-80px", dy: "-5px" }));
@@ -2566,6 +2642,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			this.flag2.setSerie(this.serie);
 			this.flag2.setWidth(100);
 			this.flag2.setHeight(100);
+			this.flag2.draw();
 		}
 	}
 
@@ -2577,25 +2654,27 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 
 		if (this.graph && this.props.data) {
 
-			this.serie.setWaveform(this.props.data.setXScale(1 / 3600));
+			this.serie.setWaveform(this.props.data);
 			this.serieZone.setWaveform(this.props.data.duplicate(true).prepend(0, 0).append(wave => wave.getXRaw(wave.getLength() - 1), 0));
 			this.graph.autoscaleAxes();
-			this.graph.draw();
+
 			//this.graph.updateLegend();
 
 			if (this.flag1 && this.flag2) {
-				this.flag1.draw();
-				this.flag2.draw();
+				//this.flag1.draw();
+				//this.flag2.draw();
 
-				this.flag1.setPosition({ x: this.props.flag1_pos / 3600 });
+
+				this.flag1.show();
+				this.flag2.show();
+
+				this.flag1.setPosition({ x: this.props.flag1_pos });
 				this.flag1.redraw();
 
 				this.flag2.setPosition({ x: this.serie.getMaxX() });
 				this.flag2.redraw();
-
-				this.flag1.show();
-				this.flag2.show();
 			}
+			this.graph.draw();
 		} else {
 
 			this.serie.setWaveform(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform().setData([]));
@@ -2636,99 +2715,6 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (statusGraph);
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) { /**/ }
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone;
-	var target = arguments[0];
-	var i = 1;
-	var length = arguments.length;
-	var deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	}
-	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
 
 /***/ }),
 /* 16 */
@@ -2954,6 +2940,10 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   componentWillReceiveProps(nextProps) {}
 
   processTime(value) {
+
+    if (value < 0 && this.props.negative) {
+      return this.props.negative;
+    }
 
     let str = [];
     let spacer = this.props.spacer || "";
@@ -3533,7 +3523,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
     // Update directly the state
 
-    console.log(data);
+
     this.setState(data.data);
 
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
@@ -3604,7 +3594,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
 
 
@@ -3893,7 +3883,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
   }
 
   render() {
-    console.log(this.state);
+
     let heating_problem = this.state.heating_voltage / this.state.heating_current > 20;
     if (this.state.heating_voltage < 1 || !this.state.heating_voltage) {
       // For low voltage, let's not flag anything
@@ -4004,7 +3994,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
 
 
@@ -4073,7 +4063,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 			instrumentId: this.props.instrumentId,
 			speed: val
 		}));
-		console.log(result);
+
 		await this.props.update();
 	}
 
@@ -4090,7 +4080,6 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 
 	render() {
 
-		console.log(this.props, __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument);
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "col-lg-2 group-status group-status-instrument" },

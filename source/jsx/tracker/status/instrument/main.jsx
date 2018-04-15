@@ -69,7 +69,7 @@ class InstrumentStatus extends React.Component {
 			instrumentId: this.props.instrumentId,
 			speed: val 
 		} ) );
-    console.log( result );
+    
 		await this.props.update();
 	}
 
@@ -87,7 +87,7 @@ class InstrumentStatus extends React.Component {
 
 	render() {
 
-console.log( this.props, environment.instrument );
+
 		return ( 
 
 		<div className="col-lg-2 group-status group-status-instrument">

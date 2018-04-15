@@ -305,7 +305,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPDOptions?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName, {
 			method: 'GET'
 		}).then(values => values.json()).then(control => {
-			console.log(control);
+
 			this.setState({ control: control });
 		}).catch(error => {
 			console.error(error);

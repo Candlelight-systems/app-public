@@ -18,7 +18,8 @@
 					"model": "ADS1259"
 				},
 
-				"fsr": 30
+				"fsr": 30,
+				"voltageRange": 2.5
 			}
 		}
 

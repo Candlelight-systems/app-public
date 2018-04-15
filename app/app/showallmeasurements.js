@@ -130,9 +130,9 @@ function pad(number) {
 	return number;
 }
 
-function downloadData(measurementName, cellInfo) {
+function downloadData(measurementName) {
 
-	__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].send("downloadData", cellInfo, undefined, measurementName);
+	__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].send("downloadData", data.config, this.state.serverState.measurementName);
 }
 
 function removeData(measurementName) {
@@ -213,6 +213,25 @@ async function render() {
 					'All existing measurements'
 				),
 				jsonArray.map(val => {
+
+					switch (val.cellInfo.trackingMode) {
+						case 'MPP':
+							tracking = 'Maximum power point';
+							break;
+
+						case 'CONSTV':
+							tracking = `Constant voltage`;
+							break;
+
+						case 'JSC':
+							tracking = `Short circuit current`;
+							break;
+
+						case 'VOC':
+							tracking = `Open circuit voltage`;
+							break;
+					}
+
 					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'li',
 						{ className: 'list-group-item', key: val.measurementName },
@@ -221,7 +240,7 @@ async function render() {
 							{ className: 'pull-right' },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'button',
-								{ className: 'btn btn-sm btn-primary', onClick: () => downloadData(val.measurementName, val.cellInfo) },
+								{ className: 'btn btn-sm btn-primary', onClick: () => downloadData(val.measurementName) },
 								'Download data'
 							),
 							val.endDate && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -246,7 +265,13 @@ async function render() {
 							' ',
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glypicon-arrow-left' }),
 							' ',
-							val.endDate ? formatDate(val.endDate) : '(Running)'
+							val.endDate ? formatDate(val.endDate) + " (" + Math.round((val.endDate - val.startDate) / 1000 / 3600 * 10) / 10 + "h)" : '(Running)'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'div',
+							null,
+							'Tracking mode: ',
+							tracking
 						)
 					);
 				})

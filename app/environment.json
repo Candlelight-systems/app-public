@@ -2,10 +2,19 @@
 	"ageing": true,
 	"statuses": {
 		"light": {
-			"version": "1.0"
+			"version": "2.0"
 		},
 		"heat": {
-			"version": "1.0"
+			"version": "2.0"
+		}
+	},
+	"instrument": {
+		"Small cells": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"fsr": 30,
+			"voltageRange": 2.5
 		}
 	}
 }

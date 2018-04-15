@@ -66,6 +66,7 @@ class CellFormTracking extends React.Component {
 					<label htmlFor="iv_interval" className="col-sm-3">Measure every</label>
 					<div className="col-sm-9">
 						<select name="iv_interval" id="iv_interval" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+							<option value="60000">Every minute</option>
 							<option value="600000">Every 10 minutes</option>
 							<option value="3600000">Every hour</option>
 							<option value="10800000">Every 3 hours</option>

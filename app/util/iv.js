@@ -1,8 +1,21 @@
 
 export let getIVParameters = ( waveform, powerwaveform, area, powin, inverted = false ) => {
 
-    let jsc = waveform.getY( waveform.getIndexFromX( 0 ) );
-    let voc = waveform.getX( waveform.findLevel( 0 ) );
+    let jsc, voc;
+
+    // Let's try to find the jsc. If we cannot find it, it's no big deal. Silent fail
+    try {
+      jsc = waveform.getY( waveform.getIndexFromX( 0 ) );
+    } catch( e ) {
+      jsc = NaN;
+    }
+
+    // Let's try to find the voc. If we cannot find it, it's no big deal. Silent fail
+    try {
+      voc = waveform.getX( waveform.findLevel( 0 ) );
+    } catch( e ) {
+      voc = NaN;
+    }
 
     let maxpower;
 

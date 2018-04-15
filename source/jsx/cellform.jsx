@@ -12,9 +12,9 @@ class CellForm extends React.Component {
 		this.subFormChanged = this.subFormChanged.bind( this );
 		this.validateConfig = this.validateConfig.bind( this );
 		this.state = {
-
 			cellArea: 0,
-			cellName: ""
+			cellName: "",
+			connection: "group"
 		};
 		this.close = this.close.bind( this );
 	}

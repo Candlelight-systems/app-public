@@ -44,6 +44,10 @@ class Timer extends React.Component {
   }
 
   processTime( value ) {
+    
+    if( value < 0 && this.props.negative ) {
+      return this.props.negative;
+    }
 
     let str = [];
     let spacer = this.props.spacer || "";

@@ -133,6 +133,7 @@ class statusGraph extends GraphComponent {
 			this.flag1.setSerie( this.serie );
 			this.flag1.setWidth( 100 );
 			this.flag1.setHeight( 100 );
+			this.flag1.draw();
 
 
 
@@ -148,6 +149,7 @@ class statusGraph extends GraphComponent {
 			this.flag2.setSerie( this.serie );
 			this.flag2.setWidth( 100 );
 			this.flag2.setHeight( 100 );
+			this.flag2.draw();
 		}
 
 	}
@@ -160,25 +162,27 @@ class statusGraph extends GraphComponent {
 
 		if( this.graph && this.props.data ) {
 
-			this.serie.setWaveform( this.props.data.setXScale( 1 / 3600 ) );
+			this.serie.setWaveform( this.props.data );
 			this.serieZone.setWaveform( this.props.data.duplicate( true ).prepend( 0, 0 ).append( ( wave ) => wave.getXRaw( wave.getLength() - 1 ), 0 ) );
 			this.graph.autoscaleAxes();
-			this.graph.draw();
+			
 			//this.graph.updateLegend();
 
 			if( this.flag1 && this.flag2 ) {
-				this.flag1.draw();
-				this.flag2.draw();
+				//this.flag1.draw();
+				//this.flag2.draw();
 
-				this.flag1.setPosition( { x: this.props.flag1_pos / 3600 } );
+
+				this.flag1.show();
+				this.flag2.show();
+
+				this.flag1.setPosition( { x: this.props.flag1_pos } );
 				this.flag1.redraw();
 				
 				this.flag2.setPosition( { x: this.serie.getMaxX() } );
 				this.flag2.redraw();
-
-				this.flag1.show();
-				this.flag2.show();
 			}
+			this.graph.draw();
 
 		} else {
 

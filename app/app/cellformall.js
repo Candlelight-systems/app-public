@@ -168,40 +168,29 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							'option',
 							{ key: '3', value: '3' },
 							'Short circuit current'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '4', value: '4' },
+							'Constant voltage'
 						)
 					)
 				)
 			),
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			this.props.tracking_mode == 4 ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: 'form-group' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'label',
 					{ htmlFor: 'tracking_mode', className: 'col-sm-3' },
-					'Current range'
+					'Voltage'
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'col-sm-9' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'select',
-						{ name: 'tracking_gain', id: 'tracking_gain', className: 'form-control', value: this.props.tracking_gain, onChange: this.handleInputChange },
-						gainOptions
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'help-block col-sm-9' },
-					'This value is independent of the maximumm current output of your device. Any gain range is safe to use, but ',
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'div',
-						{ className: 'text-danger' },
-						'do not exceed the current capabilities of your device (+/- ',
-						__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].fsr,
-						' mA)'
-					)
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'number', min: -__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].voltageRange, max: +__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].voltageRange, className: 'form-control', name: 'tracking_voltage', value: this.props.tracking_voltage, onChange: this.handleInputChange })
 				)
-			),
+			) : null,
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: 'form-group' },
@@ -319,6 +308,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							'option',
 							{ key: 'never_record', value: 'null' },
 							'Never'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '500sps_record', value: '500' },
+							'2 sample per second'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
@@ -531,6 +525,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							{ name: 'tracking_measure_voc_interval', id: 'tracking_measure_voc_interval', className: 'form-control', value: this.props.tracking_measure_voc_interval, onChange: this.handleInputChange },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'option',
+								{ value: '60000' },
+								'Every minute'
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'option',
 								{ value: '600000' },
 								'Every 10 minutes'
 							),
@@ -596,6 +595,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'select',
 							{ name: 'tracking_measure_jsc_interval', id: 'tracking_measure_jsc_interval', className: 'form-control', value: this.props.tracking_measure_jsc_interval, onChange: this.handleInputChange },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'option',
+								{ value: '60000' },
+								'Every minute'
+							),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'option',
 								{ value: '600000' },
@@ -779,6 +783,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'select',
 						{ name: 'iv_interval', id: 'iv_interval', className: 'form-control', value: this.props.iv_interval, onChange: this.handleInputChange },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '60000' },
+							'Every minute'
+						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ value: '600000' },
@@ -1130,7 +1139,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"1.0"},"heat":{"version":"1.0"}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5}}}
 
 /***/ }),
 /* 8 */
@@ -1155,9 +1164,9 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		this.subFormChanged = this.subFormChanged.bind(this);
 		this.validateConfig = this.validateConfig.bind(this);
 		this.state = {
-
 			cellArea: 0,
-			cellName: ""
+			cellName: "",
+			connection: "group"
 		};
 		this.close = this.close.bind(this);
 	}

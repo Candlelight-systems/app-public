@@ -1,13 +1,16 @@
-import StatusGraph from "../cellstatusgraph.jsx";
-import StatusIV from "../cellstatusiv.jsx";
-import CellButtons from "../cellbuttons.jsx";
-import Graph from 'node-jsgraph/dist/jsgraph-es6';
-import Timer from '../timer.jsx';
+import StatusGraph from "../cellstatusgraph.jsx"
+import StatusIV from "../cellstatusiv.jsx"
+import CellButtons from "../cellbuttons.jsx"
+import Graph from 'node-jsgraph/dist/jsgraph-es6'
+import Timer from '../timer.jsx'
+import extend from 'extend'
 
-import { query as influxquery } from "../influx";
-import React from 'react';
-import { ipcRenderer } from "electron";
+import { query as influxquery } from "../influx"
+import React from 'react'
+import { ipcRenderer } from "electron"
 import { pgaValueToRange } from "../../pgasettings"
+
+
 
 //import cfg from "./config"
 
@@ -73,7 +76,7 @@ class TrackerDevice extends React.Component {
 			"humidity": <span>%</span>
 		};
 
-		this.state = Object.assign( {}, initialState );
+		this.state = extend( true, {}, initialState );
 		this.state.data = Graph.newWaveform();
 
 		this.cfg = this.cfg.bind( this );
@@ -235,7 +238,7 @@ class TrackerDevice extends React.Component {
 
 			if( this.state.data.getLength && this.state.data.getLength() > 0 ) {
 				lastTime = this.state.data.xdata.data[ this.state.data.getLength() - 1 ];
-				lastTime += this.state.serverState.tracking_record_interval / 1000;
+				lastTime += this.state.serverState.tracking_record_interval / 1000 / 3600;
 			} else {
 				lastTime = 0;
 			}
@@ -263,7 +266,7 @@ class TrackerDevice extends React.Component {
 
 		if( data.action.stopped ) {
 			await this.getStatus();
-			newState = Object.assign( {}, initialState );
+			newState = extend( true, {}, initialState );
 			this.state = newState; // Force-remove all the other state that will pollute the new channel
 		}
 
@@ -331,6 +334,7 @@ class TrackerDevice extends React.Component {
 		if( this.state.processing_jsc ) {
 			return;
 		}
+
 		this.setState( { processing_jsc: true, error_jsc: false } );
 		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).catch( () => { this.setState( { error_jsc: true } ); } );
 		this.setState( { processing_jsc: false } );
@@ -345,34 +349,12 @@ class TrackerDevice extends React.Component {
 
 	downloadData() {
 
-		ipcRenderer.send( "downloadData", this.state.serverState, this.props.chanId, this.state.serverState.measurementName );
+		ipcRenderer.send( "downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId );
 	}
 
 
 	componentDidUpdate() {
-		
-//		this.getStatus();
-
-		this.scheduleRefresh();
-	}
-
-	scheduleRefresh() {
-
-		if( this.refreshInterval ) {
-			return;
-		}
-
-
-		this.refreshInterval = setTimeout( () => {
-
-			this.refreshInterval = false;
-			if( this.state.updating ) {
-				return;
-			}
-
-			this.updateInfluxData();	
-
-		}, this.props.refreshRate * 1000 || 60000 );
+	
 	}
 
 
@@ -530,17 +512,17 @@ class TrackerDevice extends React.Component {
 		}
 
 		let queries = [
-		"SELECT time, efficiency FROM \"" + serverState.measurementName + "\" ORDER BY time ASC limit 1",
-		"SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM \"" + serverState.measurementName + "\" ORDER BY time DESC limit 1",
+		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
+		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
 		`SELECT time, iv FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
 		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,
-		"SELECT jsc FROM \"" + serverState.measurementName + "_jsc\" ORDER BY time DESC LIMIT 1"
+		`SELECT jsc FROM "${ serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`
 		];
 		
 		let newIvCurves = false;
 
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
-			
+			console.log( results[ 2 ] );
 			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
 				
 				newState.ivCurves = this.state.ivCurves.splice( 0 );
@@ -643,7 +625,7 @@ class TrackerDevice extends React.Component {
 						offset = date.getTime();
 						time = 0;
 					} else {
-						time = ( date.getTime() - offset ) / 1000;
+						time = ( date.getTime() - offset ) / 1000 / 3600;
 					}
 
 					//value[ valueIndex ] += 2;
@@ -723,7 +705,7 @@ class TrackerDevice extends React.Component {
 
 			this.setState( newState );
 
-			this.scheduleRefresh();
+//			this.scheduleRefresh();
 		});
 	}
 
@@ -844,7 +826,7 @@ class TrackerDevice extends React.Component {
 									<span className="glyphicon glyphicon-record" onClick={ this.recordIV }></span>
 								</div>
 								<div>Next IV curve</div>
-								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextIV } /></div>
+								<div><Timer negative="Overdue" precision={2} direction="descending" timerValue={ this.state.timer_nextIV } /></div>
 								
 							</div>
 
@@ -853,7 +835,7 @@ class TrackerDevice extends React.Component {
 									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
 								</div>
 								<div>Next Voc</div>
-								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextVoc } /></div>
+								<div><Timer negative="Overdue" precision={2} direction="descending" timerValue={ this.state.timer_nextVoc } /></div>
 								
 							</div>
 
@@ -862,7 +844,7 @@ class TrackerDevice extends React.Component {
 									<span className="glyphicon glyphicon-record" onClick={ this.recordJsc }></span>
 								</div>
 								<div>Next Jsc</div>
-								<div><Timer precision={2} direction="descending" timerValue={ this.state.timer_nextJsc } /></div>
+								<div><Timer negative="Overdue" precision={2} direction="descending" timerValue={ this.state.timer_nextJsc } /></div>
 							</div>
 						</div>
 						

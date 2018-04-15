@@ -1832,27 +1832,27 @@ class CSVBuilder extends FileBuilder {
 
 function svgToPDF(domElement, width, height) {
 
-    return new Promise((resolver, rejecter) => {
+  return new Promise((resolver, rejecter) => {
 
-        var canvas = document.createElement('canvas');
-        canvas.width = width * 4;
-        canvas.height = height * 4;
-        var ctx = canvas.getContext('2d');
+    var canvas = document.createElement('canvas');
+    canvas.width = width * 4;
+    canvas.height = height * 4;
+    var ctx = canvas.getContext('2d');
 
-        var DOMURL = window.URL || window.webkitURL || window;
+    var DOMURL = window.URL || window.webkitURL || window;
 
-        var img = new Image();
-        var svg = new Blob([domElement.innerHTML], { type: 'image/svg+xml' });
-        var url = DOMURL.createObjectURL(svg);
+    var img = new Image();
+    var svg = new Blob([domElement.innerHTML], { type: 'image/svg+xml' });
+    var url = DOMURL.createObjectURL(svg);
 
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0, width * 4, height * 4);
-            resolver(canvas.toDataURL());
-            DOMURL.revokeObjectURL(url);
-        };
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, width * 4, height * 4);
+      resolver(canvas.toDataURL());
+      DOMURL.revokeObjectURL(url);
+    };
 
-        img.src = url;
-    });
+    img.src = url;
+  });
 }
 
 /***/ }),
@@ -1864,34 +1864,47 @@ function svgToPDF(domElement, width, height) {
 
 let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) => {
 
-    let jsc = waveform.getY(waveform.getIndexFromX(0));
-    let voc = waveform.getX(waveform.findLevel(0));
+  let jsc, voc;
 
-    let maxpower;
+  // Let's try to find the jsc. If we cannot find it, it's no big deal. Silent fail
+  try {
+    jsc = waveform.getY(waveform.getIndexFromX(0));
+  } catch (e) {
+    jsc = NaN;
+  }
 
-    if (inverted) {
-        maxpower = powerwaveform.getMaxY();
-    } else {
-        maxpower = powerwaveform.getMinY();
-    }
+  // Let's try to find the voc. If we cannot find it, it's no big deal. Silent fail
+  try {
+    voc = waveform.getX(waveform.findLevel(0));
+  } catch (e) {
+    voc = NaN;
+  }
 
-    let ff = maxpower / (jsc * voc);
-    let pce = Math.round(maxpower * 1000 / area / (powin / 10) * 100 * 100) / 100 * (inverted ? 1 : -1);
+  let maxpower;
 
-    let maxIndex = powerwaveform.findLevel(maxpower);
-    let vmax = powerwaveform.getX(maxIndex);
+  if (inverted) {
+    maxpower = powerwaveform.getMaxY();
+  } else {
+    maxpower = powerwaveform.getMinY();
+  }
 
-    return {
-        isc: jsc * 1000 * (inverted ? 1 : -1),
-        jsc: jsc / area * 1000 * (inverted ? 1 : -1),
-        voc: voc,
-        ff: ff * 100,
-        powerin: powin,
-        power: maxpower * 1000,
-        pce: pce,
-        jmax: 0,
-        vmax: vmax
-    };
+  let ff = maxpower / (jsc * voc);
+  let pce = Math.round(maxpower * 1000 / area / (powin / 10) * 100 * 100) / 100 * (inverted ? 1 : -1);
+
+  let maxIndex = powerwaveform.findLevel(maxpower);
+  let vmax = powerwaveform.getX(maxIndex);
+
+  return {
+    isc: jsc * 1000 * (inverted ? 1 : -1),
+    jsc: jsc / area * 1000 * (inverted ? 1 : -1),
+    voc: voc,
+    ff: ff * 100,
+    powerin: powin,
+    power: maxpower * 1000,
+    pce: pce,
+    jmax: 0,
+    vmax: vmax
+  };
 };
 
 /***/ })

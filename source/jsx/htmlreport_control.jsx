@@ -3,6 +3,18 @@ import { query as influxquery } from "./influx";
 import { ipcRenderer } from "electron";
 
 
+const possibleGraphs = {
+	pce: 				{ name: 'pce', 			label: "Power conversion efficiency" },
+	power: 				{ name: 'power', 		label: "Power output" },
+	current: 			{ name: 'current', 		label: "Current output" },
+	voltage: 			{ name: 'voltage', 		label: "Voltage output" },
+	jsc: 				{ name: 'jsc', 			label: "Short circuit current" },
+	voc: 				{ name: 'voc', 			label: "Open circuit voltage" },
+	light: 				{ name: 'light', 		label: "Light intensity" },
+	temperature: 		{ name: 'temperature', 	label: "Temperature" },
+	humidity: 			{ name: 'humidity', 	label: "Humidity" }
+};
+
 class HTMLReportControl extends React.Component {
 	
 	constructor( props ) {
@@ -20,10 +32,8 @@ class HTMLReportControl extends React.Component {
 	}
 
 	validateConfig() {
-		
 		this.props.onValidate( this.state );
 		this.close();
-	//	$( this.modal ).modal('hide');
 	}
 
 	savePDF() {
@@ -64,7 +74,6 @@ class HTMLReportControl extends React.Component {
 	}
 
 	componentDidUpdate() {
-
 	    ipcRenderer.send( "htmlReport.config", this.state );
 	}
 
@@ -87,7 +96,7 @@ class HTMLReportControl extends React.Component {
 				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
 				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
 
-			influxquery("SELECT time,iv from \"" + this.props.measurementName + "_iv\" ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
+			influxquery(`SELECT time,iv from "${ this.props.measurementName }_iv" ORDER BY time ASC;`, db, this.props.db ).then( ( results ) => {
 				
 				if( ! results[ 0 ].series ) {
 					console.warn("No IV curves for this serie");
@@ -120,38 +129,63 @@ class HTMLReportControl extends React.Component {
 			return null;
 		}
 
+		const availableGraphs = [];
+
+		switch( this.props.cellInfo.trackingMode ) {
+
+			case 'MPP':
+
+				if( this.props.cellInfo.lightMonitoring ) {
+					availableGraphs.push( possibleGraphs.pce );
+				}
+
+			case 'CONSTV':
+				availableGraphs.push( possibleGraphs.power );
+				availableGraphs.push( possibleGraphs.current );
+				availableGraphs.push( possibleGraphs.voltage );
+				availableGraphs.push( possibleGraphs.jsc );
+				availableGraphs.push( possibleGraphs.voc );
+			break;
+			
+			case 'JSC':
+				availableGraphs.push( possibleGraphs.jsc );
+			break;
+
+			case 'VOC':
+				availableGraphs.push( possibleGraphs.voc );
+			break;
+		}
+
+
+		if( this.props.cellInfo.lightMonitoring ) {
+			availableGraphs.push( possibleGraphs.light );
+		}
+		
+		if( this.props.cellInfo.temperatureMonitoring ) {
+			availableGraphs.push( possibleGraphs.temperature );
+		}
+		
+		if( this.props.cellInfo.humidityMonitoring ) {
+			availableGraphs.push( possibleGraphs.humidity );
+		}
+
 		return (
 			
 			<div className="container-fluid">
 				<form className="form-horizontal">
-						<h2>General</h2>
-					
-						<div className="form-group">
-							
-							<div className="col-sm-13 checkbox">
-								<label>
-									<input type="checkbox" checked={ this.state.humidity } name="humidity" onClick={ this.handleInputChange } /> Humidity
-								</label>
-							</div>
-						</div>
-
-						<div className="form-group">
-							<div className="col-sm-13 checkbox">
-								<label>
-									<input type="checkbox" checked={ this.state.temeprature } name="temperature" onClick={ this.handleInputChange } /> Temperature
-								</label>
-							</div>
-						</div>
-
-						<div className="form-group">
-							<label className="col-sm-3">Comment</label>
-							<div className="col-sm-9">
-								<textarea className="form-control" name="comment" value={ this.state.comment } onChange={ this.handleInputChange }>
-								</textarea>
-							</div>
-						</div>
-
-						<h2>j-V curves</h2>
+						<h3>Graphs</h3>
+						{
+							availableGraphs.map( ( g ) => 
+								<div key={ g.name } className="checkbox">
+								
+									<label>
+										<input type="checkbox" checked={ this.state[ "graph_" + g.name ] } name={ "graph_" + g.name } onClick={ this.handleInputChange } /> { g.label }
+									</label>
+								</div>
+							)
+						}
+						
+						<h3>j-V curves</h3>
 						<div className="form-group">
 							<label className="col-sm-3">Select the j-V curves for the report</label>
 							<div className="col-sm-9">
@@ -160,7 +194,15 @@ class HTMLReportControl extends React.Component {
 										<option key={ jv.time } value={ jv.time }>{ jv.ellapsed } hours</option>
 									) }
 								</select>
-								<div className="help-block">Select up to 5 i-V curves. Any additional one will not be reported for space reasons.</div>
+							</div>
+						</div>
+
+						<h3>General</h3>
+						<div className="form-group">
+							<label className="col-sm-3">Comment</label>
+							<div className="col-sm-9">
+								<textarea className="form-control" name="comment" value={ this.state.comment } onChange={ this.handleInputChange }>
+								</textarea>
 							</div>
 						</div>
 				</form>

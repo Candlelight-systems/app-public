@@ -78,10 +78,24 @@ class CellFormTracking extends React.Component {
 								<option key="1" value="1">Maximum power point</option>
 								<option key="2" value="2">Open circuit voltage</option>
 								<option key="3" value="3">Short circuit current</option>
+								<option key="4" value="4">Constant voltage</option>
 						</select>
 					</div>
 				</div>
 
+
+				{ this.props.tracking_mode == 4 ? 
+
+					<div className="form-group">
+						<label htmlFor="tracking_mode" className="col-sm-3">Voltage</label>
+						<div className="col-sm-9">
+							<input type="number" min={ - environment.instrument[ this.props.instrumentConfig.instrumentId ].voltageRange } max={ + environment.instrument[ this.props.instrumentConfig.instrumentId ].voltageRange } className="form-control" name="tracking_voltage" value={ this.props.tracking_voltage } onChange={ this.handleInputChange } />
+						</div>
+					</div>
+					: 
+					null
+				}
+{/*
 				<div className="form-group">
 					<label htmlFor="tracking_mode" className="col-sm-3">Current range</label>
 					<div className="col-sm-9">
@@ -96,7 +110,7 @@ class CellFormTracking extends React.Component {
 					
 				</div>
 
-
+*/ }
 				<div className="form-group">
 					<label htmlFor="tracking_step" className="col-sm-3">Tracking step</label>
 					<div className="col-sm-9">
@@ -136,6 +150,7 @@ class CellFormTracking extends React.Component {
 					<div className="col-sm-9">
 						<select name="tracking_record_interval" id="tracking_record_interval" className="form-control" value={this.props.tracking_record_interval} onChange={this.handleInputChange}>
 							<option key="never_record" value="null">Never</option>
+							<option key="500sps_record" value="500">2 sample per second</option>
 							<option key="1000sps_record" value="1000">1 sample per second</option>
 							<option key="10000sps_record" value="10000">6 samples per minute</option>
 							<option key="60000sps_record" value="60000">1 sample per minute</option>
@@ -199,6 +214,7 @@ class CellFormTracking extends React.Component {
 						<label htmlFor="tracking_measure_voc_interval" className="col-sm-3">Measure every</label>
 						<div className="col-sm-9">
 							<select name="tracking_measure_voc_interval" id="tracking_measure_voc_interval" className="form-control" value={ this.props.tracking_measure_voc_interval} onChange={this.handleInputChange}>
+								<option value="60000">Every minute</option>
 								<option value="600000">Every 10 minutes</option>
 								<option value="3600000">Every hour</option>
 								<option value="10800000">Every 3 hours</option>
@@ -221,6 +237,7 @@ class CellFormTracking extends React.Component {
 						<label htmlFor="tracking_measure_jsc_interval" className="col-sm-3">Measure every</label>
 						<div className="col-sm-9">
 							<select name="tracking_measure_jsc_interval" id="tracking_measure_jsc_interval" className="form-control" value={ this.props.tracking_measure_jsc_interval} onChange={this.handleInputChange}>
+								<option value="60000">Every minute</option>
 								<option value="600000">Every 10 minutes</option>
 								<option value="3600000">Every hour</option>
 								<option value="10800000">Every 3 hours</option>

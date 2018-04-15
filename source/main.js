@@ -228,14 +228,25 @@ app.on('activate', function () {
   }
 })
 
-function downloadData( event, cellInfo, chanId, measurementName ) {
+async function downloadData( event, tracker, measurementName, chanId ) {
+
+    let json = await fetch( `http://${ tracker.trackerHost }:${ tracker.trackerPort }/getMeasurement?measurementName=${ measurementName }`, {
+      method: 'GET'
+    })
+    .then( ( response ) => response.json() )
+    .catch( () => {
+
+      throw new Error(`Error while connecting to the instrument. Check that you are online and that the instrument is available on your network.`);
+    });
 
     openForm( null, "downloadform", { 
+    
       measurementName: measurementName, 
       db: config.database, 
-      cellInfo: cellInfo, 
+      cellInfo: json.cellInfo, 
       chanId: chanId 
-      }, {
+    
+    }, {
         width: 850,
         height: 800,
         resizable: false
@@ -386,7 +397,7 @@ function openMPPT( keithleyModel ) {
 
 
 async function openCalibratePD( event, data ) {
-console.log( data );
+
   openForm( null, "calibratepd", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
     width: 800,
     height: 600,
@@ -633,11 +644,13 @@ function updateInfluxDB() {
 async function configChannel( event, data ) {
 
   let influxConfig = config.database;
-
+console.log('1', data);
   var channelConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
+  console.log( channelConfig );
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
+  console.log( instrumentConfig );
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
-  
+console.log( channelState );  
   //var externalConnection = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
   var externalConnection = false;
 
@@ -662,7 +675,7 @@ async function configChannels( event, data ) {
   var channelsState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() );
-  console.log( data.chanIds );
+  
   return openForm( null, "cellformall", { 
 
     channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ], 

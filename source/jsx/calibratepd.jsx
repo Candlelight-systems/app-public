@@ -145,7 +145,7 @@ class CalibratePD extends React.Component {
 		} )
 		.then( ( values ) => values.json() )
 		.then( ( control ) => {
-			console.log( control );
+			
 			this.setState( { control: control } );
 		} ).catch( ( error ) => {
 			console.error( error );

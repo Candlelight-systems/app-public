@@ -33,7 +33,7 @@ class ScheduleLight extends React.Component {
 	async save() {
 
 		let state = await this.apply();
-		console.log( state );
+		
 		//this.close();
 	}
 
@@ -126,7 +126,7 @@ class ScheduleLight extends React.Component {
 		} )
 		.then( ( values ) => values.json() )
 		.then( ( controller ) => {
-		   	console.log( controller );
+		   	
 
 		   	return this.setState( ( state ) => ( {		   	
 		   		error: false,

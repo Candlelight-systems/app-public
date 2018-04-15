@@ -166,7 +166,7 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 	async save() {
 
 		let state = await this.apply();
-		console.log(state);
+
 		//this.close();
 	}
 
@@ -254,7 +254,6 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 			method: 'GET'
 
 		}).then(values => values.json()).then(controller => {
-			console.log(controller);
 
 			return this.setState(state => ({
 				error: false,

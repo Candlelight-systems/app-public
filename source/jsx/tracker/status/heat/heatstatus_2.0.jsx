@@ -107,7 +107,7 @@ class HeatStatus extends React.Component {
   }
 
   render() {
-console.log( this.state );
+
     let heating_problem = this.state.heating_voltage / this.state.heating_current > 20;
     if( this.state.heating_voltage < 1 || ! this.state.heating_voltage ) { // For low voltage, let's not flag anything
       heating_problem = false;

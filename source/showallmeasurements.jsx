@@ -31,9 +31,9 @@ function pad( number ) {
 	return number;
 }
 
-function downloadData( measurementName, cellInfo ) {
+function downloadData( measurementName ) {
 
-	ipcRenderer.send( "downloadData", cellInfo, undefined, measurementName );
+	ipcRenderer.send( "downloadData", data.config, this.state.serverState.measurementName );
 }
 
 
@@ -108,30 +108,55 @@ async function render( ) {
 		} );
 
 
+
 		ReactDOM.render(
 			<div className="container-fluid">
 				<ul className="list-group">
 				<li className="list-group-item list-group-item-success list-group-item-heading">
 					All existing measurements
 				</li>
-				{ jsonArray.map( ( val ) => { return (
+				{ jsonArray.map( ( val ) => { 
 
-					<li className="list-group-item" key={ val.measurementName } >
-						
-						<div className="pull-right">
-							<button className="btn btn-sm btn-primary" onClick={ () => downloadData( val.measurementName, val.cellInfo ) }>Download data</button>
-							{ val.endDate && <button className="btn btn-sm btn-danger" onClick={ () => removeData( val.measurementName ) }>Delete data</button> }
-						</div>
+					switch( val.cellInfo.trackingMode ) {
+						case 'MPP':
+							tracking = 'Maximum power point'
+						break;
 
-						<div>
-							<strong>{ val.cellInfo.cellName }</strong>
-						</div>
+						case 'CONSTV':
+							tracking = `Constant voltage`;
+						break;
 
-						<div>
-							{ formatDate( val.startDate ) } <span className="glyphicon glypicon-arrow-left"></span> { val.endDate ? formatDate( val.endDate ) : '(Running)' }
-						</div>
-						
-					</li> )
+						case 'JSC':
+							tracking = `Short circuit current`;
+						break;
+
+						case 'VOC':
+							tracking = `Open circuit voltage`;
+						break;
+					}
+
+					return (
+
+						<li className="list-group-item" key={ val.measurementName } >
+							
+							<div className="pull-right">
+								<button className="btn btn-sm btn-primary" onClick={ () => downloadData( val.measurementName ) }>Download data</button>
+								{ val.endDate && <button className="btn btn-sm btn-danger" onClick={ () => removeData( val.measurementName ) }>Delete data</button> }
+							</div>
+
+							<div>
+								<strong>{ val.cellInfo.cellName }</strong>
+							</div>
+
+							<div>
+								{ formatDate( val.startDate ) } <span className="glyphicon glypicon-arrow-left"></span> { val.endDate ? formatDate( val.endDate ) + " (" + Math.round( ( val.endDate - val.startDate ) / 1000 / 3600 * 10 ) / 10 + "h)" : '(Running)' }
+							</div>
+							
+							<div>
+								Tracking mode: { tracking }
+							</div>
+						</li> 
+					);
 				} ) }
 				</ul>
 			</div>,

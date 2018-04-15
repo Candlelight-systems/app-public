@@ -4,13 +4,26 @@
 
 		"statuses": {
 			"light": {
-				"version": "1.0"
+				"version": "2.0"
 			},
 			"heat": {
-				"version": "1.0"
+				"version": "2.0"
+			}
+		},
+
+		"instrument": {
+
+			"Small cells": {
+				"ADC": {
+					"model": "ADS1259"
+				},
+
+				"fsr": 30,
+				"voltageRange": 2.5
 			}
 		}
-	},	
+
+	},		
 
 	"development": true,
 
@@ -24,10 +37,10 @@
 			}
 		],
 		"database": {
-			"host": "influxdb2.epfl.ch",
-			"username": "lpi",
-			"password": "lpi77",
-			"port": 80,
+			"host": "localhost",
+			"username": "",
+			"password": "",
+			"port": 8086,
 			"db": "matahari"
 		},
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { ipcRenderer } from "electron";
 import { default as HeatStatus_1_0 } from "./heatstatus_1.0.jsx"
 import { default as HeatStatus_2_0 } from "./heatstatus_2.0.jsx"
+import { default as HeatStatus_ssr_1_0 } from "./heatstatus_ssr_1.0.jsx"
 import environment from "../../../../../app/environment.json"
 
 class HeatStatus extends React.Component {
@@ -26,7 +27,7 @@ class HeatStatus extends React.Component {
 
     // Update directly the state
 
-    console.log( data );
+    
     this.setState( data.data );
 
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
@@ -43,6 +44,12 @@ class HeatStatus extends React.Component {
 
       case "1.0": {
         content = ( <HeatStatus_1_0 {...this.props } /> );
+        break;
+      }
+
+
+      case "ssr_1.0": {
+        content = ( <HeatStatus_ssr_1_0 {...this.props } /> );
         break;
       }
 

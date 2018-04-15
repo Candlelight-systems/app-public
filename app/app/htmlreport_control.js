@@ -128,6 +128,18 @@ module.exports = require("react-dom");
 
 
 
+const possibleGraphs = {
+	pce: { name: 'pce', label: "Power conversion efficiency" },
+	power: { name: 'power', label: "Power output" },
+	current: { name: 'current', label: "Current output" },
+	voltage: { name: 'voltage', label: "Voltage output" },
+	jsc: { name: 'jsc', label: "Short circuit current" },
+	voc: { name: 'voc', label: "Open circuit voltage" },
+	light: { name: 'light', label: "Light intensity" },
+	temperature: { name: 'temperature', label: "Temperature" },
+	humidity: { name: 'humidity', label: "Humidity" }
+};
+
 class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 	constructor(props) {
@@ -145,10 +157,8 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 	}
 
 	validateConfig() {
-
 		this.props.onValidate(this.state);
 		this.close();
-		//	$( this.modal ).modal('hide');
 	}
 
 	savePDF() {
@@ -187,7 +197,6 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 	}
 
 	componentDidUpdate() {
-
 		__WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("htmlReport.config", this.state);
 	}
 
@@ -210,7 +219,7 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 			    timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
 			    grouping = Math.max(1, Math.round(timeDifference / 1000));
 
-			Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])("SELECT time,iv from \"" + this.props.measurementName + "_iv\" ORDER BY time ASC;", db, this.props.db).then(results => {
+			Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,iv from "${this.props.measurementName}_iv" ORDER BY time ASC;`, db, this.props.db).then(results => {
 
 				if (!results[0].series) {
 					console.warn("No IV curves for this serie");
@@ -239,6 +248,45 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 			return null;
 		}
 
+		const availableGraphs = [];
+
+		switch (this.props.cellInfo.trackingMode) {
+
+			case 'MPP':
+
+				if (this.props.cellInfo.lightMonitoring) {
+					availableGraphs.push(possibleGraphs.pce);
+				}
+
+			case 'CONSTV':
+				availableGraphs.push(possibleGraphs.power);
+				availableGraphs.push(possibleGraphs.current);
+				availableGraphs.push(possibleGraphs.voltage);
+				availableGraphs.push(possibleGraphs.jsc);
+				availableGraphs.push(possibleGraphs.voc);
+				break;
+
+			case 'JSC':
+				availableGraphs.push(possibleGraphs.jsc);
+				break;
+
+			case 'VOC':
+				availableGraphs.push(possibleGraphs.voc);
+				break;
+		}
+
+		if (this.props.cellInfo.lightMonitoring) {
+			availableGraphs.push(possibleGraphs.light);
+		}
+
+		if (this.props.cellInfo.temperatureMonitoring) {
+			availableGraphs.push(possibleGraphs.temperature);
+		}
+
+		if (this.props.cellInfo.humidityMonitoring) {
+			availableGraphs.push(possibleGraphs.humidity);
+		}
+
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "container-fluid" },
@@ -246,54 +294,23 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 				"form",
 				{ className: "form-horizontal" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"h2",
+					"h3",
 					null,
-					"General"
+					"Graphs"
 				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				availableGraphs.map(g => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"div",
-					{ className: "form-group" },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"div",
-						{ className: "col-sm-13 checkbox" },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							"label",
-							null,
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state.humidity, name: "humidity", onClick: this.handleInputChange }),
-							" Humidity"
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"div",
-					{ className: "form-group" },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"div",
-						{ className: "col-sm-13 checkbox" },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							"label",
-							null,
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state.temeprature, name: "temperature", onClick: this.handleInputChange }),
-							" Temperature"
-						)
-					)
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"div",
-					{ className: "form-group" },
+					{ key: g.name, className: "checkbox" },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						"label",
-						{ className: "col-sm-3" },
-						"Comment"
-					),
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"div",
-						{ className: "col-sm-9" },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("textarea", { className: "form-control", name: "comment", value: this.state.comment, onChange: this.handleInputChange })
+						null,
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state["graph_" + g.name], name: "graph_" + g.name, onClick: this.handleInputChange }),
+						" ",
+						g.label
 					)
-				),
+				)),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"h2",
+					"h3",
 					null,
 					"j-V curves"
 				),
@@ -317,12 +334,26 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 								jv.ellapsed,
 								" hours"
 							))
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							"div",
-							{ className: "help-block" },
-							"Select up to 5 i-V curves. Any additional one will not be reported for space reasons."
 						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"h3",
+					null,
+					"General"
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "form-group" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"label",
+						{ className: "col-sm-3" },
+						"Comment"
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"div",
+						{ className: "col-sm-9" },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("textarea", { className: "form-control", name: "comment", value: this.state.comment, onChange: this.handleInputChange })
 					)
 				)
 			),

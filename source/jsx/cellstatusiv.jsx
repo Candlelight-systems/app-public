@@ -25,10 +25,6 @@ class statusIV extends GraphComponent {
 			return;
 		}
 
-
-
-		
-
 		this.graph = new Graph( this.graphDOM, {
 			
 			paddingTop: 10,

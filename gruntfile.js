@@ -117,14 +117,13 @@ function generateWebpackConfig( theme ) {
                 filter: 'isFile'
               },
 
-              {
-                expand: true, 
+            /*    expand: true, 
                 cwd: '/Users/normanpellet/Documents/Web/graph/dist/',
                 src: ['jsgraph-es6.js'], 
                 dest: 'node_modules/node-jsgraph/dist/', 
                 filter: 'isFile'
               },
-
+*/
               {
                 expand: true, 
                 cwd: '/Users/normanpellet/Documents/Web/graph/dist/',
