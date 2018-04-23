@@ -2,6 +2,7 @@ import React from 'react';
 import { ipcRenderer } from "electron";
 import { default as LightStatus_1_0 } from "./lightstatus_1.0.jsx"
 import { default as LightStatus_2_0 } from "./lightstatus_2.0.jsx"
+import { default as LightStatus_readonly } from "./lightstatus_readonly.jsx"
 import environment from "../../../../../app/environment.json"
 
 class LightStatus extends React.Component {
@@ -42,6 +43,11 @@ class LightStatus extends React.Component {
         break;
       }
 
+      case "readonly": {
+        content = ( <LightStatus_readonly {...this.props } /> );
+        break;
+      }
+
       default:
       case "2.0": {
         content = ( <LightStatus_2_0 {...this.props} /> );
@@ -56,6 +62,8 @@ class LightStatus extends React.Component {
           "No light control is available for this group"
         }
 
+        {
+          !! environment.statuses.light.readonly && 
         <div className="row">
             <div className="col-lg-9">
               <button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }>
@@ -64,7 +72,7 @@ class LightStatus extends React.Component {
               <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.light_calibrate }><span className="glyphicon glyphicon-scale"></span> Calibrate</button>
             </div>
           </div>
-
+        }
       </div> 
     );
   }

@@ -41,6 +41,7 @@ class statusGraph extends GraphComponent {
 	 */
 	constructor( props ) {
 		super( props );
+		this.shapes_IV = [];
 	}
 
 	componentDidMount() {
@@ -160,6 +161,21 @@ class statusGraph extends GraphComponent {
 			return;
 		}
 
+
+		this.shapes_IV.map( ( shape ) => {
+			shape.kill();
+		});
+
+		if( this.props.data_IV ) {
+
+			this.shapes_IV = this.props.data_IV.map( ( data_IV ) => {
+				let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
+				shape.draw();
+				shape.redraw();
+				return shape;
+			} );
+		}
+
 		if( this.graph && this.props.data ) {
 
 			this.serie.setWaveform( this.props.data );
@@ -197,6 +213,7 @@ class statusGraph extends GraphComponent {
 				this.flag2.hide();
 			}
 		}
+
 	}	
 
 	componentWillReceiveProps( nextProps ) {

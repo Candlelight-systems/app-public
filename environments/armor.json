@@ -4,16 +4,16 @@
 
 		"statuses": {
 			"light": {
-				"version": "readonly"
+				"version": "readonly",
+				"readonly": true
 			},
 			"heat": {
-				"version": "2.0"
 			}
 		},
 
 		"instrument": {
 
-			"Small cells": {
+			"Outdoor modules": {
 
 				"ADC": {
 					"model": "ADS1259"

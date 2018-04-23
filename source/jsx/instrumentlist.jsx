@@ -29,6 +29,10 @@ class InstrumentList extends React.Component {
 
     }, 1000 );
 
+    ipcRenderer.on("instrumentUpdated", () => { // When the instrument has been changed through the config, we need to trigger a new rendering
+      this.render();
+    });
+
     this.state = {};
     this.loadInstrument = this.loadInstrument.bind( this );
     this.addInstrument = this.addInstrument.bind( this );
@@ -68,7 +72,6 @@ class InstrumentList extends React.Component {
     try {
       
       cfg = JSON.parse( fs.readFileSync( __dirname + '/../config.json') );
-      
       cfg.instruments = cfg.instruments || [];
 
     } catch( e ) {
@@ -81,7 +84,7 @@ class InstrumentList extends React.Component {
   render() {
 
     const config = this.readConfig();
-
+console.log( config );
     if( config === null ) {
       return null;
     }

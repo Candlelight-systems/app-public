@@ -269,6 +269,11 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
       });
     }, 1000);
 
+    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("instrumentUpdated", () => {
+      // When the instrument has been changed through the config, we need to trigger a new rendering
+      this.render();
+    });
+
     this.state = {};
     this.loadInstrument = this.loadInstrument.bind(this);
     this.addInstrument = this.addInstrument.bind(this);
@@ -307,7 +312,6 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
     try {
 
       cfg = JSON.parse(__WEBPACK_IMPORTED_MODULE_2_fs___default.a.readFileSync(__dirname + '/../config.json'));
-
       cfg.instruments = cfg.instruments || [];
     } catch (e) {
       return null;
@@ -319,7 +323,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
   render() {
 
     const config = this.readConfig();
-
+    console.log(config);
     if (config === null) {
       return null;
     }
@@ -392,7 +396,7 @@ module.exports = require("fs");
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0"},"heat":{"version":"2.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":true}}}}}}
 
 /***/ })
 /******/ ]);

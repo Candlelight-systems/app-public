@@ -2,19 +2,36 @@
 	"ageing": true,
 	"statuses": {
 		"light": {
-			"version": "2.0"
+			"version": "readonly",
+			"readonly": true
 		},
-		"heat": {
-			"version": "2.0"
-		}
+		"heat": {}
 	},
 	"instrument": {
-		"Small cells": {
+		"Outdoor modules": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"fsr": 30,
-			"voltageRange": 2.5
+			"voltageRange": 2.5,
+			"groups": {
+				"Box 1": {
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": true,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": true
+					}
+				}
+			}
 		}
 	}
 }

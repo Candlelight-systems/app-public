@@ -4,13 +4,13 @@ import CellButtons from "../cellbuttons.jsx"
 import Graph from 'node-jsgraph/dist/jsgraph-es6'
 import Timer from '../timer.jsx'
 import extend from 'extend'
-
+import { getIVParameters } from '../../../app/util/iv'
 import { query as influxquery } from "../influx"
 import React from 'react'
 import { ipcRenderer } from "electron"
-import { pgaValueToRange } from "../../pgasettings"
+import environment from "../../../app/environment.json"
 
-
+var instrumentEnvironment = environment.instrument;
 
 //import cfg from "./config"
 
@@ -98,11 +98,7 @@ class TrackerDevice extends React.Component {
 		//this.state.tmpServerState = {};		
 	}
 
-	shouldComponentUpdate( props, state ) {
 
-		
-		return true;
-	}
 	componentWillReceiveProps( nextProps ) {
 
 		this.setState( { updating: false } );
@@ -113,9 +109,7 @@ class TrackerDevice extends React.Component {
 		 *  We need to chose the source of truth of the channel status. Either it defines itself (see this.getStatus) or the group and in turn the instrument sets it
 		 *  But it can't be both, otherwise, if they are different (and they can be, at least temporarily), they will overwrite each other
 		 */
-
-    //  	this.setState( { serverState: nextProps.serverState } );
-  		
+		
   		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
   		if( this.props.serverState !== nextProps.serverState ) {
   			this.getStatus();
@@ -135,8 +129,8 @@ class TrackerDevice extends React.Component {
 
 		this.setState( { updating: false } );
       	this.setState( { serverState: this.props.serverState } );
-  	
       	if( this.props.serverState.tracking_mode > 0 ) {
+      		
         	this.updateInfluxData( this.props.serverState );
       	}
 
@@ -482,6 +476,7 @@ class TrackerDevice extends React.Component {
 		*/
 
 		let parameter,
+			parameter_jv,
 			newState = {},
 			db = this.props.configDB.db,
 			db_ds,
@@ -494,27 +489,31 @@ class TrackerDevice extends React.Component {
 		if( ! serverState.measurementName ) {
 			return;
 		}
+		console.log('a');
 
 		switch( this.state.serverState.tracking_mode ) {
 
 			case 3:
 				parameter = "current_mean";
+				parameter_jv = 'jsc';
 			break;
 
 			case 2:
 				parameter = "voltage_mean";
+				parameter_jv = 'voc';
 			break;
 
 			default:
 			case 1:
 				parameter = "efficiency";
+				parameter_jv = 'pce';
 			break;
 		}
-
+console.log('b');
 		let queries = [
 		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
 		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
-		`SELECT time, iv FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
+		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
 		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,
 		`SELECT jsc FROM "${ serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`
 		];
@@ -534,11 +533,21 @@ class TrackerDevice extends React.Component {
 
 					return {
 						time: new Date( value[ 0 ] ),
-						iv: this.readIV( value[ 1 ] )
+						iv: this.readIV( value[ 1 ] ),
+						sun: value[ 2 ]
 					}
 				} ) );
-			}
 
+				console.log( newState.ivCurves );
+
+				newState.iv_values = newState.ivCurves.map( ( ivCurve ) => {
+
+					const p = ivCurve.iv.duplicate().math( ( x, y ) => x * y );
+					const parameters = getIVParameters( ivCurve.iv, p, this.state.serverState.cellArea, ivCurve.sun * 1000, false );
+					return parameters[ parameter_jv ];
+				} );
+			}
+console.log( results[ 0 ] );
 			// Even if the series don't exist, we can still update the j-V curve
 			// The only thing we have to do is not throw any error and handle gracefully the lack of data
 			if( ! results[ 0 ].series ) {
@@ -594,7 +603,7 @@ class TrackerDevice extends React.Component {
 				newState.jsc = results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000;
 			}
 
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean, MEAN( power ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
 
 			queue.push( influxquery( query, db_ds, this.props.configDB ).then( ( results ) => {
 				
@@ -615,6 +624,8 @@ class TrackerDevice extends React.Component {
 				}
 
 				let valueIndex = 1;
+				let totalEnergykWh = 0;
+				let last_power;
 
 				values.forEach( ( value, index ) => {
 					
@@ -628,6 +639,29 @@ class TrackerDevice extends React.Component {
 						time = ( date.getTime() - offset ) / 1000 / 3600;
 					}
 
+					// Power is in index 8
+					/*
+						y1	|`
+							|  `
+							|	 `
+							|	   `| y2
+							|		|
+							|		|
+							|		|
+							|		|
+							|		|
+							|		|
+							|		|
+							x1      x2
+
+					Area = ( ( x2 - x1 ) * ( y1 + y2 ) ) / 2
+					*/
+
+					if( time > 0 ) {
+						totalEnergykWh += ( time - wave.getX( wave.getLength() - 1 ) * ( value[ 8 ] * last_power ) ) / 2;
+					}
+					last_power = value[ 8 ];
+					
 					//value[ valueIndex ] += 2;
 					if( this.state.serverState.tracking_mode == 1 ) {
 						if( value[ valueIndex ] > 35 || value[ valueIndex ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
@@ -653,7 +687,6 @@ class TrackerDevice extends React.Component {
 							highest_value_time = time;
 						}
 					}
-
 				} );
 
 
@@ -665,7 +698,10 @@ class TrackerDevice extends React.Component {
 					newState.jsc = Math.round( values[ values.length - 1 ][ 2 ]  * 100 ) / 100;
 				}
 				
-				
+				// totalEnergyKWh is in watt * hour (see unit analysis)
+				totalEnergykWh /= 1000; // Get the value in kWh
+				const totalEnergykWh_per_year = totalEnergykWh * ( wave.getX( wave.getLength() - 1 ) ) / ( 24 * 365 ); // Times the number of ellapsed hours divided by the number of hours in a year
+				const totalEnergykWh_per_year_per_m2 = totalEnergykWh_per_year * ( serverState.cellArea / 10000 );
 
 				newState.highest_value = Math.round( highest_value * 100 ) / 100;
 				newState.highest_value_time = highest_value_time;
@@ -675,7 +711,7 @@ class TrackerDevice extends React.Component {
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
 				newState.data_IV = waveIV;
-
+				newState.kwh_yr_m2 = totalEnergykWh_per_year_per_m2;
 			} ) );
 
 
@@ -790,8 +826,9 @@ class TrackerDevice extends React.Component {
 		let notavailable = "N/A";
 
 		const j_currentdensity = this.processCurrent( this.state.currentdensity );
-
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
+	
+		const displayElements = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].displayDeviceInformation;
 
 		if( active ) {
 
@@ -855,115 +892,169 @@ class TrackerDevice extends React.Component {
 								<div>{ active ? <span className="glyphicon glyphicon-record"></span> : <span className="glyphicon glyphicon-stop"></span> }</div>
 								{ trackingMode }
 							</div>
+							{ 
+								displayElements.ellapsed 
+									&&
+								<div className="col-lg-1 propElement">
+									
+									<div>
+										<div className="label">
+											<span className="glyphicon glyphicon-hourglass"></span>
+										</div>
+										<div className="value">
+											<Timer precision={1} maxLevel={3} spacer=" " direction="ascending" timerValue={ this.state.timer_ellapsed } />
+										</div>
+									</div>
+								</div>
+							}
+							{ 
+								displayElements.efficiency 
+									&&
+								<div className="col-xs-1 propElement">
+									
+									<div>
+										<div className="label">&eta;</div>
+										<div className="value">
+											<strong>
+												{ ( ! isNaN( this.state.efficiency ) && this.state.efficiency !== false ) ? <span>{ this.state.efficiency } { this.unit.efficiency }</span> : 'N/A' } 
+											</strong>
+										</div>
+									</div>
+								</div>
+							}
+							{ 
+								displayElements.power 
+									&&
+								<div className="col-xs-1 propElement">
+									
+									<div>
+										<div className="label">&eta;</div>
+										<div className="value">
+											<strong>
+												{ ( ! isNaN( this.state.power ) && this.state.power !== false ) ? <span>{ this.state.power } { this.unit.power }</span> : 'N/A' } 
+											</strong>
+										</div>
+									</div>
+								</div>
+							}
 
-							<div className="col-lg-1 propElement">
-								
-								<div>
+							{ 	
+								displayElements.sun 
+									&&
+								<div className="col-xs-1 propElement">
+									
+									<div>
+										<div className="label">
+											<span className="glyphicon glyphicon-scale"></span>
+										</div>
+										<div className="value">
+											{ ( ! isNaN( this.state.sun ) && this.state.sun !== false ) ? <span>{ this.state.sun } {this.unit.sun}</span> : 'N/A' }
+										</div>
+									</div>
+								</div>
+							}
+							{
+								displayElements.voc
+									&&
+								<div className={ "col-xs-1 propElement"  + ( this.state.processing_voc ? ' processing' : '' ) + ( this.state.error_voc ? ' error' : '' ) }>
+									<div className="record">
+										<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
+									</div>
 									<div className="label">
-										<span className="glyphicon glyphicon-hourglass"></span>
+										V<sub>oc</sub>
 									</div>
 									<div className="value">
-										<Timer precision={1} maxLevel={3} spacer=" " direction="ascending" timerValue={ this.state.timer_ellapsed } />
+										{ ( !isNaN( this.state.voc ) && this.state.voc !== false ) ? <span>{ this.state.voc } { this.unit.voltage }</span> : 'N/A' }
 									</div>
 								</div>
-							</div>
-							
-							<div className="col-xs-1 propElement">
-								
-								<div>
-									<div className="label">&eta;</div>
-									<div className="value">
-										<strong>
-											{ ( ! isNaN( this.state.efficiency ) && this.state.efficiency !== false ) ? <span>{ this.state.efficiency } { this.unit.efficiency }</span> : 'N/A' } 
-										</strong>
+							}
+							{
+								displayElements.jsc
+									&&
+								<div className={ "col-xs-1 propElement" + ( this.state.processing_jsc ? ' processing' : '' ) + ( this.state.error_jsc ? ' error' : '' ) }>
+									<div className="record">
+										<span className="glyphicon glyphicon-record"  onClick={ this.recordJsc }></span>
 									</div>
-								</div>
-							</div>
-							<div className="col-xs-1 propElement">
-								
-								<div>
 									<div className="label">
-										<span className="glyphicon glyphicon-scale"></span>
+										J<sub>sc</sub>
 									</div>
 									<div className="value">
-										{ ( ! isNaN( this.state.sun ) && this.state.sun !== false ) ? <span>{ this.state.sun } {this.unit.sun}</span> : 'N/A' }
+										{ jsc_currentdensity || 'N/A' }
 									</div>
+									
 								</div>
-							</div>
-							<div className={ "col-xs-1 propElement"  + ( this.state.processing_voc ? ' processing' : '' ) + ( this.state.error_voc ? ' error' : '' ) }>
-								<div className="record">
-									<span className="glyphicon glyphicon-record" onClick={ this.recordVoc }></span>
-								</div>
-								<div className="label">
-									V<sub>oc</sub>
-								</div>
-								<div className="value">
-									{ ( !isNaN( this.state.voc ) && this.state.voc !== false ) ? <span>{ this.state.voc } { this.unit.voltage }</span> : 'N/A' }
-								</div>
-								
-							</div>
-
-							<div className={ "col-xs-1 propElement" + ( this.state.processing_jsc ? ' processing' : '' ) + ( this.state.error_jsc ? ' error' : '' ) }>
-								<div className="record">
-									<span className="glyphicon glyphicon-record"  onClick={ this.recordJsc }></span>
-								</div>
-								<div className="label">
-									J<sub>sc</sub>
-								</div>
-								<div className="value">
-									{ jsc_currentdensity || 'N/A' }
-								</div>
-								
-							</div>
-
-							<div className="col-xs-1 propElement">
-								<div className="label">FF</div>
-								<div className="value">
-									{ ( ! isNaN( this.state.ff )  && this.state.ff !== false ) ?  <span>{ this.state.ff } { this.unit.fillfactor }</span> : 'N/A' }
-								</div>
-							</div>
-
-
-
-
-							<div className="col-xs-1 propElement">
-								<div className="label">V<sub>now</sub></div>
-								<div className="value">
-									{  ( !isNaN( this.state.voltage ) && this.state.voltage !== false ) ? <span>{ this.state.voltage } { this.unit.voltage }</span> : 'N/A' }
-								</div>
-							</div>
-
-
-
-							<div className="col-xs-1 propElement">
-								<div className="label">J<sub>now</sub></div>
-								<div className="value">
-									{ j_currentdensity || 'N/A' }
-								</div>
-							</div>
-							
-		
-							<div className="col-lg-1 propElement">
-								<div>
-									<div className="label">
-										<span className="glyphicon glyphicon-grain"></span>
-									</div>
+							}
+							{
+								displayElements.ff
+									&&									
+								<div className="col-xs-1 propElement">
+									<div className="label">FF</div>
 									<div className="value">
-										{ this.state.temperature && this.state.temperature > 0 ? <span title="Base temperature (local temperature on the chip just under the device)">{ this.state.temperature }</span> : 'N/A' }&nbsp;/&nbsp;
-										{ this.state.temperature_junction && this.state.temperature_junction > 0 ? <span title="Estimated junction temperature (base temperature + thermopile voltage)">{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+										{ ( ! isNaN( this.state.ff )  && this.state.ff !== false ) ?  <span>{ this.state.ff } { this.unit.fillfactor }</span> : 'N/A' }
 									</div>
 								</div>
-							</div>
-							<div className="col-lg-1 propElement">
-								<div>
-									<div className="label">
-										<span className="glyphicon glyphicon-tint"></span>
-									</div>
+							}
+							{
+								displayElements.vnow
+									&&
+								<div className="col-xs-1 propElement">
+									<div className="label">V<sub>now</sub></div>
 									<div className="value">
-										{ this.state.humidity && this.state.humidity > 0 ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
+										{  ( !isNaN( this.state.voltage ) && this.state.voltage !== false ) ? <span>{ this.state.voltage } { this.unit.voltage }</span> : 'N/A' }
 									</div>
 								</div>
-							</div>
+							}
+							{
+								displayElements.jnow
+									&&
+								<div className="col-xs-1 propElement">
+									<div className="label">J<sub>now</sub></div>
+									<div className="value">
+										{ j_currentdensity || 'N/A' }
+									</div>
+								</div>
+							}
+							{
+								displayElements.temperature
+									&&
+								<div className="col-lg-1 propElement">
+									<div>
+										<div className="label">
+											<span className="glyphicon glyphicon-grain"></span>
+										</div>
+										<div className="value">
+											{ this.state.temperature && this.state.temperature > 0 ? <span title="Base temperature (local temperature on the chip just under the device)">{ this.state.temperature }</span> : 'N/A' }&nbsp;/&nbsp;
+											{ this.state.temperature_junction && this.state.temperature_junction > 0 ? <span title="Estimated junction temperature (base temperature + thermopile voltage)">{ this.state.temperature_junction } { this.unit.temperature }</span> : 'N/A' }
+										</div>
+									</div>
+								</div>
+							}
+							{
+								displayElements.humidity
+									&&
+								<div className="col-lg-1 propElement">
+									<div>
+										<div className="label">
+											<span className="glyphicon glyphicon-tint"></span>
+										</div>
+										<div className="value">
+											{ this.state.humidity && this.state.humidity > 0 ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
+										</div>
+									</div>
+								</div>
+							}
+							{
+								displayElements.kwh_yr
+									&&
+								<div className="col-lg-1 propElement">
+									<div>
+										<div className="label">kWh yr<sup>-1</sup>m<sup>-2</sup></div>
+										<div className="value">
+											{ this.state.kwh_yr && this.state.kwh_yr_m2 > 0 ? <span>{ this.state.kwh_yr_m2 }</span> : 'N/A' }
+										</div>
+									</div>
+								</div>
+							}
 
 						
 							<div className="cell-efficiency col-lg-6">
@@ -975,16 +1066,16 @@ class TrackerDevice extends React.Component {
 									mode="default" 
 									key={ this.props.instrumentId + this.props.chanId + "_graph" } 
 									data={ this.state.data } 
-									data_sun={ this.state.data_sun } 
-									data_humidity={ this.state.data_humidity } 
-									data_temperature={ this.state.data_temperature } 
 									flag1={startVal} 
 									flag1_pos={startValPos} 
 									unit={unit} 
 									axisLabel={statusGraphAxisLabel}
 									axisUnit={statusGraphAxisUnit}
 									serieLabelLegend={statusGraphSerieLabelLegend}
-									flag2={currVal} />
+									flag2={currVal}
+									data_IV={ this.state.iv_values }
+
+									 />
 							
 							</div>
 						

@@ -27,7 +27,7 @@ class TrackerInstrument extends React.Component {
     setInterval( () => {
       this.updateInstrument();
       this.updateStatus();
-    }, 60000 );
+    }, 10000 );
 
 
     this.configure = this.configure.bind( this );

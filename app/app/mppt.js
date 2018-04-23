@@ -512,7 +512,7 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     this.instrument.command(":SOUR:VOLT:LEV:IMM:AMPL " + voltage); // Set current Voltage
   }
 
-  async iv_prepare() {
+  async iv_prepare(compliance) {
 
     await this.instrument.command("*CLS");
     await this.instrument.command(":STAT:MEAS:ENAB 512"); // Set SRQ
@@ -521,9 +521,13 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     await this.instrument.command("*SRE 1");
     await this.instrument.command(":SOUR:VOLT:MODE SWE");
     await this.instrument.command(":FORM:ELEM VOLT,CURR");
+    await this.instrument.command(":SENS:CURR:PROT " + (compliance / 1000).toPrecision(4));
   }
 
-  async _iv(fromV, toV, nbPoints) {
+  async _iv(fromV, toV, nbPoints, scanRate) {
+
+    // TODO: ADD SCAN RATE
+
 
     var stepV = (toV - fromV) / (nbPoints - 1);
     //await this.instrument.command("*SRE 1")  
@@ -545,10 +549,10 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     await this.instrument_lamp.command("AMPLitude 1");
     await this.instrument_lamp.command("OUTput ON");
 
-    await this.instrument.command(":SOUR:DEL " + settlingTime);
+    await this.instrument.command(":SOUR:DEL " + this.state.equilibration);
     await this.instrument.command(":OUTP:STAT ON");
 
-    this.iv_prepare();
+    this.iv_prepare(this.state.compliance);
 
     this.setState({ running_mpp: true });
     await this.instrument.command(":SENS:CURR:PROT " + 0.1);
@@ -1058,6 +1062,52 @@ class MPPTJV extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
                         null,
                         "-1"
                       )
+                    )
+                  )
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "div",
+                { className: "form-group row" },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "label",
+                  null,
+                  "Current compliance"
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "div",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "div",
+                    { className: "input-group" },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", className: "form-control", name: "compliance", type: "number", max: "1000", min: "0", step: "10", value: this.state.compliance, onChange: this.form_iv_change }),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      "span",
+                      { className: "input-group-addon" },
+                      "mA"
+                    )
+                  )
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "div",
+                { className: "form-group row" },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "label",
+                  null,
+                  "Equilibration time"
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  "div",
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "div",
+                    { className: "input-group" },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", className: "form-control", name: "equilibration", type: "number", max: "100", min: "0", step: "0.5", value: this.state.equilibration, onChange: this.form_iv_change }),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      "span",
+                      { className: "input-group-addon" },
+                      "s"
                     )
                   )
                 )

@@ -162,10 +162,8 @@ function doMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-
-
 function saveConfig( ) {
-  return;
+  
   fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
 
     if( error ) {
@@ -175,7 +173,6 @@ function saveConfig( ) {
     }
     
   }); 
-  
 }
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -590,6 +587,10 @@ function editInstrument( event, trackerHost ) {
       windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: data, db: config.database } ); 
     }
     
+    if( windows[ 'instrumentList' ] ) {
+      windows[ 'instrumentList' ].webContents.send( "instrumentUpdated" ); 
+    }
+    
     reloadInstruments();
 
   } ).catch( () => {} );
@@ -631,7 +632,8 @@ function showAllMeasurements( instrument ) {
 function updateInfluxDB() {
 
   config.instruments.forEach( ( instrument ) => {
-
+console.log( "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB" );
+console.log( config.database ); 
     request.post( {
        url: "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB", 
        form: config.database }, function() {
@@ -644,13 +646,13 @@ function updateInfluxDB() {
 async function configChannel( event, data ) {
 
   let influxConfig = config.database;
-console.log('1', data);
+
   var channelConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
-  console.log( channelConfig );
+
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
-  console.log( instrumentConfig );
+
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
-console.log( channelState );  
+
   //var externalConnection = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
   var externalConnection = false;
 

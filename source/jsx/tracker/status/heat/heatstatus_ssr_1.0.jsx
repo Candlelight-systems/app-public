@@ -52,7 +52,6 @@ class HeatStatus extends React.Component {
     } ).then( ( response ) => {
 
     } );
-
   }
 
   componentDidUpdate( prevProps ) {

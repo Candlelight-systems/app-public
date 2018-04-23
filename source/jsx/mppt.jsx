@@ -361,7 +361,7 @@ class MPPTJV extends React.Component {
   }
 
 
-  async iv_prepare() {
+  async iv_prepare( compliance ) {
 
     await this.instrument.command("*CLS")
     await this.instrument.command(":STAT:MEAS:ENAB 512")                        // Set SRQ
@@ -370,9 +370,14 @@ class MPPTJV extends React.Component {
     await this.instrument.command("*SRE 1")  
     await this.instrument.command(":SOUR:VOLT:MODE SWE")
     await this.instrument.command(":FORM:ELEM VOLT,CURR");  
+    await this.instrument.command(":SENS:CURR:PROT " + ( compliance / 1000 ).toPrecision( 4 ) );
+
   }
 
-  async _iv( fromV, toV, nbPoints ) {
+  async _iv( fromV, toV, nbPoints, scanRate ) {
+      
+    // TODO: ADD SCAN RATE
+
     
     var stepV = ( toV - fromV ) / ( nbPoints - 1 );
     //await this.instrument.command("*SRE 1")  
@@ -395,10 +400,10 @@ class MPPTJV extends React.Component {
     await this.instrument_lamp.command("AMPLitude 1");
     await this.instrument_lamp.command("OUTput ON");
 
-    await this.instrument.command(":SOUR:DEL " + settlingTime );
+    await this.instrument.command(":SOUR:DEL " + this.state.equilibration );
     await this.instrument.command(":OUTP:STAT ON");
 
-    this.iv_prepare();
+    this.iv_prepare( this.state.compliance );
 
     this.setState( { running_mpp: true });
     await this.instrument.command(":SENS:CURR:PROT " + 0.1 );
@@ -870,6 +875,26 @@ this.graph_mppt_instance
                     <div className="input-group">
                       <input  type="number" className="form-control" name="iv_scan_rate" type="number" max="1" min="0.0001" step="0.0001" value={ this.state.iv_scan_rate } onChange={ this.form_iv_change } />
                       <span className="input-group-addon">V s<sup>-1</sup></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group row">
+                  <label>Current compliance</label>
+                  <div>
+                    <div className="input-group">
+                      <input  type="number" className="form-control" name="compliance" type="number" max="1000" min="0" step="10" value={ this.state.compliance } onChange={ this.form_iv_change } />
+                      <span className="input-group-addon">mA</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group row">
+                  <label>Equilibration time</label>
+                  <div>
+                    <div className="input-group">
+                      <input  type="number" className="form-control" name="equilibration" type="number" max="100" min="0" step="0.5" value={ this.state.equilibration } onChange={ this.form_iv_change } />
+                      <span className="input-group-addon">s</span>
                     </div>
                   </div>
                 </div>
