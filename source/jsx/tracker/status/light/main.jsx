@@ -54,18 +54,19 @@ class LightStatus extends React.Component {
       }
     };
 
+    let button_calibrate;
     switch( environment.statuses.light.type ) {
 
       case 'pyranometer':
 
-        <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePyranometer") }><span className="glyphicon glyphicon-scale"></span> Calibrate pyranometer</button>
+        button_calibrate = <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePyranometer") }><span className="glyphicon glyphicon-scale"></span> Calibrate pyranometer</button>
 
       break;
 
       case 'photodiode':
       default:
 
-        <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePD") }><span className="glyphicon glyphicon-scale"></span> Calibrate photodiode</button>
+        button_calibrate = <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePD") }><span className="glyphicon glyphicon-scale"></span> Calibrate photodiode</button>
             
       break;
     }
@@ -92,7 +93,6 @@ class LightStatus extends React.Component {
             { button_calibrate }
             </div>
           </div>
-        }
       </div> 
     );
   }

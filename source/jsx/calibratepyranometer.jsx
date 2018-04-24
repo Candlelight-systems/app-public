@@ -49,10 +49,15 @@ class CalibratePyranometer extends React.Component {
 			  "Content-Length": body.length.toString()
 			});
 
-			await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPyranometerScaling", {
+			await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.setPyranometerScaling", {
 				method: 'POST',
 				headers: headers,
 				body: body
+			} ).then( response => {
+
+				if( response.status !== 200 ) {
+					throw "Response error";
+				}
 			} );
 
 			this.setState( {
@@ -74,7 +79,7 @@ class CalibratePyranometer extends React.Component {
 
 	async componentDidMount() {
 	
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getPyranometerScaling?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName , {
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.getPyranometerScaling?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName , {
 
 			method: 'GET',
 
@@ -82,15 +87,17 @@ class CalibratePyranometer extends React.Component {
 		   .then( response => {
 		   	
 		   	this.setState( { scale: response.scale, offset: response.offset } );
+		   	this.setState( { rescaling_error_read: false } );
 
 		} ).catch( ( error ) => {
 
 			// Catching JSON or request errors
 			console.error( error );
-			console.error("Error in getting pyranometer information");
+			console.error( "Error in getting pyranometer information" );
+
+			this.setState( { rescaling_error_read: true } );
 		} );
 
-		await this.getPD();
 	}
 
 
@@ -109,22 +116,29 @@ class CalibratePyranometer extends React.Component {
 
 		return (
 			<div className="container-fluid" id="calib_light_list">
-
 				
 				<h4>Pyranometer linear calibration settings</h4>
 
 				{ this.state.rescaling_success && <div className="alert alert-success">Pyranometer has been rescaled.</div> }
-				{ this.state.rescaling_error && <div className="alert alert-error">Error in rescaling the pyranometer. Make sure the host is running.</div> }
+				{ this.state.rescaling_error && <div className="alert alert-danger">Error in rescaling the pyranometer. Make sure the host is running.</div> }
+				{ this.state.rescaling_error_read && <div className="alert alert-danger">Error in retrieving the pyranometer scaling.</div> }
 
-				<div className="alert alert-info"><span className="glyphicon glyphicon-info"></span> The result of the equation should be in sun intensity (where 1 sun = 1'000 W m<sup>-2</sup></div>
+				<div className="alert alert-info"><span className="glyphicon glyphicon-info"></span> The result of the equation should be in sun intensity (where 1 sun = 1'000 W m<sup>-2</sup>)</div>
 
-				sun = <input type="text" name="offset" value={ this.state.scale } onChange={ this.handleInputChange } /> * [Pyranometer current 4-20mA] + <input type="text" name="offset" value={ this.state.offset } onChange={ this.handleInputChange } />
-			
-				<div className="btn-group">
-					<button type="button" className="btn btn-default" onClick={ () => this.applyScaling( this.status.scale, this.status.offset ) }>Apply scaling</button>
-					<button type="button" className="btn btn-default" onClick={this.close}>Close</button>
+				<div className="row">
+					<div className="col-sm-9">
+						sun = <input type="text" name="scale" value={ this.state.scale } onChange={ this.handleInputChange } /> * [Pyranometer current 4-20mA] + <input type="text" name="offset" value={ this.state.offset } onChange={ this.handleInputChange } />
+					</div>
 				</div>
-
+				<br />
+				<div className="row">
+					<div className="col-sm-9">
+						<div className="btn-group">
+							<button type="button" className="btn btn-primary" onClick={ () => this.applyScaling( this.state.scale, this.state.offset ) }>Apply scaling</button>
+							<button type="button" className="btn btn-default" onClick={this.close}>Close</button>
+						</div>
+					</div>
+				</div>
 			</div>
 
 		);
@@ -132,4 +146,4 @@ class CalibratePyranometer extends React.Component {
 }
 
 
-export default CalibratePD;
+export default CalibratePyranometer;

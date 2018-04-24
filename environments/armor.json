@@ -6,7 +6,7 @@
 			"light": {
 				"version": "readonly",
 				"readonly": true,
-				"reader": "pyranometer"
+				"type": "pyranometer"
 			},
 			"heat": {
 			}
@@ -36,8 +36,8 @@
 							"ff": true,
 							"vnow": true,
 							"jnow": true,
-							"temperature": true,
-							"humidity": true,
+							"temperature": false,
+							"humidity": false,
 							"kwh_yr": true
 						}
 

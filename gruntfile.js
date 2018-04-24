@@ -269,6 +269,13 @@ function generateWebpackConfig( theme ) {
                entry: [ './source/showallmeasurements.jsx' ],
                output: {
                    filename: 'app/app/showallmeasurements.js'
+               } }, webpackConfig ),
+
+            calibratepyranometer: 
+              Object.assign( {
+               entry: [ './source/calibratepyranometer.jsx' ],
+               output: {
+                   filename: 'app/app/calibratepyranometer.js'
                } }, webpackConfig )
         }
     });

@@ -396,7 +396,7 @@ module.exports = require("fs");
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"reader":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
 
 /***/ })
 /******/ ]);

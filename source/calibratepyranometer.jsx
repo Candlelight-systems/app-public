@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';	
-import CalibratePD from "./jsx/calibratepd.jsx"
+import CalibratePyranometer from "./jsx/calibratepyranometer.jsx"
 
 const {ipcRenderer} = require('electron')
 
@@ -19,7 +19,7 @@ function onClose() {
 function render( data ) {
 
 	ReactDOM.render(
-	<CalibratePD instrumentId={ data.instrumentId } groupName={ data.groupName } config={ data.config } onClose={ onClose }  />,
+	<CalibratePyranometer instrumentId={ data.instrumentId } groupName={ data.groupName } config={ data.config } onClose={ onClose }  />,
 	document.getElementById('root')
 	);
 }

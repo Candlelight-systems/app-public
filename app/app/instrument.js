@@ -79,7 +79,7 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"reader":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
 
 /***/ }),
 /* 3 */
@@ -3252,11 +3252,12 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         }
     };
 
+    let button_calibrate;
     switch (__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.type) {
 
       case 'pyranometer':
 
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        button_calibrate = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "button",
           { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => this.light_calibrate("calibratePyranometer") },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
@@ -3268,7 +3269,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
       case 'photodiode':
       default:
 
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        button_calibrate = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "button",
           { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => this.light_calibrate("calibratePD") },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
@@ -3301,8 +3302,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
           ),
           button_calibrate
         )
-      ),
-      "}"
+      )
     );
   }
 
@@ -3738,7 +3738,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
           Math.round(this.state.lightValue * 100) / 100,
           " sun"
         )
-      ) : null
+      ) : "Current value unknown"
     );
   }
 }
