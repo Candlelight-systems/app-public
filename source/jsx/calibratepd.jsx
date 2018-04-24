@@ -60,7 +60,7 @@ class CalibratePD extends React.Component {
 		  "Content-Length": body.length.toString()
 		});
 
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
+		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.setPDScaling", {
 			method: 'POST',
 			headers: headers,
 			body: body

@@ -15,9 +15,9 @@ class LightStatus extends React.Component {
 
   }
 
-  light_calibrate() {
+  light_calibrate( calibrateMethod ) {
 
-    ipcRenderer.send( "calibratePD", {
+    ipcRenderer.send( calibrateMethod, {
       instrumentId: this.props.instrumentId,
       groupName: this.props.name,
       config: this.props.config
@@ -54,6 +54,22 @@ class LightStatus extends React.Component {
       }
     };
 
+    switch( environment.statuses.light.type ) {
+
+      case 'pyranometer':
+
+        <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePyranometer") }><span className="glyphicon glyphicon-scale"></span> Calibrate pyranometer</button>
+
+      break;
+
+      case 'photodiode':
+      default:
+
+        <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ () => this.light_calibrate("calibratePD") }><span className="glyphicon glyphicon-scale"></span> Calibrate photodiode</button>
+            
+      break;
+    }
+
     return ( 
       <div className="group-status group-status-light col-lg-2">
         <h4>Light bias</h4>
@@ -62,14 +78,18 @@ class LightStatus extends React.Component {
           "No light control is available for this group"
         }
 
-        {
-          !! environment.statuses.light.readonly && 
+
         <div className="row">
             <div className="col-lg-9">
+
+            { !! environment.statuses.light.readonly && 
+
               <button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }>
                 <span className="glyphicon glyphicon-cog"></span> Configure
               </button>
-              <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.light_calibrate }><span className="glyphicon glyphicon-scale"></span> Calibrate</button>
+            }
+
+            { button_calibrate }
             </div>
           </div>
         }

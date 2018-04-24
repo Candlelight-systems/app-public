@@ -79,7 +79,7 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"reader":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":true}}}}}}
 
 /***/ }),
 /* 3 */
@@ -3210,9 +3210,9 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
     this.light_controller_config = this.light_controller_config.bind(this);
   }
 
-  light_calibrate() {
+  light_calibrate(calibrateMethod) {
 
-    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("calibratePD", {
+    __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send(calibrateMethod, {
       instrumentId: this.props.instrumentId,
       groupName: this.props.name,
       config: this.props.config
@@ -3252,6 +3252,32 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         }
     };
 
+    switch (__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.type) {
+
+      case 'pyranometer':
+
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "button",
+          { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => this.light_calibrate("calibratePyranometer") },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
+          " Calibrate pyranometer"
+        );
+
+        break;
+
+      case 'photodiode':
+      default:
+
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          "button",
+          { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: () => this.light_calibrate("calibratePD") },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
+          " Calibrate photodiode"
+        );
+
+        break;
+    }
+
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "div",
       { className: "group-status group-status-light col-lg-2" },
@@ -3261,26 +3287,22 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         "Light bias"
       ),
       this.props.serverState.lightController ? content : "No light control is available for this group",
-      !!__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.readonly && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         "div",
         { className: "row" },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
           { className: "col-lg-9" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          !!__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.readonly && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "button",
             { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
             " Configure"
           ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "button",
-            { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_calibrate },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-scale" }),
-            " Calibrate"
-          )
+          button_calibrate
         )
-      )
+      ),
+      "}"
     );
   }
 

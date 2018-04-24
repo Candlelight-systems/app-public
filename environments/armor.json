@@ -5,7 +5,8 @@
 		"statuses": {
 			"light": {
 				"version": "readonly",
-				"readonly": true
+				"readonly": true,
+				"reader": "pyranometer"
 			},
 			"heat": {
 			}

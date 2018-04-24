@@ -38,6 +38,7 @@ ipcMain.on("configChannels", configChannels );
 ipcMain.on("mppt", openMPPT );
 ipcMain.on("bugReport", openBugReport );
 ipcMain.on("calibratePD", openCalibratePD );
+ipcMain.on("calibratePyranometer", openCalibratePyranometer );
 ipcMain.on("scheduleLight", openScheduleLight );
 
 ipcMain.on("reportError", reportError );
@@ -402,6 +403,19 @@ async function openCalibratePD( event, data ) {
   }, async () => {
 
     var channelConfig = await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/resetAllChannels?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
+  } );
+}
+
+
+async function openCalibratePyranometer( event, data ) {
+
+  openForm( null, "calibratepyranometer", { instrumentId: data.instrumentId, groupName: data.groupName, config: data.config }, {
+    width: 800,
+    height: 600,
+    resizable: false
+  }, async () => {
+
+    //var channelConfig = await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/resetAllChannels?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
   } );
 }
 

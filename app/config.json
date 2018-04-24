@@ -8,14 +8,11 @@
 		}
 	],
 	"database": {
-		"db": "matahari",
-		"db_authentification": "User not found",
-		"db_connection": "ok",
-		"db_dbexists": "ok",
-		"host": "192.168.1.101",
+		"host": "localhost",
+		"username": "",
 		"password": "",
 		"port": 8086,
-		"username": ""
+		"db": "matahari"
 	},
 	"githubtokens": {
 		"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"

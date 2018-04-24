@@ -229,7 +229,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			"Content-Length": body.length.toString()
 		});
 
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setPDScaling", {
+		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/light.setPDScaling", {
 			method: 'POST',
 			headers: headers,
 			body: body
