@@ -6720,8 +6720,16 @@ div.cl-device .bar .barRed {
 div.cl-device .action {
   cursor: pointer;
 }
-.cl-group {
-  margin-bottom: 20px;
+.group-status {
+  border: 1px solid #8c9aa2;
+  border-radius: 2px;
+  flex: 1;
+  background-color: #e9eff3;
+  margin: 10px;
+  padding-bottom: 10px;
+}
+.group-status .status-error {
+  color: #d9534f;
 }
 body {
   height: 100%;
@@ -6757,14 +6765,6 @@ a {
 #root-wrapper {
   min-height: 100%;
   margin-bottom: -180px;
-}
-#root .group-status {
-  background-color: #e9eff3;
-  height: 260px;
-  margin: 10px;
-}
-#root .group-status .status-error {
-  color: #d9534f;
 }
 #root .vertical-align {
   align-items: center;
@@ -6919,6 +6919,7 @@ ul.formTabs {
   padding: 10px;
 }
 .statuses {
+  display: flex;
   margin-left: -5px;
   margin-right: -5px;
 }

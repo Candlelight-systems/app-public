@@ -16,6 +16,7 @@
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
     "fix-path": "^2.1.0",
+    "mathjax": "^2.7.4",
     "node-fetch": "^1.7.2",
     "node-jsgraph": "^2.0.79",
     "pdfkit": "^0.8.3",

@@ -83,7 +83,7 @@ class LightStatus extends React.Component {
         <div className="row">
             <div className="col-lg-9">
 
-            { !! environment.statuses.light.readonly && 
+            { ! environment.statuses.light.readonly && 
 
               <button type="button" className="btn btn-cl btn-default btn-sm"  onClick={ this.light_controller_config }>
                 <span className="glyphicon glyphicon-cog"></span> Configure

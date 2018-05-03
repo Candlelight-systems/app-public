@@ -300,13 +300,13 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 				    scaling;
 
 				switch (this.state.schedule_basis) {
-					case '1hour':
+					case 3600:
 						// in minutes
 						scaling = 60 / length;
 						this.graph.getBottomAxis().setUnit('minutes');
 						break;
 
-					case '1day':
+					case 86400:
 						// in minutes
 						scaling = 24 / length;
 						this.graph.getBottomAxis().setUnit('hours');
@@ -433,12 +433,17 @@ class ScheduleLight extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 								{ className: 'form-control', name: 'schedule_basis', value: this.state.schedule_basis, onChange: this.handleInputChange },
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 									'option',
-									{ value: '1hour' },
+									{ value: 'null', disabled: 'disabled' },
+									'Choose a time basis'
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'option',
+									{ value: '3600' },
 									'1 hour'
 								),
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 									'option',
-									{ value: '1day' },
+									{ value: '86400' },
 									'1 day'
 								)
 							)

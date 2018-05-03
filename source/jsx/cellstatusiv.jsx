@@ -106,7 +106,6 @@ class statusIV extends GraphComponent {
 		} );
 
 		this.graph.resetSeries();
-
 		
 		let maxY = 0;
 
@@ -140,6 +139,10 @@ class statusIV extends GraphComponent {
 				return;
 			}
 
+			if( data.iv.getLength() == 0 ) {
+				return;
+			}
+
 			let s = this.graph.newSerie( "iv_" + index );
 			s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
 			s.setLineColor( colors[ k ] );
@@ -152,7 +155,7 @@ class statusIV extends GraphComponent {
 			s2.excludedFromLegend = true;
 			s2.autoAxis();
 			s2.setLineWidth( 2 );
-
+console.log( data.iv );
 			s.setWaveform( data.iv );
 			s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
 

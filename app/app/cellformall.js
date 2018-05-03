@@ -1139,7 +1139,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 8 */
@@ -1290,7 +1290,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 										"span",
 										{ className: "input-group-addon" },
-										"mA cm",
+										"cm",
 										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 											"sup",
 											null,

@@ -70,6 +70,7 @@ class TrackerDevice extends React.Component {
 			"current": <span>mA</span>,
 			"efficiency": <span>%</span>,
 			"fillfactor": <span>%</span>,
+			"power": <span>W</span>,
 			"sun": <span>sun</span>,
 			"area": <span>cm<sup>2</sup></span>,
 			"temperature": <span>°C</span>,
@@ -91,6 +92,7 @@ class TrackerDevice extends React.Component {
 		this.showSummary = this.showSummary.bind( this );
 		
 		this.downloadData = this.downloadData.bind( this );
+		this.autoZero = this.autoZero.bind( this );
 
 		this.wsUpdate = this.wsUpdate.bind( this );
 			
@@ -230,6 +232,7 @@ class TrackerDevice extends React.Component {
 			
 			let lastTime;
 
+
 			if( this.state.data.getLength && this.state.data.getLength() > 0 ) {
 				lastTime = this.state.data.xdata.data[ this.state.data.getLength() - 1 ];
 				lastTime += this.state.serverState.tracking_record_interval / 1000 / 3600;
@@ -241,7 +244,35 @@ class TrackerDevice extends React.Component {
 				newState.data = Graph.newWaveform();
 			} else {
 				
-				this.state.data.append( lastTime, data.action.data );
+
+
+				switch( this.parameter ) {
+
+					case "efficiency":
+						this.state.data.append( lastTime, data.action.data.pce );
+					break;
+
+
+					case "voltage_mean":
+						this.state.data.append( lastTime, data.action.data.voltage );
+					break;
+
+
+					case "current_mean":
+						this.state.data.append( lastTime, data.action.data.curent );
+					break;
+
+					case "power_mean":
+						this.state.data.append( lastTime, data.action.data.power );
+					break;
+
+
+					default:
+					break;
+				}
+
+
+
 				newState.data = this.state.data;
 			}
 		}
@@ -346,6 +377,29 @@ class TrackerDevice extends React.Component {
 		ipcRenderer.send( "downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId );
 	}
 
+
+
+	autoZero() {
+
+	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/instrument.autoZero?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+
+	      method: 'GET'
+
+	    } )
+	    .then( response => response.text() )
+	    .then( response => {
+	    	console.log( response );
+			//this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
+	      	//this.updateInfluxData( response );
+	    } )
+	    .catch( error => {
+
+	      this.setState( {
+	        error: error
+	      } );
+
+	    } );
+	 }
 
 	componentDidUpdate() {
 	
@@ -489,7 +543,6 @@ class TrackerDevice extends React.Component {
 		if( ! serverState.measurementName ) {
 			return;
 		}
-		console.log('a');
 
 		switch( this.state.serverState.tracking_mode ) {
 
@@ -509,7 +562,8 @@ class TrackerDevice extends React.Component {
 				parameter_jv = 'pce';
 			break;
 		}
-console.log('b');
+		this.parameter = parameter;
+
 		let queries = [
 		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
 		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
@@ -521,7 +575,7 @@ console.log('b');
 		let newIvCurves = false;
 
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
-			console.log( results[ 2 ] );
+			
 			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
 				
 				newState.ivCurves = this.state.ivCurves.splice( 0 );
@@ -547,7 +601,7 @@ console.log('b');
 					return parameters[ parameter_jv ];
 				} );
 			}
-console.log( results[ 0 ] );
+
 			// Even if the series don't exist, we can still update the j-V curve
 			// The only thing we have to do is not throw any error and handle gracefully the lack of data
 			if( ! results[ 0 ].series ) {
@@ -562,8 +616,8 @@ console.log( results[ 0 ] );
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 			newState.efficiency = round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ], 2 );
-
-			newState.power = results[ 1 ].series[ 0 ].values[ 0 ][ 2 ];
+console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
+			newState.power = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] * 1000000 ) / 1000000;
 			newState.current = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000;
 			newState.currentdensity = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 / serverState.cellArea;
 			newState.voltage = parseFloat( results[ 1 ].series[ 0 ].values[ 0 ][ 4 ] ).toPrecision( 3 );
@@ -603,7 +657,12 @@ console.log( results[ 0 ] );
 				newState.jsc = results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000;
 			}
 
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean, MEAN( power ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;"
+			if( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] == -1 ) {
+				parameter = 'power_mean';
+			}
+
+			this.parameter = parameter;
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + serverState.measurementName + "\" ORDER BY time ASC LIMIT 1;"
 
 			queue.push( influxquery( query, db_ds, this.props.configDB ).then( ( results ) => {
 				
@@ -617,6 +676,8 @@ console.log( results[ 0 ] );
 					highest_value = 0, 
 					highest_value_time = 0;
 
+				newState.start_value = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
+
 				// First point gives the initial efficiency, 2nd row
 				if( values.length < 2 ) {
 					newState.data = false;
@@ -624,7 +685,7 @@ console.log( results[ 0 ] );
 				}
 
 				let valueIndex = 1;
-				let totalEnergykWh = 0;
+				let totalEnergyJoules = 0;
 				let last_power;
 
 				values.forEach( ( value, index ) => {
@@ -658,8 +719,9 @@ console.log( results[ 0 ] );
 					*/
 
 					if( time > 0 ) {
-						totalEnergykWh += ( time - wave.getX( wave.getLength() - 1 ) * ( value[ 8 ] * last_power ) ) / 2;
+						totalEnergyJoules += ( time - wave.getX( wave.getLength() - 1 ) ) * ( value[ 8 ] + last_power ) / 2 * 3600;
 					}
+
 					last_power = value[ 8 ];
 					
 					//value[ valueIndex ] += 2;
@@ -698,10 +760,13 @@ console.log( results[ 0 ] );
 					newState.jsc = Math.round( values[ values.length - 1 ][ 2 ]  * 100 ) / 100;
 				}
 				
+
+				
 				// totalEnergyKWh is in watt * hour (see unit analysis)
-				totalEnergykWh /= 1000; // Get the value in kWh
-				const totalEnergykWh_per_year = totalEnergykWh * ( wave.getX( wave.getLength() - 1 ) ) / ( 24 * 365 ); // Times the number of ellapsed hours divided by the number of hours in a year
-				const totalEnergykWh_per_year_per_m2 = totalEnergykWh_per_year * ( serverState.cellArea / 10000 );
+				let totalEnergykWh = totalEnergyJoules / 3600000; // Get the value in kWh
+				
+				const totalEnergykWh_per_year = totalEnergykWh / ( wave.getX( wave.getLength() - 1 ) ) * ( 24 * 365 ); // Times the number of ellapsed hours divided by the number of hours in a year
+				const totalEnergykWh_per_year_per_m2 = totalEnergykWh_per_year / ( serverState.cellArea / 10000 );
 
 				newState.highest_value = Math.round( highest_value * 100 ) / 100;
 				newState.highest_value_time = highest_value_time;
@@ -711,13 +776,13 @@ console.log( results[ 0 ] );
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
 				newState.data_IV = waveIV;
-				newState.kwh_yr_m2 = totalEnergykWh_per_year_per_m2;
+				newState.kwh_yr_m2 = Math.round( totalEnergykWh_per_year_per_m2 * 100 ) / 100;
 			} ) );
 
 
 
 			return Promise.all( queue ).then( () => {
-
+console.log( newState.power, serverState.cellArea, newState.voc, newState.jsc );
 				newState.ff = Math.round( newState.power / serverState.cellArea / ( newState.voc * newState.jsc / 1000 ) * 100 );
 				newState.updating = false;
 				
@@ -752,9 +817,9 @@ console.log( results[ 0 ] );
 		}
 
 		if( Math.abs( value ) < 0.8 ) {
-			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toFixed( 1 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
+			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toPrecision( 3 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
 		} else {
-			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toFixed( 1 ) }&nbsp;mA&nbsp;cm<sup>-2</sup></span> );
+			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toPrecision( 3 ) }&nbsp;mA&nbsp;cm<sup>-2</sup></span> );
 		}
 	}
 
@@ -773,13 +838,9 @@ console.log( results[ 0 ] );
 			statusGraphSerieLabelLegend;
 
 
-		switch( this.state.serverState.tracking_mode ) {
+		switch( this.parameter ) {
 
-			case 0:
-				trackingMode = "No tracking";
-			break;
-
-			case 1:
+			case "efficiency":
 				unit = "%";
 				startVal = this.state.highest_value;
 				startValPos = this.state.highest_value_time;
@@ -794,7 +855,7 @@ console.log( results[ 0 ] );
 			break;
 
 
-			case 2:
+			case "voltage_mean":
 				unit = "V";
 				startVal = this.state.start_value;
 				startValPos = 0;
@@ -808,7 +869,7 @@ console.log( results[ 0 ] );
 			break;
 
 
-			case 3:
+			case "current_mean":
 				unit = this.unit.currentdensity;
 				startVal = this.state.start_value;
 				startValPos = 0;
@@ -820,6 +881,24 @@ console.log( results[ 0 ] );
 				statusGraphAxisUnit = "mA cm^-2";
 				statusGraphSerieLabelLegend = "Jsc";
 			break;
+
+			case "power_mean":
+				unit = this.unit.power;
+				startVal = this.state.start_value;
+				startValPos = 0;
+				currVal = this.state.power;
+				
+
+				trackingMode = "MPPT";
+				statusGraphAxisLabel = "Power";
+				statusGraphAxisUnit = "W";
+				statusGraphSerieLabelLegend = "Pout";
+			break;
+
+
+			default:
+				trackingMode = "No tracking";
+			break;
 		}
 
 		let active = this.state.serverState.enable > 0 && this.state.serverState.tracking_mode > 0;
@@ -829,6 +908,7 @@ console.log( results[ 0 ] );
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
 	
 		const displayElements = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].displayDeviceInformation;
+		const button_autozero = <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button>;
 
 		if( active ) {
 
@@ -893,7 +973,7 @@ console.log( results[ 0 ] );
 								{ trackingMode }
 							</div>
 							{ 
-								displayElements.ellapsed 
+								displayElements.time_ellapsed 
 									&&
 								<div className="col-lg-1 propElement">
 									
@@ -908,7 +988,7 @@ console.log( results[ 0 ] );
 								</div>
 							}
 							{ 
-								displayElements.efficiency 
+								displayElements.pce 
 									&&
 								<div className="col-xs-1 propElement">
 									
@@ -916,7 +996,7 @@ console.log( results[ 0 ] );
 										<div className="label">&eta;</div>
 										<div className="value">
 											<strong>
-												{ ( ! isNaN( this.state.efficiency ) && this.state.efficiency !== false ) ? <span>{ this.state.efficiency } { this.unit.efficiency }</span> : 'N/A' } 
+												{ ( ! isNaN( this.state.efficiency ) && this.state.efficiency !== false && this.state.efficiency >= 0 ) ? <span>{ this.state.efficiency } { this.unit.efficiency }</span> : 'N/A' } 
 											</strong>
 										</div>
 									</div>
@@ -928,7 +1008,7 @@ console.log( results[ 0 ] );
 								<div className="col-xs-1 propElement">
 									
 									<div>
-										<div className="label">&eta;</div>
+										<div className="label">P<sub>out</sub></div>
 										<div className="value">
 											<strong>
 												{ ( ! isNaN( this.state.power ) && this.state.power !== false ) ? <span>{ this.state.power } { this.unit.power }</span> : 'N/A' } 
@@ -948,7 +1028,7 @@ console.log( results[ 0 ] );
 											<span className="glyphicon glyphicon-scale"></span>
 										</div>
 										<div className="value">
-											{ ( ! isNaN( this.state.sun ) && this.state.sun !== false ) ? <span>{ this.state.sun } {this.unit.sun}</span> : 'N/A' }
+											{ ( ! isNaN( this.state.sun ) && this.state.sun !== false && this.state.sun >= 0 ) ? <span>{ this.state.sun } {this.unit.sun}</span> : 'N/A' }
 										</div>
 									</div>
 								</div>
@@ -1050,7 +1130,7 @@ console.log( results[ 0 ] );
 									<div>
 										<div className="label">kWh yr<sup>-1</sup>m<sup>-2</sup></div>
 										<div className="value">
-											{ this.state.kwh_yr && this.state.kwh_yr_m2 > 0 ? <span>{ this.state.kwh_yr_m2 }</span> : 'N/A' }
+											{ this.state.kwh_yr_m2 && this.state.kwh_yr_m2 > 0 ? <span>{ this.state.kwh_yr_m2 }</span> : 'N/A' }
 										</div>
 									</div>
 								</div>
@@ -1088,6 +1168,7 @@ console.log( results[ 0 ] );
 							</div>
 							<div className="col-lg-8">
 								<button className="btn btn-cl" onClick={ this.downloadData }><span className="glyphicon glyphicon-download-alt"></span> Download</button>
+								 { button_autozero }
 								<button className="btn btn-cl" onClick={ this.stop }><span className="glyphicon glyphicon-stop"></span> Stop</button>
 								<button className="btn btn-cl" onClick={ this.cfg }><span className="glyphicon glyphicon-cog"></span> Configure</button>
 							</div>
@@ -1131,7 +1212,7 @@ console.log( results[ 0 ] );
 								{ 
 									!!( this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && ! active && this.state.serverState.tracking_mode > 0 )
 									&&
-									<button className="btn btn-cl btn-sm" onClick={ this.start }><span className="glyphicon glyphicon-start"></span> Start</button> 
+									<div><button className="btn btn-cl btn-sm" onClick={ this.start }><span className="glyphicon glyphicon-start"></span> Start</button> { button_autozero }</div>
 								}
 							</div>
 

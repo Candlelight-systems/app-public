@@ -179,12 +179,12 @@ class ScheduleLight extends React.Component {
 
 
 				switch( this.state.schedule_basis ) {
-					case '1hour': // in minutes
+					case 3600: // in minutes
 						scaling = 60 / length;
 						this.graph.getBottomAxis().setUnit('minutes'); 
 					break;
 
-					case '1day': // in minutes
+					case 86400: // in minutes
 						scaling = 24 / length;
 						this.graph.getBottomAxis().setUnit('hours'); 
 					break;
@@ -268,8 +268,9 @@ class ScheduleLight extends React.Component {
 									<label>Time basis :</label>
 								
 									<select className="form-control" name="schedule_basis" value={ this.state.schedule_basis } onChange={ this.handleInputChange }>
-										<option value="1hour">1 hour</option>
-										<option value="1day">1 day</option>
+										<option value="null" disabled="disabled">Choose a time basis</option>
+										<option value="3600">1 hour</option>
+										<option value="86400">1 day</option>
 									</select>
 								
 								</div>

@@ -87,7 +87,7 @@ class CellForm extends React.Component {
 						<div className="col-sm-9">
 							<div className="input-group">
 								<input type="number" step="0.01" disabled={active} name="cellArea" id="cellArea" className="form-control col-sm-9" placeholder="Cell area" value={this.state.cellArea} onChange={this.handleInputChange} />
-								<span className="input-group-addon">mA cm<sup>-2</sup></span>
+								<span className="input-group-addon">cm<sup>-2</sup></span>
 							</div>
 							{ active ? <div className="help-block">The area cannot be changed once the device is in active mode</div> : null }
 						</div>

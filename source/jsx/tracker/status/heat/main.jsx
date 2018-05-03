@@ -47,7 +47,6 @@ class HeatStatus extends React.Component {
         break;
       }
 
-
       case "ssr_1.0": {
         content = ( <HeatStatus_ssr_1_0 {...this.props } /> );
         break;
@@ -67,7 +66,7 @@ class HeatStatus extends React.Component {
               { 
                 this.state.temperature !== undefined && this.state.temperature !== false ? 
                 <div className="row">
-                  <div className="col-lg-5">Environment temperature:</div>
+                  <div className="col-lg-5">Temperature (env.) :</div>
                   <div className="col-lg-4">{ this.state.temperature } &deg;C</div>
                 </div> 
                 : null 

@@ -119,6 +119,7 @@ class InstrumentStatus extends React.Component {
             </div>
           </div>
 
+          { environment.instrument[ this.props.instrumentId ].groups[ this.props.name ].resettable !== false &&
            <div className="row">
             <div className="col-lg-5">
                 <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.resetSlave }><span>Reset enclosure(s)</span></button>              
@@ -127,7 +128,8 @@ class InstrumentStatus extends React.Component {
 
             </div>
           </div>
-          { speedOptions.length > 0 && 
+      		}
+          { speedOptions.length > 0 && environment.instrument[ this.props.instrumentId ].changeSpeed !== false && 
 			<div className="form-group">
 				<label htmlFor="tracking_speed" className="col-sm-9">Acquisition speed <sup title="This option directly affects the acquisition speed of the instrument, and therefore has a significant impact on the tracking efficiency when the light bias is noisy. The slower the better for the convergence, but it will limit the overall tracking speed.">?</sup></label>
 				<div className="col-sm-9">

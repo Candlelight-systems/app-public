@@ -79,7 +79,7 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 3 */
@@ -124,238 +124,6 @@ let ping = function (cfg) {
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports) {
-
-module.exports = require("react-dom");
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-
-
-
-class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent {
-
-	constructor(props) {
-		super(props);
-	}
-
-	componentWillReceiveProps(nextProps) {
-		if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
-			this.resize(nextProps);
-		}
-	}
-
-	shouldComponentUpdate(nextProps) {
-
-		if (!nextProps.shown) {
-			return false;
-		}
-
-		return true;
-	}
-
-	resize(props) {
-		console.log(props);
-		this.graph.resize(props.width || 300, props.height || 130);
-	}
-
-	render() {
-		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-			"div",
-			{ className: "cellGraph" },
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { ref: el => this.graphDOM = el })
-		);
-	}
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (GraphComponent);
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
-
-var isArray = function isArray(arr) {
-	if (typeof Array.isArray === 'function') {
-		return Array.isArray(arr);
-	}
-
-	return toStr.call(arr) === '[object Array]';
-};
-
-var isPlainObject = function isPlainObject(obj) {
-	if (!obj || toStr.call(obj) !== '[object Object]') {
-		return false;
-	}
-
-	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-	// Not own constructor property must be Object
-	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-		return false;
-	}
-
-	// Own properties are enumerated firstly, so to speed up,
-	// if last one is own, then all properties are own.
-	var key;
-	for (key in obj) { /**/ }
-
-	return typeof key === 'undefined' || hasOwn.call(obj, key);
-};
-
-module.exports = function extend() {
-	var options, name, src, copy, copyIsArray, clone;
-	var target = arguments[0];
-	var i = 1;
-	var length = arguments.length;
-	var deep = false;
-
-	// Handle a deep copy situation
-	if (typeof target === 'boolean') {
-		deep = target;
-		target = arguments[1] || {};
-		// skip the boolean and the target
-		i = 2;
-	}
-	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
-		target = {};
-	}
-
-	for (; i < length; ++i) {
-		options = arguments[i];
-		// Only deal with non-null/undefined values
-		if (options != null) {
-			// Extend the base object
-			for (name in options) {
-				src = target[name];
-				copy = options[name];
-
-				// Prevent never-ending loop
-				if (target !== copy) {
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (typeof copy !== 'undefined') {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-	}
-
-	// Return the modified object
-	return target;
-};
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-
-
-
-class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
-
-	/*
-  *	props.current
-  *	props.start
-  *	props.change
-  *	props.arrowstatus
-  */
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-
-		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-			"div",
-			null,
-			!!this.props.cfg && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-default", onClick: this.props.cfg },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" })
-			),
-			!!this.props.button_start && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-success", onClick: this.props.start },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-play" })
-			),
-			!!this.props.button_stop && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-danger", onClick: this.props.stop },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
-			),
-			!!this.props.button_jsc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_jsc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordJsc },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" J",
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"sub",
-					null,
-					"sc"
-				)
-			),
-			!!this.props.button_voc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_voc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordVoc },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" V",
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"sub",
-					null,
-					"oc"
-				)
-			),
-			!!this.props.button_iv && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_iv_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordIV },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" IV"
-			),
-			!!this.props.button_download && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.downloadData },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-download" })
-			),
-			!!this.props.button_details && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.details },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-chevron-down" })
-			)
-		);
-	}
-}
-
-/* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
-
-/***/ }),
-/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -542,6 +310,238 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-dom");
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+
+class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent {
+
+	constructor(props) {
+		super(props);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
+			this.resize(nextProps);
+		}
+	}
+
+	shouldComponentUpdate(nextProps) {
+
+		if (!nextProps.shown) {
+			return false;
+		}
+
+		return true;
+	}
+
+	resize(props) {
+		console.log(props);
+		this.graph.resize(props.width || 300, props.height || 130);
+	}
+
+	render() {
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			{ className: "cellGraph" },
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { ref: el => this.graphDOM = el })
+		);
+	}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (GraphComponent);
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+	var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) { /**/ }
+
+	return typeof key === 'undefined' || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	var options, name, src, copy, copyIsArray, clone;
+	var target = arguments[0];
+	var i = 1;
+	var length = arguments.length;
+	var deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+	if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target !== copy) {
+					// Recurse if we're merging plain objects or arrays
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+						if (copyIsArray) {
+							copyIsArray = false;
+							clone = src && isArray(src) ? src : [];
+						} else {
+							clone = src && isPlainObject(src) ? src : {};
+						}
+
+						// Never move original objects, clone them
+						target[name] = extend(deep, clone, copy);
+
+					// Don't bring in undefined values
+					} else if (typeof copy !== 'undefined') {
+						target[name] = copy;
+					}
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+
+class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+	/*
+  *	props.current
+  *	props.start
+  *	props.change
+  *	props.arrowstatus
+  */
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			null,
+			!!this.props.cfg && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-default", onClick: this.props.cfg },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" })
+			),
+			!!this.props.button_start && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-success", onClick: this.props.start },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-play" })
+			),
+			!!this.props.button_stop && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-danger", onClick: this.props.stop },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
+			),
+			!!this.props.button_jsc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_jsc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordJsc },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" J",
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"sub",
+					null,
+					"sc"
+				)
+			),
+			!!this.props.button_voc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_voc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordVoc },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" V",
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"sub",
+					null,
+					"oc"
+				)
+			),
+			!!this.props.button_iv && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_iv_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordIV },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" IV"
+			),
+			!!this.props.button_download && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.downloadData },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-download" })
+			),
+			!!this.props.button_details && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.details },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-chevron-down" })
+			)
+		);
+	}
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
+
+/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -556,7 +556,7 @@ module.exports = __webpack_require__(11);
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
@@ -859,7 +859,7 @@ var _initialiseProps = function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__influx__ = __webpack_require__(4);
@@ -1146,11 +1146,11 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_extend__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_util_iv__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__influx__ = __webpack_require__(4);
@@ -1257,6 +1257,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				null,
 				"%"
 			),
+			"power": __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+				"span",
+				null,
+				"W"
+			),
 			"sun": __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 				"span",
 				null,
@@ -1299,6 +1304,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		this.showSummary = this.showSummary.bind(this);
 
 		this.downloadData = this.downloadData.bind(this);
+		this.autoZero = this.autoZero.bind(this);
 
 		this.wsUpdate = this.wsUpdate.bind(this);
 
@@ -1446,7 +1452,28 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.data = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 			} else {
 
-				this.state.data.append(lastTime, data.action.data);
+				switch (this.parameter) {
+
+					case "efficiency":
+						this.state.data.append(lastTime, data.action.data.pce);
+						break;
+
+					case "voltage_mean":
+						this.state.data.append(lastTime, data.action.data.voltage);
+						break;
+
+					case "current_mean":
+						this.state.data.append(lastTime, data.action.data.curent);
+						break;
+
+					case "power_mean":
+						this.state.data.append(lastTime, data.action.data.power);
+						break;
+
+					default:
+						break;
+				}
+
 				newState.data = this.state.data;
 			}
 		}
@@ -1553,6 +1580,24 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 	downloadData() {
 
 		__WEBPACK_IMPORTED_MODULE_9_electron__["ipcRenderer"].send("downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId);
+	}
+
+	autoZero() {
+
+		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/instrument.autoZero?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+
+			method: 'GET'
+
+		}).then(response => response.text()).then(response => {
+			console.log(response);
+			//this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
+			//this.updateInfluxData( response );
+		}).catch(error => {
+
+			this.setState({
+				error: error
+			});
+		});
 	}
 
 	componentDidUpdate() {}
@@ -1686,7 +1731,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		if (!serverState.measurementName) {
 			return;
 		}
-		console.log('a');
 
 		switch (this.state.serverState.tracking_mode) {
 
@@ -1706,13 +1750,14 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				parameter_jv = 'pce';
 				break;
 		}
-		console.log('b');
+		this.parameter = parameter;
+
 		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
 
 		Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
-			console.log(results[2]);
+
 			if (results[2].series && results[2].series[0]) {
 
 				newState.ivCurves = this.state.ivCurves.splice(0);
@@ -1738,7 +1783,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 					return parameters[parameter_jv];
 				});
 			}
-			console.log(results[0]);
+
 			// Even if the series don't exist, we can still update the j-V curve
 			// The only thing we have to do is not throw any error and handle gracefully the lack of data
 			if (!results[0].series) {
@@ -1753,8 +1798,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
 			newState.efficiency = round(results[1].series[0].values[0][1], 2);
-
-			newState.power = results[1].series[0].values[0][2];
+			console.log(results[1].series[0].values[0][2]);
+			newState.power = Math.round(results[1].series[0].values[0][2] * 1000000) / 1000000;
 			newState.current = results[1].series[0].values[0][3] * 1000;
 			newState.currentdensity = results[1].series[0].values[0][3] * 1000 / serverState.cellArea;
 			newState.voltage = parseFloat(results[1].series[0].values[0][4]).toPrecision(3);
@@ -1795,7 +1840,12 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.jsc = results[4].series[0].values[0][1] / serverState.cellArea * 1000;
 			}
 
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( sun ) as sMean, MEAN( power ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
+			if (results[1].series[0].values[0][1] == -1) {
+				parameter = 'power_mean';
+			}
+
+			this.parameter = parameter;
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + serverState.measurementName + "\" ORDER BY time ASC LIMIT 1;";
 
 			queue.push(Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
 
@@ -1809,6 +1859,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				    highest_value = 0,
 				    highest_value_time = 0;
 
+				newState.start_value = Math.round(results[1].series[0].values[0][1] * 100) / 100;
+
 				// First point gives the initial efficiency, 2nd row
 				if (values.length < 2) {
 					newState.data = false;
@@ -1816,7 +1868,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				}
 
 				let valueIndex = 1;
-				let totalEnergykWh = 0;
+				let totalEnergyJoules = 0;
 				let last_power;
 
 				values.forEach((value, index) => {
@@ -1849,8 +1901,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
      */
 
 					if (time > 0) {
-						totalEnergykWh += (time - wave.getX(wave.getLength() - 1) * (value[8] * last_power)) / 2;
+						totalEnergyJoules += (time - wave.getX(wave.getLength() - 1)) * (value[8] + last_power) / 2 * 3600;
 					}
+
 					last_power = value[8];
 
 					//value[ valueIndex ] += 2;
@@ -1890,9 +1943,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				}
 
 				// totalEnergyKWh is in watt * hour (see unit analysis)
-				totalEnergykWh /= 1000; // Get the value in kWh
-				const totalEnergykWh_per_year = totalEnergykWh * wave.getX(wave.getLength() - 1) / (24 * 365); // Times the number of ellapsed hours divided by the number of hours in a year
-				const totalEnergykWh_per_year_per_m2 = totalEnergykWh_per_year * (serverState.cellArea / 10000);
+				let totalEnergykWh = totalEnergyJoules / 3600000; // Get the value in kWh
+
+				const totalEnergykWh_per_year = totalEnergykWh / wave.getX(wave.getLength() - 1) * (24 * 365); // Times the number of ellapsed hours divided by the number of hours in a year
+				const totalEnergykWh_per_year_per_m2 = totalEnergykWh_per_year / (serverState.cellArea / 10000);
 
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
@@ -1902,11 +1956,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
 				newState.data_IV = waveIV;
-				newState.kwh_yr_m2 = totalEnergykWh_per_year_per_m2;
+				newState.kwh_yr_m2 = Math.round(totalEnergykWh_per_year_per_m2 * 100) / 100;
 			}));
 
 			return Promise.all(queue).then(() => {
-
+				console.log(newState.power, serverState.cellArea, newState.voc, newState.jsc);
 				newState.ff = Math.round(newState.power / serverState.cellArea / (newState.voc * newState.jsc / 1000) * 100);
 				newState.updating = false;
 			}).catch(error => {
@@ -1939,7 +1993,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			return __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 				"span",
 				null,
-				(Math.round(value * 10000) / 10).toFixed(1),
+				(Math.round(value * 10000) / 10).toPrecision(3),
 				"\xA0\u03BCA\xA0cm",
 				__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 					"sup",
@@ -1951,7 +2005,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			return __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 				"span",
 				null,
-				(Math.round(value * 100) / 100).toFixed(1),
+				(Math.round(value * 100) / 100).toPrecision(3),
 				"\xA0mA\xA0cm",
 				__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 					"sup",
@@ -1966,13 +2020,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 		let unit, arrowstatus, change, changeUnit, currVal, startVal, startValPos, trackingMode, statusGraphAxisLabel, statusGraphAxisUnit, statusGraphSerieLabelLegend;
 
-		switch (this.state.serverState.tracking_mode) {
+		switch (this.parameter) {
 
-			case 0:
-				trackingMode = "No tracking";
-				break;
-
-			case 1:
+			case "efficiency":
 				unit = "%";
 				startVal = this.state.highest_value;
 				startValPos = this.state.highest_value_time;
@@ -1985,7 +2035,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 				break;
 
-			case 2:
+			case "voltage_mean":
 				unit = "V";
 				startVal = this.state.start_value;
 				startValPos = 0;
@@ -1997,7 +2047,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				statusGraphSerieLabelLegend = "Voc";
 				break;
 
-			case 3:
+			case "current_mean":
 				unit = this.unit.currentdensity;
 				startVal = this.state.start_value;
 				startValPos = 0;
@@ -2008,6 +2058,22 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				statusGraphAxisUnit = "mA cm^-2";
 				statusGraphSerieLabelLegend = "Jsc";
 				break;
+
+			case "power_mean":
+				unit = this.unit.power;
+				startVal = this.state.start_value;
+				startValPos = 0;
+				currVal = this.state.power;
+
+				trackingMode = "MPPT";
+				statusGraphAxisLabel = "Power";
+				statusGraphAxisUnit = "W";
+				statusGraphSerieLabelLegend = "Pout";
+				break;
+
+			default:
+				trackingMode = "No tracking";
+				break;
 		}
 
 		let active = this.state.serverState.enable > 0 && this.state.serverState.tracking_mode > 0;
@@ -2017,6 +2083,11 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
 		const displayElements = instrumentEnvironment[this.props.instrumentId].groups[this.props.groupName].displayDeviceInformation;
+		const button_autozero = __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+			"button",
+			{ className: "btn btn-cl", onClick: this.autoZero },
+			" Auto zero"
+		);
 
 		if (active) {
 
@@ -2151,7 +2222,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 							),
 							trackingMode
 						),
-						displayElements.ellapsed && __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+						displayElements.time_ellapsed && __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 							"div",
 							{ className: "col-lg-1 propElement" },
 							__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
@@ -2169,7 +2240,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 								)
 							)
 						),
-						displayElements.efficiency && __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+						displayElements.pce && __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 							"div",
 							{ className: "col-xs-1 propElement" },
 							__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
@@ -2186,7 +2257,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 									__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 										"strong",
 										null,
-										!isNaN(this.state.efficiency) && this.state.efficiency !== false ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+										!isNaN(this.state.efficiency) && this.state.efficiency !== false && this.state.efficiency >= 0 ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 											"span",
 											null,
 											this.state.efficiency,
@@ -2206,7 +2277,12 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 									"div",
 									{ className: "label" },
-									"\u03B7"
+									"P",
+									__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+										"sub",
+										null,
+										"out"
+									)
 								),
 								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 									"div",
@@ -2239,7 +2315,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									!isNaN(this.state.sun) && this.state.sun !== false ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+									!isNaN(this.state.sun) && this.state.sun !== false && this.state.sun >= 0 ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 										"span",
 										null,
 										this.state.sun,
@@ -2446,7 +2522,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 									"div",
 									{ className: "value" },
-									this.state.kwh_yr && this.state.kwh_yr_m2 > 0 ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+									this.state.kwh_yr_m2 && this.state.kwh_yr_m2 > 0 ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 										"span",
 										null,
 										this.state.kwh_yr_m2
@@ -2493,6 +2569,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement("span", { className: "glyphicon glyphicon-download-alt" }),
 								" Download"
 							),
+							button_autozero,
 							__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 								"button",
 								{ className: "btn btn-cl", onClick: this.stop },
@@ -2566,10 +2643,16 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 							" Configure"
 						),
 						!!(this.state.serverState.cellName && this.state.serverState.cellName.length > 0 && !active && this.state.serverState.tracking_mode > 0) && __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
-							"button",
-							{ className: "btn btn-cl btn-sm", onClick: this.start },
-							__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
-							" Start"
+							"div",
+							null,
+							__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+								"button",
+								{ className: "btn btn-cl btn-sm", onClick: this.start },
+								__WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement("span", { className: "glyphicon glyphicon-start" }),
+								" Start"
+							),
+							" ",
+							button_autozero
 						)
 					)
 				)
@@ -2585,12 +2668,12 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_extend__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__);
@@ -2841,7 +2924,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
@@ -2960,6 +3043,10 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 				return;
 			}
 
+			if (data.iv.getLength() == 0) {
+				return;
+			}
+
 			let s = this.graph.newSerie("iv_" + index);
 			s.setLabel(Math.round((data.time - firstTime) / 1000 / 3600 * 10) / 10 + "h");
 			s.setLineColor(colors[k]);
@@ -2972,7 +3059,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			s2.excludedFromLegend = true;
 			s2.autoAxis();
 			s2.setLineWidth(2);
-
+			console.log(data.iv);
 			s.setWaveform(data.iv);
 			s2.setWaveform(data.iv.duplicate().math((y, x) => y * x));
 
@@ -3294,7 +3381,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
           { className: "col-lg-9" },
-          !!__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.readonly && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          !__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.readonly && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "button",
             { type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.light_controller_config },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" }),
@@ -3836,7 +3923,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
             { className: "col-lg-5" },
-            "Environment temperature:"
+            "Temperature (env.) :"
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             "div",
@@ -3863,7 +3950,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
 
 
@@ -4261,6 +4348,9 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
+
 
 
 
@@ -4274,11 +4364,115 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
     this.setTargetTemperature = this.setTargetTemperature.bind(this);
     this.changeTargetTemperature = this.changeTargetTemperature.bind(this);
+    this.setPower = this.setPower.bind(this);
+    this.setPIDParameters = this.setPIDParameters.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleInputChange(event) {
+
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    if (this.state.heater_cooling) {
+      if (name == 'Ki') {
+        this.setState({ 'Ki_cooling': value });
+      } else if (name == 'Kp') {
+        this.setState({ 'Kp_cooling': value });
+      } else if (name == 'Kd') {
+        this.setState({ 'Kd_cooling': value });
+      } else if (name == 'bias') {
+        this.setState({ 'bias_cooling': value });
+      }
+    } else {
+
+      if (name == 'Ki') {
+        this.setState({ 'Ki_heating': value });
+      } else if (name == 'Kp') {
+        this.setState({ 'Kp_heating': value });
+      } else if (name == 'Kd') {
+        this.setState({ 'Kd_heating': value });
+      } else if (name == 'bias') {
+        this.setState({ 'bias_heating': value });
+      }
+    }
+
+    this.setState({ [name]: value });
   }
 
   componentDidMount() {
-
     __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+
+    fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.getPIDParameters?instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, { method: 'GET' }).then(response => response.json()).then(response => {
+
+      this.setState({
+
+        Kp_heating: response.heating.Kp,
+        Kp_cooling: response.cooling.Kp,
+        Kd_heating: response.heating.Kd,
+        Kd_cooling: response.cooling.Kd,
+        Ki_heating: response.heating.Ki,
+        Ki_cooling: response.cooling.Ki,
+
+        bias_heating: response.heating.bias,
+        bias_cooling: response.cooling.bias
+
+      });
+    });
+  }
+
+  setPIDParameters() {
+
+    try {
+      fetch(__WEBPACK_IMPORTED_MODULE_2_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.setPIDParameters`, {
+
+        instrumentId: this.props.instrumentId,
+        groupName: this.props.name,
+
+        Kp_h: this.state.Kp_heating,
+        Kp_c: this.state.Kp_cooling,
+        Kd_h: this.state.Kd_heating,
+        Kd_c: this.state.Kd_cooling,
+        Ki_h: this.state.Ki_heating,
+        Ki_c: this.state.Ki_cooling,
+
+        bias_h: this.state.bias_heating,
+        bias_c: this.state.bias_cooling
+
+      })).then(response => {
+        if (response.status !== 200) {
+          throw "Error";
+        }
+      });
+
+      this.setState({ pid_error: false, pid_success: true });
+    } catch (e) {
+      console.error(e);
+      this.setState({ pid_error: e, pid_success: false });
+    }
+  }
+
+  setPower() {
+
+    try {
+      fetch(__WEBPACK_IMPORTED_MODULE_2_url_lib___default.a.formatUrl(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.setPower`, {
+
+        instrumentId: this.props.instrumentId,
+        groupName: this.props.name,
+        power: this.state.newpower / 100
+
+      })).then(response => {
+        if (response.status !== 200) {
+          throw "Error";
+        }
+      });
+
+      this.setState({ power_error: false, power_success: true });
+    } catch (e) {
+      console.error(e);
+      this.setState({ power_error: e, power_success: false });
+    }
   }
 
   componentWillUnmount() {
@@ -4316,7 +4510,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
   componentDidUpdate(prevProps) {
 
-    if (this.buttonHeatCool && !this.transformed) {
+    if (this.buttonHeatCool && this.buttonMode && !this.transformed) {
 
       $(this.buttonHeatCool).bootstrapToggle({
         on: 'Cooling',
@@ -4337,96 +4531,378 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
           __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to switch the heater polarity");
         });
       });
+
+      $(this.buttonMode).bootstrapToggle({
+        on: 'PID',
+        off: 'Set power'
+      }).change(() => {
+
+        $(this.buttonMode).bootstrapToggle('disable');
+
+        fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/heat.setMode?mode=${this.buttonMode.checked ? 'pid' : 'fixedPower'}&instrumentId=${this.props.instrumentId}&groupName=${this.props.name}`, {
+
+          method: 'GET'
+
+        }).then(response => {
+
+          $(this.buttonMode).bootstrapToggle('enable');
+        }).catch(() => {
+
+          __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to change the heating mode");
+        });
+      });
+
       this.transformed = true;
     }
 
     if (this.buttonHeatCool) {
-      $(this.buttonHeatCool).data('bs.toggle')[this.state.heater_status ? 'on' : 'off'](true);
+      $(this.buttonHeatCool).data('bs.toggle')[this.state.heater_cooling ? 'on' : 'off'](true);
+    }
+
+    if (this.buttonMode) {
+      $(this.buttonMode).data('bs.toggle')[this.state.heater_mode == 'pid' ? 'on' : 'off'](true);
     }
   }
 
   render() {
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      "div",
+      'div',
       null,
       this.props.serverState.heatController ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
+        'div',
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "row" },
+          'div',
+          { className: 'row' },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-5" },
-            "Mode"
+            'div',
+            { className: 'col-lg-5' },
+            'Temperature (ref.) :'
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-4" },
+            'div',
+            { className: 'col-lg-4' },
+            this.state.heater_reference_temperature ? this.state.heater_reference_temperature + "°C" : "N/A"
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'h4',
+          null,
+          'Control'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'row' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'col-lg-5' },
+            'Polarity'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'col-lg-4' },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "label",
+              'label',
               null,
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { "data-toggle": "toggle", disabled: "disabled", type: "checkbox", ref: el => this.buttonHeatCool = el, checked: this.state.heater_status, "data-width": "100", "data-height": "25" })
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { 'data-toggle': 'toggle', type: 'checkbox', ref: el => this.buttonHeatCool = el, checked: this.state.heater_cooling, 'data-width': '100', 'data-height': '25' })
             )
           )
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "row" },
+          'div',
+          { className: 'row' },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-5" },
-            "Reference temperature"
+            'div',
+            { className: 'col-lg-5' },
+            'Mode'
           ),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-4" },
-            (this.state.heater_reference_temperature || "N/A") + " °C"
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "row" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-5" },
-            "Target temperature:"
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            null,
-            this.state.heater_target_temperature || 'N/A',
-            " \xB0C"
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          "div",
-          { className: "row" },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-5" },
-            "New target temperature:"
-          ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            "div",
-            { className: "col-lg-4" },
+            'div',
+            { className: 'col-lg-4' },
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              "div",
-              { className: "input-group" },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "number", onChange: this.changeTargetTemperature, className: "form-control", min: "10", max: "85", step: "0.5", value: this.state.input_heater_target_temperature }),
+              'label',
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { 'data-toggle': 'toggle', type: 'checkbox', ref: el => this.buttonMode = el, checked: this.state.heater_mode == 'pid', 'data-width': '100', 'data-height': '25' })
+            )
+          )
+        ),
+        this.state.heater_mode == 'pid' ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h5',
+            null,
+            'PID control'
+          ),
+          this.state.pid_error && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'alert alert-danger' },
+            'Error in setting the PID parameters.'
+          ),
+          this.state.pid_success && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'alert alert-success' },
+            'PID parameters updated !'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'row' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'col-lg-5' },
+              'Target temperature:'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'col-lg-4' },
+              this.state.heater_target_temperature ? this.state.heater_target_temperature + " °C" : 'N/A'
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'row' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'col-lg-5' },
+              'New target temperature:'
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'col-lg-3' },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "span",
-                { className: "input-group-addon" },
-                "\xB0C"
+                'div',
+                { className: 'input-group input-group-sm' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'number', onChange: this.changeTargetTemperature, className: 'form-control', min: '10', max: '85', step: '0.5', value: this.state.input_heater_target_temperature }),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'span',
+                  { className: 'input-group-addon' },
+                  '\xB0C'
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'span',
+                  { className: 'input-group-btn' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'button',
+                    { className: 'btn btn-default', onClick: this.setTargetTemperature, type: 'button' },
+                    'Set'
+                  )
+                )
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            null,
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'small',
+                  null,
+                  'Output:'
+                )
               ),
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                "span",
-                { className: "input-btn-group" },
+                'div',
+                { className: 'col-lg-4' },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  "button",
-                  { className: "btn btn-default", onClick: this.setTargetTemperature, type: "button" },
-                  "Set temperature"
+                  'small',
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'em',
+                    null,
+                    'Duty cycle (0.0 - 1.0) '
+                  )
+                )
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'small',
+                  null,
+                  'Input:'
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'small',
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'em',
+                    null,
+                    'Temperature error in \xB0C'
+                  )
+                )
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'small',
+                  null,
+                  'Time unit:'
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'small',
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'em',
+                    null,
+                    'Seconds'
+                  )
+                )
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'Kp (Prop.)'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control input-sm', name: 'Kp', value: this.state.heater_cooling ? this.state.Kp_cooling : this.state.Kp_heating, onChange: this.handleInputChange })
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'Kd (Differential)'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control input-sm', name: 'Kd', value: this.state.heater_cooling ? this.state.Kd_cooling : this.state.Kd_heating, onChange: this.handleInputChange })
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'Ki (Integral)'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control input-sm', name: 'Ki', value: this.state.heater_cooling ? this.state.Ki_cooling : this.state.Ki_heating, onChange: this.handleInputChange })
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'Bias'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control input-sm', name: 'bias', value: this.state.heater_cooling ? this.state.bias_cooling : this.state.bias_heating, onChange: this.handleInputChange })
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'col-lg-5' }),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'button',
+                  { className: 'btn btn-default btn-sm', onClick: this.setPIDParameters, type: 'button' },
+                  'Update PID parameters'
+                )
+              )
+            )
+          )
+        ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          null,
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h5',
+            null,
+            'Fixed power'
+          ),
+          this.state.power_error && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'alert alert-danger' },
+            'Error in setting the powers.'
+          ),
+          this.state.power_success && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'alert alert-success' },
+            'Power updated !'
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            null,
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'Current power'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-4' },
+                this.state.heater_power ? this.state.heater_power * 100 + "%" : 'N/A'
+              )
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'div',
+              { className: 'row' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-5' },
+                'New power'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'col-lg-3 input-group input-group-sm' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { className: 'form-control', type: 'number', name: 'newpower', value: this.state.newpower, onChange: this.handleInputChange }),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'span',
+                  { className: 'input-group-addon' },
+                  '%'
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'span',
+                  { className: 'input-group-btn' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'button',
+                    { className: 'btn btn-default', onClick: this.setPower, type: 'button' },
+                    'Set'
+                  )
                 )
               )
             )
@@ -4450,7 +4926,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
 
 
@@ -4618,7 +5094,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 					)
 				)
 			),
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument[this.props.instrumentId].groups[this.props.name].resettable !== false && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
 				{ className: "row" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -4636,7 +5112,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "col-lg-4" })
 			),
-			speedOptions.length > 0 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			speedOptions.length > 0 && __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument[this.props.instrumentId].changeSpeed !== false && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
 				{ className: "form-group" },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
