@@ -178,7 +178,7 @@ class TrackerDevice extends React.Component {
 		}
 
 		if( data.state.power ) {
-			newState.power = round( data.state.power, 2 );
+			newState.power = round( data.state.power, 5 );
 		}
 
 		if( data.state.voc ) {
@@ -592,7 +592,7 @@ class TrackerDevice extends React.Component {
 					}
 				} ) );
 
-				console.log( newState.ivCurves );
+				//console.log( newState.ivCurves );
 
 				newState.iv_values = newState.ivCurves.map( ( ivCurve ) => {
 
@@ -616,7 +616,7 @@ class TrackerDevice extends React.Component {
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round( results[ 0 ].series[ 0 ].values[ 0 ][ 1 ] * 100 ) / 100;
 			newState.efficiency = round( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ], 2 );
-console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
+//console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
 			newState.power = Math.round( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] * 1000000 ) / 1000000;
 			newState.current = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000;
 			newState.currentdensity = results[ 1 ].series[ 0 ].values[ 0 ][ 3 ] * 1000 / serverState.cellArea;
@@ -656,8 +656,8 @@ console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
 			if( results[ 4 ] && results[ 4 ].series && this.state.serverState.tracking_mode == 1 ) {
 				newState.jsc = results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000;
 			}
-
-			if( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] == -1 ) {
+//console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] );
+			if( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] == -1 || results[ 1 ].series[ 0 ].values[ 0 ][ 5 ] < 0.001 ) {
 				parameter = 'power_mean';
 			}
 
@@ -782,7 +782,7 @@ console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
 
 
 			return Promise.all( queue ).then( () => {
-console.log( newState.power, serverState.cellArea, newState.voc, newState.jsc );
+//console.log( newState.power, serverState.cellArea, newState.voc, newState.jsc );
 				newState.ff = Math.round( newState.power / serverState.cellArea / ( newState.voc * newState.jsc / 1000 ) * 100 );
 				newState.updating = false;
 				

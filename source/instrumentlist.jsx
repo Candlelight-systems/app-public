@@ -13,15 +13,36 @@ function mppt_keithley_2400() {
   ipcRenderer.send("mppt", "keithley2400");
 }
 
+
+function edit_influxdb() {
+  ipcRenderer.send("editInfluxDB");
+}
+
+
 function render( ) {
 
   ReactDOM.render(
     <div>
       <Header />
       <div className="container">
+
+      
       { environment.ageing && <div>
-          <h4>Candlelight ageing setups</h4>
-          <InstrumentList />
+          <div className="row">
+            <div className="pull-right">
+                <button className="btn btn-default" onClick={ edit_influxdb }><a href="#">Edit InfluxDB connection</a></button>
+            </div>
+            <h4>Ageing setups</h4>
+          </div>
+          <InstrumentList mode="ageing" />
+        </div>
+      }
+
+      { environment.measurement && <div>
+          <div className="row">
+            <h4>Precision measurements</h4>
+          </div>
+          <InstrumentList mode="measurement" />
         </div>
       }
         <h4>Maximum power point tracking</h4>

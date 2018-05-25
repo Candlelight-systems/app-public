@@ -4,21 +4,20 @@
 		"light": {
 			"version": "2.0",
 			"readonly": false
-		},
-		"heat": {
-			"version": "ssr_1.0"
 		}
 	},
 	"instrument": {
-		"Small cells": {
+		"Large modules": {
 			"ADC": {
 				"model": "ADS1259"
 			},
+			"LSB": 4.88,
+			"LSBValue": 1,
 			"changeSpeed": false,
-			"fsr": 30,
-			"voltageRange": 2.5,
+			"fsr": 2000,
+			"voltageRange": 10,
 			"groups": {
-				"Box 1": {
+				"Main": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,

@@ -653,10 +653,15 @@ class HTMLReport extends React.Component {
 			affect: 'h',
 			startingColorHSL: { h: 0, s: 0.5, l: 0.5 },
 			endingColorHSL: { h: 270, s: 0.5, l: 0.5 }
+		}, ( index, color ) => {
+
+			const table = document.getElementById('ivTable');
+			table.children[ index + 1 ].style.color = color;
 		} );
 
 		//graph.makeLegend( { isSerieHideable: false, frame: false, paddingTop: 5, paddingBottom: 0 } ).setAutoPosition( "bottom" );
 		//graph.updateLegend();
+		graph.autoscaleAxes();
 		graph.draw();
 		//graph.updateLegend();
 	}
@@ -1013,39 +1018,41 @@ class HTMLReport extends React.Component {
 						<div className="row"><div className="col-xs-4">Final efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
 
 						<h4>j-V sweeps</h4>	
-						<div className="row ivData ivHead">
-							<div className="col-xs-3">Time<br /><nobr>(h)</nobr></div>
-							<div className="col-xs-1">V<sub>oc</sub><br /><nobr>(V)</nobr></div>
-							<div className="col-xs-1">J<sub>sc</sub><br /><nobr>(mA cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-1">P<sub>out</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-1">P<sub>in</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
-							<div className="col-xs-1">Fill factor<br /><nobr>(%)</nobr></div>
-							<div className="col-xs-1">PCE<br /><nobr>(%)</nobr></div>
+						<div id="ivTable">
+							<div className="row ivData" id="ivHead">
+								<div className="col-xs-3">Time<br /><nobr>(h)</nobr></div>
+								<div className="col-xs-1">V<sub>oc</sub><br /><nobr>(V)</nobr></div>
+								<div className="col-xs-1">J<sub>sc</sub><br /><nobr>(mA cm<sup>-2</sup>)</nobr></div>
+								<div className="col-xs-1">P<sub>out</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
+								<div className="col-xs-1">P<sub>in</sub><br /><nobr>(mW cm<sup>-2</sup>)</nobr></div>
+								<div className="col-xs-1">Fill factor<br /><nobr>(%)</nobr></div>
+								<div className="col-xs-1">PCE<br /><nobr>(%)</nobr></div>
+							</div>
+
+							{
+								!! this.state.data && !! this.state.data.jv && this.state.data.jv.map( ( jv, index ) => {
+									
+									if( index > 4 ) {
+										return null;
+									}
+
+									return ( 
+
+									<div className="row ivData">
+										<div className="col-xs-3">{ jv.ellapsed } h</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
+										<div className="col-xs-1">{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
+									</div> 
+									);
+								} )
+
+
+							}
 						</div>
-
-						{
-							!! this.state.data && !! this.state.data.jv && this.state.data.jv.map( ( jv, index ) => {
-								
-								if( index > 4 ) {
-									return null;
-								}
-
-								return ( 
-
-								<div className="row ivData">
-									<div className={ "col-xs-3 color-series-style-" + index }>{ jv.ellapsed } h</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
-									<div className={ "col-xs-1 color-series-style-" + index }>{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
-								</div> 
-								);
-							} )
-
-
-						}
 
 						<div ref={ el => this.domJV = el }></div>
 

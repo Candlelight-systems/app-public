@@ -1,4 +1,4 @@
-
+  
 import React from 'react';
 import $ from "jquery";
 import fs from "fs";
@@ -44,7 +44,7 @@ class InstrumentList extends React.Component {
     ipcRenderer.send("addInstrument");
   }
 
-  loadInstrument( event ) {
+  loadInstrument( event, mode ) {
 
     let instrumentHost = event.currentTarget.getAttribute('id')
     
@@ -52,7 +52,7 @@ class InstrumentList extends React.Component {
       return;
     }
 
-    ipcRenderer.send("loadInstrument", instrumentHost );
+    ipcRenderer.send("loadInstrument", { host: instrumentHost, mode: mode } );
   }
 
   removeInstrument( event ) {
@@ -84,7 +84,7 @@ class InstrumentList extends React.Component {
   render() {
 
     const config = this.readConfig();
-console.log( config );
+
     if( config === null ) {
       return null;
     }
@@ -97,7 +97,7 @@ console.log( config );
           <li 
             className = { ( "list-group-item " + ( connected ? 'bg-success' : 'bg-danger' ) ) } 
             id =        { config.trackerHost } 
-            onClick =   { this.loadInstrument } 
+            onClick =   { ( e ) => this.loadInstrument( e, this.props.mode ) } 
             key =       { config.trackerHost } >
             
             <div className="pull-right">

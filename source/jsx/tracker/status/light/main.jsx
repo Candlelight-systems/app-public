@@ -36,6 +36,11 @@ class LightStatus extends React.Component {
   render() {
 
     let content = null;
+
+    if( ! environment.statuses.light  ) {
+      return null;
+    }
+    
     switch( environment.statuses.light.version ) {
 
       case "1.0": {

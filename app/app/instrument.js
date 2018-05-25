@@ -79,7 +79,7 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Large modules":{"ADC":{"model":"ADS1259"},"LSB":4.88,"LSBValue":1,"changeSpeed":false,"fsr":2000,"voltageRange":10,"groups":{"Main":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 3 */
@@ -1385,7 +1385,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 
 		if (data.state.power) {
-			newState.power = round(data.state.power, 2);
+			newState.power = round(data.state.power, 5);
 		}
 
 		if (data.state.voc) {
@@ -1774,7 +1774,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 					};
 				}));
 
-				console.log(newState.ivCurves);
+				//console.log( newState.ivCurves );
 
 				newState.iv_values = newState.ivCurves.map(ivCurve => {
 
@@ -1798,7 +1798,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			newState.latest = timeto_date.getTime();
 			newState.start_value = Math.round(results[0].series[0].values[0][1] * 100) / 100;
 			newState.efficiency = round(results[1].series[0].values[0][1], 2);
-			console.log(results[1].series[0].values[0][2]);
+			//console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 2 ] );
 			newState.power = Math.round(results[1].series[0].values[0][2] * 1000000) / 1000000;
 			newState.current = results[1].series[0].values[0][3] * 1000;
 			newState.currentdensity = results[1].series[0].values[0][3] * 1000 / serverState.cellArea;
@@ -1839,8 +1839,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			if (results[4] && results[4].series && this.state.serverState.tracking_mode == 1) {
 				newState.jsc = results[4].series[0].values[0][1] / serverState.cellArea * 1000;
 			}
-
-			if (results[1].series[0].values[0][1] == -1) {
+			//console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] );
+			if (results[1].series[0].values[0][1] == -1 || results[1].series[0].values[0][5] < 0.001) {
 				parameter = 'power_mean';
 			}
 
@@ -1960,7 +1960,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			}));
 
 			return Promise.all(queue).then(() => {
-				console.log(newState.power, serverState.cellArea, newState.voc, newState.jsc);
+				//console.log( newState.power, serverState.cellArea, newState.voc, newState.jsc );
 				newState.ff = Math.round(newState.power / serverState.cellArea / (newState.voc * newState.jsc / 1000) * 100);
 				newState.updating = false;
 			}).catch(error => {
@@ -2848,10 +2848,11 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 		if (this.props.data_IV) {
 
 			this.shapes_IV = this.props.data_IV.map(data_IV => {
-				let shape = this.graph.newShape('ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } });
-				shape.draw();
-				shape.redraw();
-				return shape;
+				console.log(data_IV);
+				/*let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
+    shape.draw();
+    shape.redraw();
+    return shape;*/
 			});
 		}
 
@@ -3059,7 +3060,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			s2.excludedFromLegend = true;
 			s2.autoAxis();
 			s2.setLineWidth(2);
-			console.log(data.iv);
+
 			s.setWaveform(data.iv);
 			s2.setWaveform(data.iv.duplicate().math((y, x) => y * x));
 
@@ -3318,6 +3319,11 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
   render() {
 
     let content = null;
+
+    if (!__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light) {
+      return null;
+    }
+
     switch (__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.light.version) {
 
       case "1.0":
@@ -3419,7 +3425,6 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
   }
 
   componentDidMount() {
-
     __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
   }
 
@@ -3792,9 +3797,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
     this.setState(data.data);
 
     // New state means re-enabling
-    if (this.toggleLightMode) {
-      $(this.toggleLightMode).bootstrapToggle('enable');
-    }
+
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/
@@ -3884,6 +3887,9 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
   render() {
 
     let content = null;
+    if (!__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.heat) {
+      return null;
+    }
 
     switch (__WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.statuses.heat.version) {
 

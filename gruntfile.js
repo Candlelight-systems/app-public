@@ -84,6 +84,7 @@ function generateWebpackConfig( theme ) {
                 filter: 'isFile'
               },
 
+
               {
                 expand: true, 
                 cwd: './node_modules/bootstrap-toggle/js/',
@@ -138,6 +139,14 @@ function generateWebpackConfig( theme ) {
                 src: ['**/**.html'], 
                 dest: 'app/app/', 
                 filter: 'isFile'
+              },
+
+              // JV app
+              {
+                expand: true, 
+                cwd: '../app_jv/app/render',
+                src: ['**/*'], 
+                dest: 'app/render/jv/'
               }
             ]
           }

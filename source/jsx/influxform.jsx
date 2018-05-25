@@ -27,7 +27,7 @@ class AppForm extends React.Component {
 	validateConfig() {
 		
 		this.props.onValidate( this.state );
-		this.close();
+		
 	//	$( this.modal ).modal('hide');
 	}
 
@@ -63,6 +63,8 @@ class AppForm extends React.Component {
 		const p = this.state.password;
 		const db = this.state.db;
 
+
+
 		let address = `http://${ this.state.host }:${ this.state.port }`;
 		let query = `${address}/ping`;
 		let query_auth = `${address}/query?u=${ u }&p=${ p }&q=${ encodeURIComponent( `SHOW GRANTS FOR "${ u }"` ) }`;
@@ -71,16 +73,21 @@ class AppForm extends React.Component {
 
 		const state = {};
 
-		state.db_authentification = null;
+		state.db_authentication = null;
 
 //		this.setState( { await fetch( address + "ping" ) ;
 		try {
+
+			if( this.state.host == 'localhost' || this.state.host.slice( 0, 3 ) == '127' ) {
+				state.db_connection = 'error';
+				throw "The address must not be local (the tracker must also access it)";	
+			}
+
 			await fetch( query );
-			console.log('exists');
 			state.db_connection = 'ok';
 		} catch( e ) {
 			console.log( e );
-			state.db_connection = 'error';
+			state.db_connection = e.toString();
 		}
 		
 		try {
@@ -125,10 +132,17 @@ class AppForm extends React.Component {
 
 
 			if( auth.results[ 0 ].error ) {
+
+				if( u == "" ) {
+					throw "No user defined";	
+				}
+				
+
 				throw "User not found";
 			}
 
 			if( ! auth.results[ 0 ].series[ 0 ] || ! auth.results[ 0 ].series[ 0 ].values ) {
+				console.log( auth.results );
 				throw "No privileges found";
 			}
 
@@ -144,13 +158,11 @@ class AppForm extends React.Component {
 				throw `Wrong privileges were found for user ${ u }`;
 			}
 
-			state.db_authentification = 'ok';
-
-
+			state.db_authentication = 'ok';
 
 		} catch( e ) {
 			
-			state.db_authentification = e.toString();
+			state.db_authentication = e.toString();
 		}
 
 		
@@ -194,22 +206,29 @@ class AppForm extends React.Component {
 				status_text_db_connection = <span>Database connection successful</span>;
 			break;
 
+
+			case undefined:
+			case null:
+				status_class_db_connection = 'alert-default';
+				status_text_db_connection = null;
+			break;
+
 			case 'error':
 				status_class_db_connection = 'alert-danger';
 				status_text_db_connection = <span>Could not connect to the database</span>;
 			break;
 
 			default:
-				status_class_db_connection = 'alert-default';
-				status_text_db_connection = null;
+				status_class_db_connection = 'alert-danger';
+				status_text_db_connection = <span>{ this.state.db_connection }</span>;
 			break;
 		}
 
-		switch( this.state.db_authentification ) {
+		switch( this.state.db_authentication ) {
 
 			case 'ok':
 				status_class_db_auth = 'alert-success';
-				status_text_db_auth = <span>Database authentification successful</span>;
+				status_text_db_auth = <span>Database authentication successful</span>;
 			break;
 
 			case undefined:
@@ -218,9 +237,14 @@ class AppForm extends React.Component {
 				status_text_db_auth = null;
 			break;
 
+			case "No user defined":
+				status_class_db_auth = 'alert-warning';
+				status_text_db_auth = <span>No user was defined. If no authentication to the DB is required, this warning may be ignored.</span>;
+			break;
+
 			default:
 				status_class_db_auth = 'alert-danger';
-				status_text_db_auth = <span>{ this.state.db_authentification }</span>;
+				status_text_db_auth = <span>{ this.state.db_authentication }</span>;
 			break;
 		}
 
@@ -244,10 +268,40 @@ class AppForm extends React.Component {
 			break;
 		}
 
+			
+		let status_progress;
+
+		if( this.props.uploading ) {
+
+			switch( this.props.uploading.status ) {
+
+				case 'progress':
+
+					status_progress = <div className="alert alert-info">Uploading to { this.props.uploading.host } in progress</div>
+
+				break;
+
+
+				case 'done':
+
+					status_progress = <div className="alert alert-success">Uploaded to { this.props.uploading.host } in progress</div>
+
+				break;
+
+
+				case 'error':
+
+					status_progress = <div className="alert alert-danger">Error while uploading to { this.props.uploading.host }. Check that the host is running</div>
+
+				break;
+
+			}
+		}
 		return (
 	
 			<div className="container-fluid">
 
+				{ this.props.uploading ? status_progress : null }
 
 				{ status_text_db_connection && <div className={ "alert " + status_class_db_connection }>{ status_text_db_connection }</div> }
 				{ status_text_db_auth && <div className={ "alert " + status_class_db_auth }>{ status_text_db_auth }</div> }
@@ -272,7 +326,7 @@ class AppForm extends React.Component {
 							</div>
 						</div>
 
-						<div className="alert alert-info">If the authentification is disabled in influxDB, credentials are not checked. Read <a href="#" onClick={ openDocs }>this</a> for further information.</div>
+						<div className="alert alert-info">If the authentication is disabled in influxDB, credentials are not checked. Read <a href="#" onClick={ openDocs }>this</a> for further information.</div>
 						<div className="form-group">
 							<label className="col-sm-3">Username</label>
 							<div className="col-sm-9">

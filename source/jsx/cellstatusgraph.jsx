@@ -169,11 +169,13 @@ class statusGraph extends GraphComponent {
 		if( this.props.data_IV ) {
 
 			this.shapes_IV = this.props.data_IV.map( ( data_IV ) => {
-				let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
+				console.log( data_IV );
+				/*let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
 				shape.draw();
 				shape.redraw();
-				return shape;
+				return shape;*/
 			} );
+
 		}
 
 		if( this.graph && this.props.data ) {

@@ -27,6 +27,7 @@ function render( data ) {
 	ReactDOM.render(
 	<CellForm 
 		instrumentConfig={ data.instrumentConfig } 
+		groupName={ data.groupName }
 		formState={ data.channelState } 
 		onValidate={ onValidate } 
 		onClose={ onClose } />,

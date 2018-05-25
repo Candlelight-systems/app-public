@@ -113,6 +113,7 @@ function render(data) {
 	;
 	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_cellform_jsx__["a" /* default */], {
 		instrumentConfig: data.instrumentConfig,
+		groupName: data.groupName,
 		formState: data.channelState,
 		onValidate: onValidate,
 		onClose: onClose }), document.getElementById('root'));
@@ -192,6 +193,13 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	render() {
 
 		let active = !!this.state.enable && this.state.tracking_mode > 0;
+		let groups = this.props.instrumentConfig.groups;
+		let relayController = false;
+		for (var i = 0; i < groups.length; i++) {
+			if (groups[i].groupName == this.props.groupName) {
+				relayController = groups[i].dualOutput || groups[i].relayController;
+			}
+		}
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
@@ -288,7 +296,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 								) : null
 							)
 						),
-						this.props.instrumentConfig.relayController && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						relayController && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
 							{ className: "form-group" },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -415,7 +423,8 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 	render() {
 
 		let active = !!this.props.enable && this.props.tracking_mode > 0;
-
+		const LSB = __WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].LSB || 1.22;
+		const LSBVal = __WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].LSBValue || 0.001;
 		let gainOptions = [];
 
 		switch (__WEBPACK_IMPORTED_MODULE_1__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].ADC.model) {
@@ -520,28 +529,33 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 						{ name: 'tracking_stepsize', id: 'tracking_stepsize', className: 'form-control', value: this.props.tracking_step, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv1', value: '0.001' },
-							'1 mV'
+							{ key: 'mv1', value: LSBVal * 1 },
+							LSB * 1,
+							' mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv2', value: '0.002' },
-							'2 mV'
+							{ key: 'mv2', value: LSBVal * 2 },
+							LSB * 2,
+							' mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv3', value: '0.003' },
-							'3 mV'
+							{ key: 'mv3', value: LSBVal * 3 },
+							LSB * 3,
+							' mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv4', value: '0.004' },
-							'4 mV'
+							{ key: 'mv4', value: LSBVal * 4 },
+							LSB * 4,
+							' mV'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'mv5', value: '0.005' },
-							'5 mV'
+							{ key: 'mv5', value: LSBVal * 5 },
+							LSB * 5,
+							' mV'
 						)
 					)
 				)
@@ -957,7 +971,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Large modules":{"ADC":{"model":"ADS1259"},"LSB":4.88,"LSBValue":1,"changeSpeed":false,"fsr":2000,"voltageRange":10,"groups":{"Main":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 7 */

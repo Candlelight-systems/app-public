@@ -26,9 +26,7 @@ class LightStatus extends React.Component {
     this.setState( data.data );
 
     // New state means re-enabling
-    if( this.toggleLightMode ) {
-      $( this.toggleLightMode ).bootstrapToggle('enable');
-    }
+    
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/

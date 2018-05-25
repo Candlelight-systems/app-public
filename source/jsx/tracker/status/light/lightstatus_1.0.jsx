@@ -11,14 +11,12 @@ class LightStatus extends React.Component {
   }
 
   componentDidMount() {
-
     ipcRenderer.on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
   }
 
   componentWillUnmount() {
     ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
   }
-
 
   wsUpdate( event, data ) {
 
@@ -33,7 +31,6 @@ class LightStatus extends React.Component {
       this.setState( { paused: data.state.paused } );
     }*/
   }
-
 
   componentDidUpdate( prevProps ) {
 

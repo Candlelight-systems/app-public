@@ -29,7 +29,8 @@ function render( data ) {
 		instrumentConfig={ data.instrumentConfig } 
 		allStatuses={ data.channelsState } 
 		channelIds={ data.channelIds } 
-		formState={ data.channelState } 
+		formState={ data.channelState }
+		groupName={ data.groupName } 
 		onValidate={ onValidate } 
 		onClose={ onClose } />,
 	document.getElementById('root')
