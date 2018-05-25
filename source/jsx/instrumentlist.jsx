@@ -70,11 +70,13 @@ class InstrumentList extends React.Component {
     let cfg;
 
     try {
-      
+      console.log( __dirname, fs.readFileSync( __dirname + '/../config.json') );
       cfg = JSON.parse( fs.readFileSync( __dirname + '/../config.json') );
+      console.log( cfg );
       cfg.instruments = cfg.instruments || [];
 
     } catch( e ) {
+      console.error( e );
       return null;
     }
 

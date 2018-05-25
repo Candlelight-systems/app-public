@@ -11,10 +11,11 @@
   "keywords": [],
   "author": "Norman Pellet",
   "devDependencies": {
-    "electron": "~1.6.2"
+    "electron": "^2.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1"
   },
   "dependencies": {
-    "babel-plugin-transform-class-properties": "^6.24.1",
+    
     "fix-path": "^2.1.0",
     "mathjax": "^2.7.4",
     "node-fetch": "^1.7.2",
