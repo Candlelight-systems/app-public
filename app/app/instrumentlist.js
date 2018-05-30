@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,39 +73,79 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = require("electron");
+module.exports = jQuery;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(3);
-
+module.exports = require("fs");
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+module.exports = require("electron");
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(5);
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_header_jsx__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__jsx_instrumentlist_jsx__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_header_jsx__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__jsx_instrumentlist_jsx__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__app_environment_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__influx__ = __webpack_require__(12);
 
 
 
 
 
 
+
+
+let influx_error = undefined;
 
 __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("reloadInstruments", () => {
+  render();
+});
+
+__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("dbInformation", async (event, db) => {
+  console.log('r');
+  influx_error = false;
+
+  try {
+    console.log(db);
+
+    await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["c" /* ping */])(db);
+    await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["b" /* checkDB */])(db, db.username, db.password, db.db);
+    await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["a" /* checkAuth */])(db, db.username, db.password, db.db);
+  } catch (e) {
+    console.error(e);
+    // No privileges doesn't mean no write access...
+    if (e === "No user defined" || e === "User not found" || e === "No privileges found") {
+      // Ok that's fine
+    } else {
+      console.log('sdf');
+      influx_error = true;
+    }
+  }
+
   render();
 });
 
@@ -118,6 +158,31 @@ function edit_influxdb() {
 }
 
 function render() {
+
+  let status = null;
+
+  if (influx_error !== undefined) {
+    switch (influx_error) {
+
+      case true:
+        status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'span',
+          { className: 'text-warning' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-warning-sign' }),
+          ' Cannot connect'
+        );
+        break;
+
+      case false:
+        status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'span',
+          { className: 'text-success' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-check' }),
+          ' Connection ok'
+        );
+        break;
+    }
+  }
 
   __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'div',
@@ -135,6 +200,9 @@ function render() {
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'div',
             { className: 'pull-right' },
+            'InfluxDB status: ',
+            status,
+            ' \xA0 ',
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               'button',
               { className: 'btn btn-default', onClick: edit_influxdb },
@@ -194,21 +262,21 @@ render();
 /**/
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_path__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url__);
 
 
@@ -253,29 +321,29 @@ class Header extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Header);
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = require("path");
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
 
 
@@ -416,22 +484,115 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 /* harmony default export */ __webpack_exports__["a"] = (InstrumentList);
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-module.exports = jQuery;
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-module.exports = require("fs");
-
-/***/ }),
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Large modules":{"ADC":{"model":"ADS1259"},"LSB":4.88,"LSBValue":1,"changeSpeed":false,"fsr":2000,"voltageRange":10,"groups":{"Main":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export query */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return ping; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkAuth; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkDB; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
+
+
+
+
+let query = function (query, db, cfg) {
+
+	return new Promise((resolver, rejecter) => {
+
+		let params = {};
+		params.q = query;
+		params.db = db;
+		params.u = cfg.username;
+		params.p = cfg.password;
+
+		__WEBPACK_IMPORTED_MODULE_0_jquery___default.a.get("http://" + cfg.host + ":" + cfg.port + "/query", params, function (results) {
+			resolver(results.results);
+		});
+	});
+};
+
+const address = cfg => {
+	return "http://" + cfg.host + ":" + cfg.port + "/";
+};
+
+let ping = cfg => {
+	return fetch(address(cfg) + "ping", { method: 'GET' });
+};
+
+let checkAuth = async (cfg, u, p, db) => {
+
+	const query_auth = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW GRANTS FOR "${u}"`)}`;
+
+	const auth = await fetch(query_auth).then(r => r.json());
+
+	if (auth.error) {
+		throw "Bad credentials";
+	}
+
+	if (auth.results[0].error) {
+		if (u == "") {
+			throw "No user defined";
+		}
+		throw "User not found";
+	}
+
+	if (!auth.results[0].series[0] || !auth.results[0].series[0].values) {
+		throw "No privileges found";
+	}
+
+	let accept = false;
+	auth.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db && v[1] == "ALL PRIVILEGES") {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw `Wrong privileges were found for user ${u}`;
+	}
+};
+
+let checkDB = async (cfg, u, p, db) => {
+
+	if (u == null || u.length == 0) {
+		return;
+	}
+
+	const query_db = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW DATABASES`)}`;
+	const dbs = await fetch(query_db).then(r => r.json());
+
+	if (!dbs.results[0].series) {
+		throw "Database not found";
+	}
+
+	if (!dbs.results[0].series[0].values) {
+		throw "Database not found";
+	}
+
+	let accept = false;
+	dbs.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db) {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw "Database not found";
+	}
+};
 
 /***/ })
 /******/ ]);

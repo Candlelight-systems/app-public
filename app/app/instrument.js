@@ -79,51 +79,10 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Large modules":{"ADC":{"model":"ADS1259"},"LSB":4.88,"LSBValue":1,"changeSpeed":false,"fsr":2000,"voltageRange":10,"groups":{"Main":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-module.exports = require("node-jsgraph/dist/jsgraph-es6");
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return query; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ping; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
-
-
-
-
-let query = function (query, db, cfg) {
-
-	return new Promise((resolver, rejecter) => {
-
-		let params = {};
-		params.q = query;
-		params.db = db;
-		params.u = cfg.username;
-		params.p = cfg.password;
-
-		__WEBPACK_IMPORTED_MODULE_0_jquery___default.a.get("http://" + cfg.host + ":" + cfg.port + "/query", params, function (results) {
-			resolver(results.results);
-		});
-	});
-};
-
-let ping = function (cfg) {
-	return fetch("http://" + cfg.host + ":" + cfg.port + "/ping", { method: 'GET' });
-};
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -310,6 +269,121 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("node-jsgraph/dist/jsgraph-es6");
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url_lib__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_url_lib__);
+
+
+const buildURL = urlProps => {
+	return `http://${urlProps.trackerHost}:${urlProps.trackerPort}/`;
+};
+
+const fetchGET = url => {
+
+	return fetch(url, {
+		method: 'GET'
+	});
+};
+
+const fetchGETJson = url => {
+	return fetchGET(url).then(response => response.json());
+};
+
+const fetchPOST = (url, bodyObject) => {
+
+	const bodyJSON = JSON.stringify(bodyObject);
+	const headers = new Headers({
+		"Content-Type": "application/json",
+		"Content-Length": bodyJSON.length.toString()
+	});
+
+	fetch(url, {
+		headers: headers,
+		method: 'POST',
+		body: bodyJSON
+	});
+};
+
+const autoZero = (urlProps, instrumentId, chanId) => {
+	return fetchGET(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}instrument.autoZero`, {
+		instrumentId: instrumentId,
+		channelId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = autoZero;
+
+
+const getChannelStatus = (urlProps, instrumentId, chanId) => {
+	return fetchGETJson(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}getStatus`, {
+		instrumentId: instrumentId,
+		chanId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["e"] = getChannelStatus;
+
+
+const saveChannelStatus = (urlProps, newStatus) => {
+	return fetchPOST(`${buildURL(urlProps)}setStatus`, newStatus);
+};
+/* harmony export (immutable) */ __webpack_exports__["g"] = saveChannelStatus;
+
+
+const saveChannelStatuses = (urlProps, newStatuses) => {
+	return fetchPOST(`${buildURL(urlProps)}setStatuses`, newStatus);
+};
+/* unused harmony export saveChannelStatuses */
+
+
+const resetChannelStatus = (urlProps, instrumentId, chanId) => {
+
+	return fetchGET(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}resetStatus`, {
+		instrumentId: instrumentId,
+		chanId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["f"] = resetChannelStatus;
+
+
+const channelExecuteIV = (urlProps, instrumentId, chanId) => {
+
+	return fetchGET(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}executeIV`, {
+		instrumentId: instrumentId,
+		chanId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["b"] = channelExecuteIV;
+
+
+const channelExecuteVoc = (urlProps, instrumentId, chanId) => {
+
+	return fetchGET(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}recordVoc`, {
+		instrumentId: instrumentId,
+		chanId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["d"] = channelExecuteVoc;
+
+
+const channelExecuteJsc = (urlProps, instrumentId, chanId) => {
+
+	return fetchGET(__WEBPACK_IMPORTED_MODULE_0_url_lib___default.a.formatUrl(`${buildURL(urlProps)}recordJsc`, {
+		instrumentId: instrumentId,
+		chanId: chanId
+	}));
+};
+/* harmony export (immutable) */ __webpack_exports__["c"] = channelExecuteJsc;
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports) {
 
@@ -460,86 +534,105 @@ module.exports = function extend() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return query; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ping; });
+/* unused harmony export checkAuth */
+/* unused harmony export checkDB */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
 
 
 
-class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
-	/*
-  *	props.current
-  *	props.start
-  *	props.change
-  *	props.arrowstatus
-  */
-	constructor(props) {
-		super(props);
+let query = function (query, db, cfg) {
+
+	return new Promise((resolver, rejecter) => {
+
+		let params = {};
+		params.q = query;
+		params.db = db;
+		params.u = cfg.username;
+		params.p = cfg.password;
+
+		__WEBPACK_IMPORTED_MODULE_0_jquery___default.a.get("http://" + cfg.host + ":" + cfg.port + "/query", params, function (results) {
+			resolver(results.results);
+		});
+	});
+};
+
+const address = cfg => {
+	return "http://" + cfg.host + ":" + cfg.port + "/";
+};
+
+let ping = cfg => {
+	return fetch(address(cfg) + "ping", { method: 'GET' });
+};
+
+let checkAuth = async (cfg, u, p, db) => {
+
+	const query_auth = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW GRANTS FOR "${u}"`)}`;
+
+	const auth = await fetch(query_auth).then(r => r.json());
+
+	if (auth.error) {
+		throw "Bad credentials";
 	}
 
-	render() {
-
-		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-			"div",
-			null,
-			!!this.props.cfg && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-default", onClick: this.props.cfg },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" })
-			),
-			!!this.props.button_start && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-success", onClick: this.props.start },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-play" })
-			),
-			!!this.props.button_stop && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ className: "btn btn-sm btn-danger", onClick: this.props.stop },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
-			),
-			!!this.props.button_jsc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_jsc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordJsc },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" J",
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"sub",
-					null,
-					"sc"
-				)
-			),
-			!!this.props.button_voc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_voc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordVoc },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" V",
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"sub",
-					null,
-					"oc"
-				)
-			),
-			!!this.props.button_iv && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: (this.props.button_iv_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordIV },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
-				" IV"
-			),
-			!!this.props.button_download && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.downloadData },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-download" })
-			),
-			!!this.props.button_details && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				"button",
-				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.details },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-chevron-down" })
-			)
-		);
+	if (auth.results[0].error) {
+		if (u == "") {
+			throw "No user defined";
+		}
+		throw "User not found";
 	}
-}
 
-/* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
+	if (!auth.results[0].series[0] || !auth.results[0].series[0].values) {
+		throw "No privileges found";
+	}
+
+	let accept = false;
+	auth.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db && v[1] == "ALL PRIVILEGES") {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw `Wrong privileges were found for user ${u}`;
+	}
+};
+
+let checkDB = async (cfg, u, p, db) => {
+
+	if (u == null || u.length == 0) {
+		return;
+	}
+
+	const query_db = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW DATABASES`)}`;
+	const dbs = await fetch(query_db).then(r => r.json());
+
+	if (!dbs.results[0].series) {
+		throw "Database not found";
+	}
+
+	if (!dbs.results[0].series[0].values) {
+		throw "Database not found";
+	}
+
+	let accept = false;
+	dbs.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db) {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw "Database not found";
+	}
+};
 
 /***/ }),
 /* 10 */
@@ -619,12 +712,12 @@ function render(cfg) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lodash_debounce__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(9);
 
 
 
@@ -685,6 +778,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     return Object(__WEBPACK_IMPORTED_MODULE_5__influx__["a" /* ping */])(this.props.configDB).catch(error => {
 
       console.warn("Cannot reach influx DB. Error was: ", error);
+
       this.setState({
         error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
       });
@@ -718,11 +812,12 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       if (response.status !== 200) throw "500 Internal server error";else return response;
     }).then(response => response.json()).catch(error => {
 
-      setTimeout(() => {
-
-        this.updateInstrument();
-      }, 3000);
-
+      /*
+            setTimeout( () => {
+              
+              this.updateInstrument();
+            }, 3000 );
+      */
       this.setState({
         error: `Error while retrieving the instrument status. The returned error was ${error.toString()}.`,
         errorMethods: [["Retry", this.updateInstrument]]
@@ -758,6 +853,10 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     return fetch("http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET' }).then(response => {
       if (response.status !== 200) throw "500 Internal server error";else return response;
     }).then(response => response.json()).catch(error => {
+
+      setTimeout(() => {
+        this.updateInstrument();
+      }, 3000);
 
       this.setState({
         error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network",
@@ -859,13 +958,12 @@ var _initialiseProps = function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__device_jsx__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__influx__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__status_light_main_jsx__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__status_heat_main_jsx__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__status_instrument_main_jsx__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__status_light_main_jsx__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__status_heat_main_jsx__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__status_instrument_main_jsx__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__queries__ = __webpack_require__(5);
 
 
 
@@ -900,13 +998,13 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       heatingPower: this.props.serverState ? this.props.serverState.heatingPower : 'N/A'
     });
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+    __WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
     this.doEnvironmentalSensing();
   }
 
   componentWillUnmount() {
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
+    __WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate);
   }
 
   wsUpdate(event, data) {
@@ -939,7 +1037,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       }
     }
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].once("channelsConfigured", (event, response) => {
+    __WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].once("channelsConfigured", (event, response) => {
 
       this.setState({ updating: true });
 
@@ -954,31 +1052,14 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       delete response.enable;
 
       for (var i = 0; i < chanIds.length; i++) {
-
-        data.chanStatuses[chanIds[i]] = Object.assign({}, response, { cellName: response["__cellName_" + chanIds[i]] });;
-
+        data.chanStatuses[chanIds[i]] = Object.assign({}, response, { cellName: response["__cellName_" + chanIds[i]] });
         //delete response["__cellName_" + chanIds[ i ] ];
       }
 
-      let body = JSON.stringify(data);
-      let headers = new Headers({
-        "Content-Type": "application/json",
-        "Content-Length": body.length.toString()
-      });
-
-      fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatuses", {
-
-        headers: headers,
-        method: 'POST',
-        body: body
-
-      }).then(response => {
-
-        this.props.getStatus();
-      }).catch(() => {});
+      return Object(__WEBPACK_IMPORTED_MODULE_6__queries__["setChannelStatuses"])(this.props.config, data);
     });
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("configChannels", {
+    __WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("configChannels", {
 
       instrumentId: this.props.instrumentId,
       groupName: this.props.name,
@@ -1061,7 +1142,6 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
           configDB: this.props.configDB,
           chanId: chan.chanId,
           serverState: this.props.serverState.channels[chan.chanId],
-          updateStatus: this.props.getStatus,
           toggleChannelCheck: () => this.toggleChannelCheck(chan.chanId),
           channelChecked: this.state.channelChecked[chan.chanId] });
       });
@@ -1100,9 +1180,9 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
         "div",
         { className: "row statuses" },
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_7__status_instrument_main_jsx__["a" /* default */], this.props),
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__status_light_main_jsx__["a" /* default */], this.props),
-        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6__status_heat_main_jsx__["a" /* default */], this.props),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__status_instrument_main_jsx__["a" /* default */], this.props),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__status_light_main_jsx__["a" /* default */], this.props),
+        __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__status_heat_main_jsx__["a" /* default */], this.props),
         __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement("div", { className: "clearfix" })
       ),
       __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
@@ -1146,20 +1226,22 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_extend__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_util_iv__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__influx__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_util_iv__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__influx__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__app_environment_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__queries__ = __webpack_require__(5);
+
 
 
 
@@ -1300,9 +1382,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		this.recordJsc = this.recordJsc.bind(this);
 		this.recordVoc = this.recordVoc.bind(this);
 
-		this.showEfficiencies = this.showEfficiencies.bind(this);
-		this.showSummary = this.showSummary.bind(this);
-
 		this.downloadData = this.downloadData.bind(this);
 		this.autoZero = this.autoZero.bind(this);
 
@@ -1339,7 +1418,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		this.setState({ updating: false });
 		this.setState({ serverState: this.props.serverState });
 		if (this.props.serverState.tracking_mode > 0) {
-
 			this.updateInfluxData(this.props.serverState);
 		}
 
@@ -1367,7 +1445,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		if (data.state.efficiency) {
 			newState.efficiency = round(data.state.efficiency, 2);
 		}
-
+		console.log(data);
 		if (data.state.current) {
 			// Convert to mA
 			newState.current = round(data.state.current * 1000, 2);
@@ -1437,45 +1515,51 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() };
 		}
 
-		if (data.action.data && this.state.data) {
+		if (data.action.data) {
 
 			let lastTime;
 
-			if (this.state.data.getLength && this.state.data.getLength() > 0) {
+			if (this.state.data && this.state.data.getLength && this.state.data.getLength() > 0) {
 				lastTime = this.state.data.xdata.data[this.state.data.getLength() - 1];
 				lastTime += this.state.serverState.tracking_record_interval / 1000 / 3600;
 			} else {
 				lastTime = 0;
 			}
 
-			if (!this.state.data) {
-				newState.data = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+			let statedata;
+			if (this.state.data) {
+				statedata = this.state.data;
 			} else {
-
-				switch (this.parameter) {
-
-					case "efficiency":
-						this.state.data.append(lastTime, data.action.data.pce);
-						break;
-
-					case "voltage_mean":
-						this.state.data.append(lastTime, data.action.data.voltage);
-						break;
-
-					case "current_mean":
-						this.state.data.append(lastTime, data.action.data.curent);
-						break;
-
-					case "power_mean":
-						this.state.data.append(lastTime, data.action.data.power);
-						break;
-
-					default:
-						break;
-				}
-
-				newState.data = this.state.data;
+				statedata = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 			}
+
+			switch (this.parameter) {
+
+				case "efficiency":
+					statedata.append(lastTime, data.action.data.pce);
+					break;
+
+				case "voltage_mean":
+					statedata.append(lastTime, data.action.data.voltage);
+					break;
+
+				case "current_mean":
+					statedata.append(lastTime, data.action.data.curent);
+					break;
+
+				case "power_mean":
+					statedata.append(lastTime, data.action.data.power);
+					break;
+
+				default:
+					break;
+			}
+
+			//if( ! this.state.data ) {
+			newState.data = statedata;
+			//}
+
+			console.log(newState);
 		}
 
 		if (data.action.ivCurve) {
@@ -1502,18 +1586,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 	saveStatus(newState) {
 
-		let body = JSON.stringify(newState);
-
-		let headers = new Headers({
-			"Content-Type": "application/json",
-			"Content-Length": body.length.toString()
-		});
-
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatus", {
-			headers: headers,
-			method: 'POST',
-			body: body
-		});
+		return Object(__WEBPACK_IMPORTED_MODULE_11__queries__["g" /* saveChannelStatus */])(this.props.config, newState);
 	}
 
 	resetChannel() {
@@ -1526,11 +1599,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
   		this.state.serverState.enable = 0;
   
   */
-		fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetStatus?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId, {
 
-			method: 'GET'
-
-		});
+		return Object(__WEBPACK_IMPORTED_MODULE_11__queries__["f" /* resetChannelStatus */])(this.props.config, this.props.instrumentId, this.props.chanId);
 	}
 
 	async recordIV() {
@@ -1539,9 +1609,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			return;
 		}
 		this.setState({ processing_iv: true, error_iv: false });
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+		try {
+
+			await Object(__WEBPACK_IMPORTED_MODULE_11__queries__["b" /* channelExecuteIV */])(this.props.config, this.props.instrumentId, this.props.chanId);
+		} catch (e) {
 			this.setState({ error_iv: true });
-		});
+		}
+
 		this.setState({ processing_iv: false });
 	}
 
@@ -1550,10 +1624,15 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		if (this.state.processing_voc) {
 			return;
 		}
+
 		this.setState({ processing_voc: true, error_voc: false });
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+
+		try {
+			await Object(__WEBPACK_IMPORTED_MODULE_11__queries__["d" /* channelExecuteVoc */])(this.props.config, this.props.instrumentId, this.props.chanId);
+		} catch (e) {
 			this.setState({ error_voc: true });
-		});
+		}
+
 		this.setState({ processing_voc: false });
 	}
 
@@ -1564,9 +1643,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 
 		this.setState({ processing_jsc: true, error_jsc: false });
-		await fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId).catch(() => {
+
+		try {
+			await Object(__WEBPACK_IMPORTED_MODULE_11__queries__["c" /* channelExecuteJsc */])(this.props.config, this.props.instrumentId, this.props.chanId);
+		} catch (e) {
 			this.setState({ error_jsc: true });
-		});
+		}
+
 		this.setState({ processing_jsc: false });
 	}
 
@@ -1584,15 +1667,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 	autoZero() {
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/instrument.autoZero?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
-
-			method: 'GET'
-
-		}).then(response => response.text()).then(response => {
-			console.log(response);
-			//this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
-			//this.updateInfluxData( response );
-		}).catch(error => {
+		return Object(__WEBPACK_IMPORTED_MODULE_11__queries__["a" /* autoZero */])(this.props.config, this.props.instrumentId, this.props.chanId).catch(error => {
 
 			this.setState({
 				error: error
@@ -1645,11 +1720,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 	getStatus() {
 
-		return fetch("http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getStatus?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
-
-			method: 'GET'
-
-		}).then(response => response.json()).then(response => {
+		return Object(__WEBPACK_IMPORTED_MODULE_11__queries__["e" /* getChannelStatus */])(this.props.config, this.props.instrumentId, this.props.chanId).then(response => {
 
 			this.setState({ serverState: response[this.props.groupName].channels[this.props.chanId] });
 			//this.updateInfluxData( response );
@@ -1659,39 +1730,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				error: error
 			});
 		});
-	}
-
-	tooltip(message, color) {
-
-		return e => {
-			if (message.length == 0) {
-				this._tooltip.style.display = 'none';
-			} else {
-
-				this._tooltip.setAttribute('data-color', color);
-				this._tooltip.style.display = 'block';
-				this._tooltipcontent.innerHTML = message;
-			}
-		};
-	}
-
-	showEfficiencies() {
-
-		if (this.wrapper.classList.contains('show-second')) {
-			return;
-		}
-		this.wrapper.classList.add("show-second");
-		this.wrapper.classList.remove("show-first");
-	}
-
-	showSummary() {
-
-		if (!this.wrapper || !this.wrapper.classList.contains('show-second')) {
-			return;
-		}
-
-		this.wrapper.classList.add("show-first");
-		this.wrapper.classList.remove("show-second");
 	}
 
 	readIV(value) {
@@ -1717,7 +1755,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
   *		2. Use grouping to get 100 points
   *		3. Get latest vocs, jscs
   */
-
+		console.log('update influx');
 		let parameter,
 		    parameter_jv,
 		    newState = {},
@@ -1752,19 +1790,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 		this.parameter = parameter;
 
-		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
+		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > ${this.state._last_iv_time.getTime() * 1000}` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
-
+		console.log(`SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > ${this.state._last_iv_time.getTime() * 1000}` : ''} ORDER BY time ASC`);
 		Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
-
+			console.log(results[2]);
 			if (results[2].series && results[2].series[0]) {
 
 				newState.ivCurves = this.state.ivCurves.splice(0);
 				newState.ivCurves = newState.ivCurves.concat(results[2].series[0].values.map((value, index) => {
 
 					if (index == results[2].series[0].values.length - 1) {
-						newState._last_iv_time = value[0];
+						newState._last_iv_time = new Date(value[0]);
 					}
 
 					return {
@@ -1773,6 +1811,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						sun: value[2]
 					};
 				}));
+
+				console.log(newState.ivCurves.length);
 
 				//console.log( newState.ivCurves );
 
@@ -2082,12 +2122,13 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		const j_currentdensity = this.processCurrent(this.state.currentdensity);
 		const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
+		//console.log( this.props, instrumentEnvironment );
 		const displayElements = instrumentEnvironment[this.props.instrumentId].groups[this.props.groupName].displayDeviceInformation;
-		const button_autozero = __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+		const button_autozero = instrumentEnvironment[this.props.instrumentId].groups[this.props.groupName].autoZero == "device" ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 			"button",
 			{ className: "btn btn-cl", onClick: this.autoZero },
 			" Auto zero"
-		);
+		) : null;
 
 		if (active) {
 
@@ -2675,7 +2716,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_extend__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__);
 
 
@@ -2841,14 +2882,15 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 			return;
 		}
 
-		this.shapes_IV.map(shape => {
-			shape.kill();
-		});
-
+		/*
+  		this.shapes_IV.map( ( shape ) => {
+  			shape.kill();
+  		});
+  */
 		if (this.props.data_IV) {
 
 			this.shapes_IV = this.props.data_IV.map(data_IV => {
-				console.log(data_IV);
+				//	console.log( data_IV );
 				/*let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
     shape.draw();
     shape.redraw();
@@ -2926,7 +2968,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
@@ -3110,6 +3152,92 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 
 
+class CellButtons extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+	/*
+  *	props.current
+  *	props.start
+  *	props.change
+  *	props.arrowstatus
+  */
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			null,
+			!!this.props.cfg && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-default", onClick: this.props.cfg },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-cog" })
+			),
+			!!this.props.button_start && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-success", onClick: this.props.start },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-play" })
+			),
+			!!this.props.button_stop && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ className: "btn btn-sm btn-danger", onClick: this.props.stop },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-stop" })
+			),
+			!!this.props.button_jsc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_jsc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordJsc },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" J",
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"sub",
+					null,
+					"sc"
+				)
+			),
+			!!this.props.button_voc && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_voc_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordVoc },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" V",
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"sub",
+					null,
+					"oc"
+				)
+			),
+			!!this.props.button_iv && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: (this.props.button_iv_disabled ? 'disabled ' : '') + "btn btn-primary btn-sm", onClick: this.props.recordIV },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-record" }),
+				" IV"
+			),
+			!!this.props.button_download && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.downloadData },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-download" })
+			),
+			!!this.props.button_details && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"button",
+				{ type: "button", className: "btn btn-primary btn-sm", onClick: this.props.details },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", { className: "glyphicon glyphicon-chevron-down" })
+			)
+		);
+	}
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (CellButtons);
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+
 class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
   constructor(props) {
@@ -3205,7 +3333,7 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Timer);
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3257,19 +3385,19 @@ let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) =
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = jQuery;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3277,9 +3405,9 @@ module.exports = require("fs");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lightstatus_1_0_jsx__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lightstatus_2_0_jsx__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lightstatus_readonly_jsx__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lightstatus_1_0_jsx__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lightstatus_2_0_jsx__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__lightstatus_readonly_jsx__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__app_environment_json__);
 
@@ -3404,7 +3532,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* harmony default export */ __webpack_exports__["a"] = (LightStatus);
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3567,7 +3695,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* harmony default export */ __webpack_exports__["a"] = (LightStatus);
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3762,7 +3890,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* harmony default export */ __webpack_exports__["a"] = (LightStatus);
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3836,7 +3964,7 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* harmony default export */ __webpack_exports__["a"] = (LightStatus);
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3844,9 +3972,9 @@ class LightStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__heatstatus_1_0_jsx__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__heatstatus_2_0_jsx__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__heatstatus_ssr_1_0_jsx__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__heatstatus_1_0_jsx__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__heatstatus_2_0_jsx__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__heatstatus_ssr_1_0_jsx__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__app_environment_json__);
 
@@ -3948,7 +4076,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3956,7 +4084,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
 
 
@@ -4137,7 +4265,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4346,7 +4474,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4354,7 +4482,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
 
 
@@ -4922,7 +5050,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony default export */ __webpack_exports__["a"] = (HeatStatus);
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4932,8 +5060,10 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__queries__ = __webpack_require__(5);
+
 
 
 
@@ -4977,6 +5107,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 		this.state = {};
 		this.togglePause = this.togglePause.bind(this);
 		this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind(this);
+		this.autoZero = this.autoZero.bind(this);
 	}
 
 	componentDidMount() {
@@ -4993,6 +5124,11 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				break;
 		}
 	}
+
+	async autoZero(event) {
+		await Object(__WEBPACK_IMPORTED_MODULE_4__queries__["a" /* autoZero */])(this.props.config, this.props.instrumentId);
+	}
+
 	async changeAcquisitionSpeed(event) {
 
 		let val = event.target.value;
@@ -5100,6 +5236,24 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 					)
 				)
 			),
+			__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument[this.props.instrumentId].autoZero === "instrument" && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "row" },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					"div",
+					{ className: "col-lg-5" },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						"button",
+						{ type: "button", className: "btn btn-cl btn-default btn-sm", onClick: this.autoZero },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"span",
+							null,
+							"Auto-zero"
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", { className: "col-lg-4" })
+			),
 			__WEBPACK_IMPORTED_MODULE_2__app_environment_json___default.a.instrument[this.props.instrumentId].groups[this.props.name].resettable !== false && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				"div",
 				{ className: "row" },
@@ -5172,7 +5326,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 /* harmony default export */ __webpack_exports__["a"] = (InstrumentStatus);
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5225,7 +5379,7 @@ class Error extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Error);
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 /**

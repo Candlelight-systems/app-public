@@ -5,10 +5,11 @@ import Graph from 'node-jsgraph/dist/jsgraph-es6'
 import Timer from '../timer.jsx'
 import extend from 'extend'
 import { getIVParameters } from '../../../app/util/iv'
-import { query as influxquery } from "../influx"
+import { query as influxquery } from "../../influx"
 import React from 'react'
 import { ipcRenderer } from "electron"
 import environment from "../../../app/environment.json"
+import { autoZero, getChannelStatus, saveChannelStatus, resetChannelStatus, channelExecuteIV, channelExecuteVoc, channelExecuteJsc } from '../../queries'
 
 var instrumentEnvironment = environment.instrument;
 
@@ -88,8 +89,6 @@ class TrackerDevice extends React.Component {
 		this.recordJsc = this.recordJsc.bind( this );
 		this.recordVoc = this.recordVoc.bind( this );
 
-		this.showEfficiencies = this.showEfficiencies.bind( this );
-		this.showSummary = this.showSummary.bind( this );
 		
 		this.downloadData = this.downloadData.bind( this );
 		this.autoZero = this.autoZero.bind( this );
@@ -132,7 +131,6 @@ class TrackerDevice extends React.Component {
 		this.setState( { updating: false } );
       	this.setState( { serverState: this.props.serverState } );
       	if( this.props.serverState.tracking_mode > 0 ) {
-      		
         	this.updateInfluxData( this.props.serverState );
       	}
 
@@ -160,7 +158,7 @@ class TrackerDevice extends React.Component {
 		if( data.state.efficiency ) {
 			newState.efficiency = round( data.state.efficiency, 2 );
 		}
-
+console.log( data );
 		if( data.state.current ) {
 			// Convert to mA
 			newState.current = round( data.state.current * 1000, 2 );
@@ -228,53 +226,53 @@ class TrackerDevice extends React.Component {
 
 
 
-		if( data.action.data && this.state.data ) {
-			
+		if( data.action.data ) {
+
 			let lastTime;
 
 
-			if( this.state.data.getLength && this.state.data.getLength() > 0 ) {
+			if( this.state.data && this.state.data.getLength && this.state.data.getLength() > 0 ) {
 				lastTime = this.state.data.xdata.data[ this.state.data.getLength() - 1 ];
 				lastTime += this.state.serverState.tracking_record_interval / 1000 / 3600;
 			} else {
 				lastTime = 0;
 			}
 
-			if( ! this.state.data ) {
-				newState.data = Graph.newWaveform();
+			let statedata;
+			if( this.state.data ) {
+				statedata = this.state.data;
 			} else {
-				
-
-
-				switch( this.parameter ) {
-
-					case "efficiency":
-						this.state.data.append( lastTime, data.action.data.pce );
-					break;
-
-
-					case "voltage_mean":
-						this.state.data.append( lastTime, data.action.data.voltage );
-					break;
-
-
-					case "current_mean":
-						this.state.data.append( lastTime, data.action.data.curent );
-					break;
-
-					case "power_mean":
-						this.state.data.append( lastTime, data.action.data.power );
-					break;
-
-
-					default:
-					break;
-				}
-
-
-
-				newState.data = this.state.data;
+				statedata = Graph.newWaveform();
 			}
+				
+			
+			switch( this.parameter ) {
+
+				case "efficiency":
+					statedata.append( lastTime, data.action.data.pce );
+				break;
+
+				case "voltage_mean":
+					statedata.append( lastTime, data.action.data.voltage );
+				break;
+
+				case "current_mean":
+					statedata.append( lastTime, data.action.data.curent );
+				break;
+
+				case "power_mean":
+					statedata.append( lastTime, data.action.data.power );
+				break;
+
+				default:
+				break;
+			}
+
+			//if( ! this.state.data ) {
+				newState.data = statedata;			
+			//}
+
+			console.log( newState );
 		}
 
 		if( data.action.ivCurve ) {
@@ -300,18 +298,7 @@ class TrackerDevice extends React.Component {
 
 	saveStatus( newState ) {
 
-		let body = JSON.stringify( newState );
-		
-		let headers = new Headers({
-		  "Content-Type": "application/json",
-		  "Content-Length": body.length.toString()
-		});
-
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatus", {
-			headers: headers,
-			method: 'POST',
-			body: body
-		} );
+		return saveChannelStatus( this.props.config, newState );
 	}
 
 	resetChannel() {
@@ -324,11 +311,8 @@ class TrackerDevice extends React.Component {
 		this.state.serverState.enable = 0;
 
 */
-		fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/resetStatus?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId , {
 
-			method: 'GET'
-
-		} );
+		return resetChannelStatus( this.props.config, this.props.instrumentId, this.props.chanId );
 	}
 
 
@@ -338,18 +322,32 @@ class TrackerDevice extends React.Component {
 			return;
 		}
 		this.setState( { processing_iv: true, error_iv: false } );
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/executeIV?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).catch( () => { this.setState( { error_iv: true } ); } );
+		try {
+			
+			await channelExecuteIV( this.props.config, this.props.instrumentId, this.props.chanId );
+
+		} catch( e ) {
+			this.setState( { error_iv: true } );
+		}
+
 		this.setState( { processing_iv: false } );
 	}
 
 	async recordVoc() {
 
-
 		if( this.state.processing_voc ) {
 			return;
 		}
+
 		this.setState( { processing_voc: true, error_voc: false } );
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordVoc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId  ).catch( () => { this.setState( { error_voc: true } ); } );
+
+		try {
+			await channelExecuteVoc( this.props.config, this.props.instrumentId, this.props.chanId )
+		} catch( e ) {
+			this.setState( { error_voc: true } )
+		}
+
+		
 		this.setState( { processing_voc: false } );
 	}
 
@@ -361,7 +359,13 @@ class TrackerDevice extends React.Component {
 		}
 
 		this.setState( { processing_jsc: true, error_jsc: false } );
-		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/recordJsc?instrumentId=" + this.props.instrumentId + "&chanId=" + this.props.chanId ).catch( () => { this.setState( { error_jsc: true } ); } );
+
+		try {
+			await channelExecuteJsc( this.props.config, this.props.instrumentId, this.props.chanId )
+		} catch( e ) {
+			this.setState( { error_jsc: true } )
+		}
+
 		this.setState( { processing_jsc: false } );
 	}
 
@@ -381,25 +385,13 @@ class TrackerDevice extends React.Component {
 
 	autoZero() {
 
-	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/instrument.autoZero?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+		return autoZero( this.props.config, this.props.instrumentId, this.props.chanId ).catch( ( error ) => {
 
-	      method: 'GET'
-
-	    } )
-	    .then( response => response.text() )
-	    .then( response => {
-	    	console.log( response );
-			//this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
-	      	//this.updateInfluxData( response );
-	    } )
-	    .catch( error => {
-
-	      this.setState( {
-	        error: error
-	      } );
-
-	    } );
-	 }
+			this.setState( { 
+				error: error
+			} )
+		} );
+	}
 
 	componentDidUpdate() {
 	
@@ -450,60 +442,20 @@ class TrackerDevice extends React.Component {
 
 	getStatus() {
 
-	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getStatus?instrumentId=" + this.props.instrumentId + "&channelId=" + this.props.chanId, {
+		return getChannelStatus( this.props.config, this.props.instrumentId, this.props.chanId )
+		    .then( response => {
 
-	      method: 'GET'
+				this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
+		      	//this.updateInfluxData( response );
+		    } )
+		    .catch( error => {
 
-	    } )
-	    .then( response => response.json() )
-	    .then( response => {
+		      this.setState( {
+		        error: error
+		      } );
 
-			this.setState( { serverState: response[ this.props.groupName ].channels[ this.props.chanId ] } );
-	      	//this.updateInfluxData( response );
-	    } )
-	    .catch( error => {
-
-	      this.setState( {
-	        error: error
-	      } );
-
-	    } );
+		    } );
 	 }
-
-	tooltip( message, color ) {
-
-		return ( e ) => {
-			if( message.length == 0 ) {
-				this._tooltip.style.display = 'none';
-			} else {
-
-				this._tooltip.setAttribute('data-color', color );
-				this._tooltip.style.display = 'block';
-				this._tooltipcontent.innerHTML = message;
-			}
-		}
-	}
-
-	showEfficiencies() {
-
-
-		if( this.wrapper.classList.contains('show-second')) {
-			return;
-		}
-		this.wrapper.classList.add("show-second");
-		this.wrapper.classList.remove("show-first");
-	}
-
-	showSummary() {
-
-		if( ! this.wrapper || ! this.wrapper.classList.contains('show-second')) {
-			return;
-		}
-
-		this.wrapper.classList.add("show-first");
-		this.wrapper.classList.remove("show-second");	
-	}
-
 
 	readIV( value ) {
 
@@ -511,7 +463,7 @@ class TrackerDevice extends React.Component {
 			return;
 		}
 
-		let iv = value.replace("\"", "").split(",").map( (el) => parseFloat( el ) ),
+		let iv = value.replace("\"", "").split(",").map( ( el ) => parseFloat( el ) ),
 			wave = Graph.newWaveform();
 
 		for( var i = 2; i < iv.length - 1; i += 2 ) {
@@ -528,7 +480,7 @@ class TrackerDevice extends React.Component {
 		*		2. Use grouping to get 100 points
 		*		3. Get latest vocs, jscs
 		*/
-
+console.log('update influx');
 		let parameter,
 			parameter_jv,
 			newState = {},
@@ -567,22 +519,22 @@ class TrackerDevice extends React.Component {
 		let queries = [
 		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
 		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
-		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
+		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`,
 		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,
 		`SELECT jsc FROM "${ serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`
 		];
 		
 		let newIvCurves = false;
-
+console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
-			
+			console.log( results[ 2 ] );
 			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
 				
 				newState.ivCurves = this.state.ivCurves.splice( 0 );
 				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
 
 					if( index == results[ 2 ].series[ 0 ].values.length - 1 ) {
-						newState._last_iv_time = value[ 0 ];
+						newState._last_iv_time = new Date( value[ 0 ] );
 					}	
 
 					return {
@@ -591,6 +543,8 @@ class TrackerDevice extends React.Component {
 						sun: value[ 2 ]
 					}
 				} ) );
+
+				console.log( newState.ivCurves.length );
 
 				//console.log( newState.ivCurves );
 
@@ -906,9 +860,10 @@ class TrackerDevice extends React.Component {
 
 		const j_currentdensity = this.processCurrent( this.state.currentdensity );
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
-	
+
+		//console.log( this.props, instrumentEnvironment );
 		const displayElements = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].displayDeviceInformation;
-		const button_autozero = <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button>;
+		const button_autozero = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].autoZero == "device" ? <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button> : null;
 
 		if( active ) {
 

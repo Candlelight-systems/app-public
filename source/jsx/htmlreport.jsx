@@ -1,6 +1,6 @@
 import React from 'react';
 import fs from 'fs';
-import { query as influxquery } from "./influx";
+import { query as influxquery } from "../influx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import { getIVParameters } from '../../app/util/iv'
 import { ipcRenderer } from 'electron';
@@ -677,7 +677,7 @@ class HTMLReport extends React.Component {
 	}
 
 	componentDidUpdate() {
-
+		this.updateGraphJV( this.state.data );
 	}
 
 	async updateProps( props = this.props ) {
@@ -718,7 +718,7 @@ class HTMLReport extends React.Component {
 		} );
 
 		this.updateGraphs();
-		this.updateGraphJV( this.data );
+		
 		this.setState( { data: this.data } );
 	}
 
@@ -946,15 +946,11 @@ class HTMLReport extends React.Component {
 							waveInfo: getIVParameters( waveform, power, parseFloat( this.props.cellInfo.cellArea ), result.series[ 0 ].values[ 0 ][ 2 ] * 1000, true )
 						}
 					} );
-
-				});
+				} );
 			} else {
-
 				this.data.jv = [];
 			}
-
-			
-		});
+		} );
 	}
 
 	render() {	 
@@ -980,26 +976,26 @@ class HTMLReport extends React.Component {
 
 						<h4>Timing</h4>
 						<div className="row">
-							<div className="col-xs-4">Start date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.start_date && toDate( this.state.data.start_date ) }</div>
+							<div className="col-xs-3">Start date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.start_date && toDate( this.state.data.start_date ) }</div>
 						</div>
 						
 						<div className="row">
-							<div className="col-xs-4">End date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.end_date && toDate( this.state.data.end_date ) }</div>
+							<div className="col-xs-3">End date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.end_date && toDate( this.state.data.end_date ) }</div>
 						</div>
 
 						<div className="row">
-							<div className="col-xs-4">Ageing time: </div><div className="col-xs-5 info">{ !!this.state.data &&  !! this.state.data.ellapsed && this.state.data.ellapsed } hours</div>
+							<div className="col-xs-3">Ageing time: </div><div className="col-xs-5 info">{ !!this.state.data &&  !! this.state.data.ellapsed && this.state.data.ellapsed } hours</div>
 						</div>
 						
 
 						<h4>Device parameters</h4>
 
 						<div className="row">
-							<div className="col-xs-4">Cell active area: </div><div className="col-xs-5 info">{ this.props.cellInfo.cellArea } cm<sup>2</sup></div>
+							<div className="col-xs-3">Cell active area: </div><div className="col-xs-5 info">{ this.props.cellInfo.cellArea } cm<sup>2</sup></div>
 						</div>
 
 						<div className="row">
-							<div className="col-xs-4">Comment: </div><div className="col-xs-5">{ this.props.config.comment }</div>
+							<div className="col-xs-3">Comment: </div><div className="col-xs-5">{ this.props.config.comment }</div>
 						</div>
 	
 
@@ -1009,13 +1005,13 @@ class HTMLReport extends React.Component {
 							<div className="col-xs-4">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
 						</div>	
 						{!! this.state.data && !! this.state.data.timeEfficiencies && [					
-							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-4">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 1 ] ? <div className="row"><div className="col-xs-4">Efficiency after 24h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 1 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 2 ] ? <div className="row"><div className="col-xs-4">Efficiency after 100h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 2 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 3 ] ? <div className="row"><div className="col-xs-4">Efficiency after 500h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 3 ] }%</div></div> : '' ),
-							( this.state.data.timeEfficiencies[ 4 ] ? <div className="row"><div className="col-xs-4">Efficiency after 1'000h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 4 ] }%</div></div> : '' )
+							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-3">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 1 ] ? <div className="row"><div className="col-xs-3">Efficiency after 24h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 1 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 2 ] ? <div className="row"><div className="col-xs-3">Efficiency after 100h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 2 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 3 ] ? <div className="row"><div className="col-xs-3">Efficiency after 500h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 3 ] }%</div></div> : '' ),
+							( this.state.data.timeEfficiencies[ 4 ] ? <div className="row"><div className="col-xs-3">Efficiency after 1'000h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 4 ] }%</div></div> : '' )
 						] }
-						<div className="row"><div className="col-xs-4">Final efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
+						<div className="row"><div className="col-xs-3">Final efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
 
 						<h4>j-V sweeps</h4>	
 						<div id="ivTable">

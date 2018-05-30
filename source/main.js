@@ -183,6 +183,10 @@ function createMainWindow() {
   // Create the browser window.
   windows[ 'instrumentList' ] = new BrowserWindow({ width: 800, height: 700, resizable: false })
 
+  windows[ 'instrumentList' ].webContents.once("dom-ready", () => {
+    windows[ 'instrumentList' ].webContents.send("dbInformation", config.database );
+  });
+
   // and load the index.html of the app.
   windows[ 'instrumentList' ].loadURL(url.format({
     pathname: path.join(__dirname, 'app/instrumentlist.html'),
@@ -200,6 +204,8 @@ function createMainWindow() {
     // when you should delete the corresponding element.
     windows[ 'instrumentList' ] = null
   });
+
+
 
   doMenu();
 }
@@ -688,6 +694,8 @@ async function configChannel( event, data ) {
   //var externalConnection = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
   var externalConnection = false;
 
+  instrumentConfig.instrumentId = data.instrumentId;
+
   return openForm( null, "cellform", { 
     instrumentConfig: instrumentConfig, 
     groupName: data.groupName,
@@ -711,6 +719,9 @@ async function configChannels( event, data ) {
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() );
   
+    instrumentConfig.instrumentId = data.instrumentId;
+
+
   return openForm( null, "cellformall", { 
 
     channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ], 
