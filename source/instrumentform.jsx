@@ -8,6 +8,7 @@ ipcRenderer.on("loadForm", ( event, data ) => {
   render( data );
 });
 
+
 function onValidate( formData ) {
 
 	ipcRenderer.send('validateForm', formData );
@@ -20,7 +21,6 @@ function onClose() {
 
 
 function render( props ) {
-
 
 	ReactDOM.render(
 		<InstrumentForm formState={props} onValidate={ onValidate } onClose={ onClose } />,

@@ -48,6 +48,7 @@ class CellForm extends React.Component {
 		  $(this).tab('show')
 		});
 
+
 		this.setState( this.props.formState );
 	}
 
@@ -59,6 +60,13 @@ class CellForm extends React.Component {
 	render() {	 
 
 		let active = !! this.state.enable && this.state.tracking_mode > 0;
+		let groups = this.props.instrumentConfig.groups;
+		let relayController = false;
+		for( var i = 0; i < groups.length; i ++ ) {
+			if( groups[ i ].groupName == this.props.groupName ) {
+				relayController = groups[ i ].dualOutput || groups[ i ].relayController;
+			}
+		}
 
 		return (
 			<div className="container-fluid">
@@ -93,7 +101,7 @@ class CellForm extends React.Component {
 						</div>
 					</div>
 
-					{ this.props.instrumentConfig.relayController &&
+					{ relayController &&
 						<div className="form-group">
 							<label htmlFor="cellarea" className="col-sm-3">Connection</label>
 							<div className="col-sm-9">

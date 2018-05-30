@@ -1,17 +1,18 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "128.178.16.172",
+			"trackerHost": "192.168.1.101",
 			"trackerName": "Main Instrument",
-			"trackerPort": 8080
+			"trackerPort": 8080,
+			"trackerPortWS": 8081
 		}
 	],
 	"database": {
-		"host": "influxdb2.epfl.ch",
-		"username": "lpi",
-		"password": "lpi77",
-		"port": 80,
-		"db": "matahari"
+		"db": "matahari",
+		"host": "192.168.1.100",
+		"password": "",
+		"port": 8086,
+		"username": ""
 	},
 	"githubtokens": {
 		"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"

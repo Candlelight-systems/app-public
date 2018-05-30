@@ -113,6 +113,10 @@ function mppt_keithley_2400() {
   __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send("mppt", "keithley2400");
 }
 
+function edit_influxdb() {
+  __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send("editInfluxDB");
+}
+
 function render() {
 
   __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -126,11 +130,42 @@ function render() {
         'div',
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'h4',
-          null,
-          'Candlelight ageing setups'
+          'div',
+          { className: 'row' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
+            { className: 'pull-right' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'button',
+              { className: 'btn btn-default', onClick: edit_influxdb },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'a',
+                { href: '#' },
+                'Edit InfluxDB connection'
+              )
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h4',
+            null,
+            'Ageing setups'
+          )
         ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__jsx_instrumentlist_jsx__["a" /* default */], null)
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__jsx_instrumentlist_jsx__["a" /* default */], { mode: 'ageing' })
+      ),
+      __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.measurement && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'row' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h4',
+            null,
+            'Precision measurements'
+          )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__jsx_instrumentlist_jsx__["a" /* default */], { mode: 'measurement' })
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'h4',
@@ -284,7 +319,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
     __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("addInstrument");
   }
 
-  loadInstrument(event) {
+  loadInstrument(event, mode) {
 
     let instrumentHost = event.currentTarget.getAttribute('id');
 
@@ -292,7 +327,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
       return;
     }
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("loadInstrument", instrumentHost);
+    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("loadInstrument", { host: instrumentHost, mode: mode });
   }
 
   removeInstrument(event) {
@@ -325,7 +360,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
   render() {
 
     const config = this.readConfig();
-    console.log(config);
+
     if (config === null) {
       return null;
     }
@@ -339,7 +374,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
         {
           className: "list-group-item " + (connected ? 'bg-success' : 'bg-danger'),
           id: config.trackerHost,
-          onClick: this.loadInstrument,
+          onClick: e => this.loadInstrument(e, this.props.mode),
           key: config.trackerHost },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           "div",
@@ -398,7 +433,7 @@ module.exports = require("fs");
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Large modules":{"ADC":{"model":"ADS1259"},"LSB":4.88,"LSBValue":1,"changeSpeed":false,"fsr":2000,"voltageRange":10,"groups":{"Main":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ })
 /******/ ]);

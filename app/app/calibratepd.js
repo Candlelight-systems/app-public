@@ -218,6 +218,8 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 			scalingFactor = sunValue / this.state.channelsJsc["pd"];
 		}
 
+		scalingFactor = Math.round(scalingFactor * 1000) / 1000;
+
 		let body = JSON.stringify({
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
@@ -260,7 +262,7 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 				for (var i in json) {
 					if (i == 'pd') {
-						json.pd = json.pd[0];
+						json.pd = json.pd;
 					} else {
 						json[i] *= 1000;
 					}

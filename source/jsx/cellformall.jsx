@@ -44,7 +44,9 @@ class CellFormAll extends CellForm {
 		if( props.formState ) {
 			Object.assign( stateObj, props.formState );
 
-		}console.log( props );
+		}
+
+		console.log( props );
 	
 		this.setState( stateObj );
 				
@@ -92,7 +94,7 @@ class CellFormAll extends CellForm {
 						</div>
 
 
-						{ this.props.instrumentConfig.relayController &&
+						{ ( this.props.instrumentConfig.relayController || this.props.instrumentConfig.dualOutput ) &&
 							<div className="form-group">
 								<label htmlFor="cellarea" className="col-sm-3">Connection</label>
 								<div className="col-sm-9">

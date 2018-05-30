@@ -155,7 +155,7 @@ class statusIV extends GraphComponent {
 			s2.excludedFromLegend = true;
 			s2.autoAxis();
 			s2.setLineWidth( 2 );
-console.log( data.iv );
+
 			s.setWaveform( data.iv );
 			s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
 

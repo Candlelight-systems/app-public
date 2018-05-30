@@ -20,11 +20,11 @@ body.report .footer {
 body.report .row.ivData {
   font-weight: bold;
 }
-body.report .row.ivData.ivHead {
+body.report .row.ivData#ivHead {
   font-weight: normal;
   margin-bottom: 5px;
 }
-body.report .row.ivData.ivHead nobr {
+body.report .row.ivData#ivHead nobr {
   font-size: 0.8em;
 }
 body.report .row.ivData div.col-xs-2 {
@@ -33,22 +33,4 @@ body.report .row.ivData div.col-xs-2 {
 }
 body.report .row.ivData div.col-xs-2:first-child {
   padding-left: 15px;
-}
-body.report .color-series-style-0 {
-  color: #9f1616 !important;
-}
-body.report .color-series-style-1 {
-  color: #9f8016 !important;
-}
-body.report .color-series-style-2 {
-  color: #8a9f16 !important;
-}
-body.report .color-series-style-3 {
-  color: #169f3a !important;
-}
-body.report .color-series-style-4 {
-  color: #16949f !important;
-}
-body.report .color-series-style-5 {
-  color: #16409f !important;
 }

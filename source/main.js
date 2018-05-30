@@ -8,7 +8,7 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 const fs = require('fs');
-const request = require('request');
+const request = require('request-promise-native');
 const fix = require( 'fix-path' );
 const fetch = require( 'node-fetch' );
 const WebSocket = require( 'ws' );
@@ -527,18 +527,39 @@ function addInstrument() {
 
 }
 
-function loadInstrument( event, trackerHost ) {
+function loadInstrument( event, tracker ) {
+
+  const trackerHost = tracker.host;
+  const mode = tracker.mode;
+
 
   if( ! windows[ 'instrumentMain' ] ) {
     // Create the browser window.
     windows[ 'instrumentMain' ] = new BrowserWindow({width: 1400, height: 1024, center: true, resizable: false})
 
-      // and load the index.html of the app.
-    windows[ 'instrumentMain' ].loadURL(url.format({
-      pathname: path.join(__dirname, 'app/instrument.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
+
+  }
+
+  switch( mode ) {
+
+    case 'ageing':
+
+       windows[ 'instrumentMain' ].loadURL(url.format({
+        pathname: path.join(__dirname, 'app/instrument.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+    break;
+
+    case 'measurement':
+
+      windows[ 'instrumentMain' ].loadURL(url.format({
+        pathname: path.join(__dirname, 'app/instrument.html'),
+        protocol: 'file:',
+        slashes: true
+      } ) );
+
+    break;
   }
   
   if( windows[ 'instrumentList' ] ) {
@@ -594,7 +615,7 @@ function editInstrument( event, trackerHost ) {
   }
 
   openForm( null, "instrumentform", data, {
-    width: 850,
+    width: 600,
     height: 800,
     resizable: false
 
@@ -624,12 +645,18 @@ function editInfluxDB( event ) {
   let data;
   let influxConfig = config.database;
 
-  openForm( null, "influxdbform", influxConfig, { width: 600, height: 700, resizable: false } ).then( ( results ) => {
+  openForm( null, "influxdbform", influxConfig, { width: 600, height: 700, resizable: false } ).then( async ( results ) => {
 
     config.database = results;
     saveConfig();
 
-    updateInfluxDB();
+    windows[ 'form' ].webContents.send("uploading", { status: 'progress', host: config.instruments.map( ( i ) => i.trackerHost ).join(', ') } );
+
+    updateInfluxDB( ).then( () => {
+      windows[ 'form' ].webContents.send("uploading", { status: 'done', host: instrument.trackerHost } );
+    } ).catch( err => {
+      windows[ 'form' ].webContents.send("uploading", { status: 'error', error: err, host: err.options.form.host } );
+    });
 
     if( windows[ 'instrumentMain' ] ) {
       windows[ 'instrumentMain' ].webContents.send( "reloadDB", { db: config.database } ); 
@@ -637,9 +664,6 @@ function editInfluxDB( event ) {
     
   } ).catch( () => {} );
 }
-
-
-
 
 function showAllMeasurements( instrument ) {
   
@@ -649,17 +673,11 @@ function showAllMeasurements( instrument ) {
 }
 
 
-function updateInfluxDB() {
+function updateInfluxDB( ) {
 
-  config.instruments.forEach( ( instrument ) => {
-console.log( "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB" );
-console.log( config.database ); 
-    request.post( {
-       url: "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB", 
-       form: config.database }, function() {
-
-       } );
-  });
+  return Promise.all( config.instruments.map( ( instrument ) => {
+       return request.post( { url: "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB", form: config.database, timeout: 1000 } );
+  }  ) );
 }
 
 
@@ -678,6 +696,7 @@ async function configChannel( event, data ) {
 
   return openForm( null, "cellform", { 
     instrumentConfig: instrumentConfig, 
+    groupName: data.groupName,
     channelConfig: channelConfig, 
     channelState: channelState[ data.groupName ].channels[ data.chanId ],
   }, { width: 600, height: 800 } ).then( ( results ) => {
@@ -702,6 +721,7 @@ async function configChannels( event, data ) {
 
     channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ], 
     channelsState: channelsState[ data.groupName ].channels, 
+    groupName: data.groupName,
     instrumentConfig: instrumentConfig,
     channelIds: data.chanIds
 

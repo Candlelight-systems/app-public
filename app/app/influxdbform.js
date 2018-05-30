@@ -595,8 +595,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 const { ipcRenderer } = __webpack_require__(11);
 
+let formState, uploadingState;
+
 ipcRenderer.on("loadForm", (event, data) => {
-	render(data);
+	formState = data;
+	render();
+});
+
+ipcRenderer.on("uploading", (event, data) => {
+	uploadingState = data;
+	render();
 });
 
 function onValidate(formData) {
@@ -609,9 +617,9 @@ function onClose() {
 	ipcRenderer.send('closeForm');
 }
 
-function render(props) {
+function render(form = formState, upload = uploadingState) {
 
-	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_influxform_jsx__["a" /* default */], { formState: props, onValidate: onValidate, onClose: onClose }), document.getElementById('root'));
+	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_influxform_jsx__["a" /* default */], { formState: form, uploading: upload, onValidate: onValidate, onClose: onClose }), document.getElementById('root'));
 }
 
 /***/ }),
@@ -660,7 +668,7 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	validateConfig() {
 
 		this.props.onValidate(this.state);
-		this.close();
+
 		//	$( this.modal ).modal('hide');
 	}
 
@@ -700,16 +708,21 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 		const state = {};
 
-		state.db_authentification = null;
+		state.db_authentication = null;
 
 		//		this.setState( { await fetch( address + "ping" ) ;
 		try {
+
+			if (this.state.host == 'localhost' || this.state.host.slice(0, 3) == '127') {
+				state.db_connection = 'error';
+				throw "The address must not be local (the tracker must also access it)";
+			}
+
 			await __WEBPACK_IMPORTED_MODULE_2_node_fetch___default()(query);
-			console.log('exists');
 			state.db_connection = 'ok';
 		} catch (e) {
 			console.log(e);
-			state.db_connection = 'error';
+			state.db_connection = e.toString();
 		}
 
 		try {
@@ -751,10 +764,16 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			}
 
 			if (auth.results[0].error) {
+
+				if (u == "") {
+					throw "No user defined";
+				}
+
 				throw "User not found";
 			}
 
 			if (!auth.results[0].series[0] || !auth.results[0].series[0].values) {
+				console.log(auth.results);
 				throw "No privileges found";
 			}
 
@@ -770,10 +789,10 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				throw `Wrong privileges were found for user ${u}`;
 			}
 
-			state.db_authentification = 'ok';
+			state.db_authentication = 'ok';
 		} catch (e) {
 
-			state.db_authentification = e.toString();
+			state.db_authentication = e.toString();
 		}
 
 		console.log(state);
@@ -819,6 +838,12 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				);
 				break;
 
+			case undefined:
+			case null:
+				status_class_db_connection = 'alert-default';
+				status_text_db_connection = null;
+				break;
+
 			case 'error':
 				status_class_db_connection = 'alert-danger';
 				status_text_db_connection = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -829,19 +854,23 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				break;
 
 			default:
-				status_class_db_connection = 'alert-default';
-				status_text_db_connection = null;
+				status_class_db_connection = 'alert-danger';
+				status_text_db_connection = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'span',
+					null,
+					this.state.db_connection
+				);
 				break;
 		}
 
-		switch (this.state.db_authentification) {
+		switch (this.state.db_authentication) {
 
 			case 'ok':
 				status_class_db_auth = 'alert-success';
 				status_text_db_auth = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'span',
 					null,
-					'Database authentification successful'
+					'Database authentication successful'
 				);
 				break;
 
@@ -851,12 +880,21 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				status_text_db_auth = null;
 				break;
 
+			case "No user defined":
+				status_class_db_auth = 'alert-warning';
+				status_text_db_auth = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'span',
+					null,
+					'No user was defined. If no authentication to the DB is required, this warning may be ignored.'
+				);
+				break;
+
 			default:
 				status_class_db_auth = 'alert-danger';
 				status_text_db_auth = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'span',
 					null,
-					this.state.db_authentification
+					this.state.db_authentication
 				);
 				break;
 		}
@@ -893,9 +931,54 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				break;
 		}
 
+		let status_progress;
+
+		if (this.props.uploading) {
+
+			switch (this.props.uploading.status) {
+
+				case 'progress':
+
+					status_progress = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'alert alert-info' },
+						'Uploading to ',
+						this.props.uploading.host,
+						' in progress'
+					);
+
+					break;
+
+				case 'done':
+
+					status_progress = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'alert alert-success' },
+						'Uploaded to ',
+						this.props.uploading.host,
+						' in progress'
+					);
+
+					break;
+
+				case 'error':
+
+					status_progress = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'alert alert-danger' },
+						'Error while uploading to ',
+						this.props.uploading.host,
+						'. Check that the host is running'
+					);
+
+					break;
+
+			}
+		}
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
 			{ className: 'container-fluid' },
+			this.props.uploading ? status_progress : null,
 			status_text_db_connection && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: "alert " + status_class_db_connection },
@@ -960,7 +1043,7 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'alert alert-info' },
-					'If the authentification is disabled in influxDB, credentials are not checked. Read ',
+					'If the authentication is disabled in influxDB, credentials are not checked. Read ',
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'a',
 						{ href: '#', onClick: openDocs },

@@ -25,7 +25,8 @@ class CellFormTracking extends React.Component {
 	render() {	 
 
 		let active = !! this.props.enable && this.props.tracking_mode > 0;
-		
+		const LSB = environment.instrument[ this.props.instrumentConfig.instrumentId ].LSB || 1.22;
+		const LSBVal = environment.instrument[ this.props.instrumentConfig.instrumentId ].LSBValue || 0.001;
 		let gainOptions = [];
 		
 		switch( environment.instrument[ this.props.instrumentConfig.instrumentId ].ADC.model ) {
@@ -115,11 +116,11 @@ class CellFormTracking extends React.Component {
 					<label htmlFor="tracking_step" className="col-sm-3">Tracking step</label>
 					<div className="col-sm-9">
 						<select name="tracking_stepsize" id="tracking_stepsize" className="form-control" value={this.props.tracking_step} onChange={this.handleInputChange}>
-								<option key="mv1" value="0.001">1 mV</option>
-								<option key="mv2" value="0.002">2 mV</option>
-								<option key="mv3" value="0.003">3 mV</option>
-								<option key="mv4" value="0.004">4 mV</option>
-								<option key="mv5" value="0.005">5 mV</option>
+								<option key="mv1" value={ LSBVal * 1 }>{ LSB * 1 } mV</option>
+								<option key="mv2" value={ LSBVal * 2 }>{ LSB * 2 } mV</option>
+								<option key="mv3" value={ LSBVal * 3 }>{ LSB * 3 } mV</option>
+								<option key="mv4" value={ LSBVal * 4 }>{ LSB * 4 } mV</option>
+								<option key="mv5" value={ LSBVal * 5 }>{ LSB * 5 } mV</option>
 						</select>
 					</div>
 				</div>

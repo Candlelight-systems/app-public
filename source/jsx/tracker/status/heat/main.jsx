@@ -38,7 +38,10 @@ class HeatStatus extends React.Component {
   render() {
 
     let content = null;
-
+    if( ! environment.statuses.heat  ) {
+      return null;
+    }
+        
 
     switch( environment.statuses.heat.version ) {
 

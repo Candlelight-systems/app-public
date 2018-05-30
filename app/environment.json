@@ -1,3 +1,40 @@
 {
-	"ageing": true
+	"ageing": true,
+	"statuses": {
+		"light": {
+			"version": "2.0",
+			"readonly": false
+		}
+	},
+	"instrument": {
+		"Large modules": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"LSB": 4.88,
+			"LSBValue": 1,
+			"changeSpeed": false,
+			"fsr": 2000,
+			"voltageRange": 10,
+			"groups": {
+				"Main": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				}
+			}
+		}
+	}
 }

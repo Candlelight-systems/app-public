@@ -633,10 +633,15 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 			affect: 'h',
 			startingColorHSL: { h: 0, s: 0.5, l: 0.5 },
 			endingColorHSL: { h: 270, s: 0.5, l: 0.5 }
+		}, (index, color) => {
+
+			const table = document.getElementById('ivTable');
+			table.children[index + 1].style.color = color;
 		});
 
 		//graph.makeLegend( { isSerieHideable: false, frame: false, paddingTop: 5, paddingBottom: 0 } ).setAutoPosition( "bottom" );
 		//graph.updateLegend();
+		graph.autoscaleAxes();
 		graph.draw();
 		//graph.updateLegend();
 	}
@@ -1152,170 +1157,174 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
-						{ className: 'row ivData ivHead' },
+						{ id: 'ivTable' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-3' },
-							'Time',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+							{ className: 'row ivData', id: 'ivHead' },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(h)'
-							)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'V',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'sub',
-								null,
-								'oc'
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(V)'
-							)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'J',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'sub',
-								null,
-								'sc'
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(mA cm',
+								'div',
+								{ className: 'col-xs-3' },
+								'Time',
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'sup',
+									'nobr',
 									null,
-									'-2'
-								),
-								')'
-							)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'P',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'sub',
-								null,
-								'out'
+									'(h)'
+								)
 							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(mW cm',
+								'div',
+								{ className: 'col-xs-1' },
+								'V',
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'sup',
+									'sub',
 									null,
-									'-2'
+									'oc'
 								),
-								')'
-							)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'P',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'sub',
-								null,
-								'in'
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(V)'
+								)
 							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(mW cm',
+								'div',
+								{ className: 'col-xs-1' },
+								'J',
 								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'sup',
+									'sub',
 									null,
-									'-2'
+									'sc'
 								),
-								')'
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(mA cm',
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'sup',
+										null,
+										'-2'
+									),
+									')'
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: 'col-xs-1' },
+								'P',
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'sub',
+									null,
+									'out'
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(mW cm',
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'sup',
+										null,
+										'-2'
+									),
+									')'
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: 'col-xs-1' },
+								'P',
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'sub',
+									null,
+									'in'
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(mW cm',
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'sup',
+										null,
+										'-2'
+									),
+									')'
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: 'col-xs-1' },
+								'Fill factor',
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(%)'
+								)
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: 'col-xs-1' },
+								'PCE',
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'nobr',
+									null,
+									'(%)'
+								)
 							)
 						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'Fill factor',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(%)'
-							)
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'col-xs-1' },
-							'PCE',
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'nobr',
-								null,
-								'(%)'
-							)
-						)
+						!!this.state.data && !!this.state.data.jv && this.state.data.jv.map((jv, index) => {
+
+							if (index > 4) {
+								return null;
+							}
+
+							return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ className: 'row ivData' },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-3' },
+									jv.ellapsed,
+									' h'
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.voc) ? 'N/A' : jv.waveInfo.voc.toPrecision(3)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.jsc) ? 'N/A' : jv.waveInfo.jsc.toPrecision(3)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.ff) ? 'N/A' : jv.waveInfo.ff.toPrecision(2)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									'div',
+									{ className: 'col-xs-1' },
+									isNaN(jv.waveInfo.pce) ? 'N/A' : jv.waveInfo.pce.toPrecision(3)
+								)
+							);
+						})
 					),
-					!!this.state.data && !!this.state.data.jv && this.state.data.jv.map((jv, index) => {
-
-						if (index > 4) {
-							return null;
-						}
-
-						return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'div',
-							{ className: 'row ivData' },
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-3 color-series-style-" + index },
-								jv.ellapsed,
-								' h'
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.voc) ? 'N/A' : jv.waveInfo.voc.toPrecision(3)
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.jsc) ? 'N/A' : jv.waveInfo.jsc.toPrecision(3)
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.ff) ? 'N/A' : jv.waveInfo.ff.toPrecision(2)
-							),
-							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: "col-xs-1 color-series-style-" + index },
-								isNaN(jv.waveInfo.pce) ? 'N/A' : jv.waveInfo.pce.toPrecision(3)
-							)
-						);
-					}),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { ref: el => this.domJV = el })
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

@@ -27,7 +27,7 @@ body.report {
 	.row.ivData {
 
 		font-weight: bold;
-		&.ivHead {
+		&#ivHead {
 			font-weight: normal;
 
 			nobr {
@@ -47,27 +47,4 @@ body.report {
 		}
 	}
 
-	.color-series-style-0 {
-		color: #9f1616 !important;
-	}
-
-	.color-series-style-1 {
-		color: #9f8016 !important;
-	}
-
-	.color-series-style-2 {
-		color: #8a9f16 !important;
-	}
-
-	.color-series-style-3 {
-		color: #169f3a !important;
-	}
-
-	.color-series-style-4 {
-		color: #16949f !important;
-	}
-
-	.color-series-style-5 {
-		color: #16409f !important;
-	}
 }
