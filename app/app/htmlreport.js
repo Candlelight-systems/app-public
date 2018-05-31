@@ -60,49 +60,43 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = require("electron");
+module.exports = require("react");
 
 /***/ }),
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = require("react");
+module.exports = require("electron");
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = require("fs");
+module.exports = __webpack_require__(3);
+
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(4);
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__ = __webpack_require__(5);
 
 
 
-const { ipcRenderer } = __webpack_require__(0);
+const { ipcRenderer } = __webpack_require__(1);
 
 let data = {
 	cellInfo: {}
@@ -125,33 +119,42 @@ function render() {
 }
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__influx__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_util_iv__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_electron__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__influx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_util_iv__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
 
 
 
 
 
 
-const { dialog } = __webpack_require__(0).remote;
+const colors = {
+	'pce': '#ae1826',
+	'power': '#2618ae',
+	'voltage': '#18ae77',
+	'current': '#d59a1c',
+	'jsc': '#9017c3',
+	'voc': '#1770c3',
+	'ff': '#719f40',
+	'humidity': '#5ca1b2',
+	'temperature': '#b44736',
+	'light': '#8a9609'
+};
 
 const pageHeight = 795; //window.pageY;
 
@@ -222,7 +225,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	}
 
 	componentWillUnmount() {
-		__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].removeListener("savePDF", this.savePDF);
+		__WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].removeListener("savePDF", this.savePDF);
 	}
 
 	/*********************/
@@ -231,7 +234,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makePCEGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Power conversion efficiency (PCE)");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -259,7 +262,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makePowerGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Power output");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -287,7 +290,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeJscGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Short circuit current");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -315,7 +318,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeVocGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Open circuit voltage");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -343,7 +346,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeVoltageGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Voltage");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -371,7 +374,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeCurrentGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Current");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -399,7 +402,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeLightGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Light intensity");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -427,7 +430,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeTemperatureGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Temperature");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -455,7 +458,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 	makeHumidityGraph(dom) {
 
-		const g = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(dom);
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(dom);
 		g.setTitle("Humidity");
 
 		this.graph_cfg_setBottomAxisTime(g);
@@ -483,113 +486,133 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	}
 
 	makeGraphs() {
-		graphsCfg.map(g => {
 
-			this.graphs[g.graphRef] = (() => {
-
-				if (!this.graphsRefs[g.graphRef]) {
-					return;
-				}
-
-				switch (g.type) {
-
-					case 'pce':
-						return this.makePCEGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'power':
-						return this.makePowerGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'jsc':
-						return this.makeJscGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'voc':
-						return this.makeVocGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'current':
-						return this.makeCurrentGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'voltage':
-						return this.makeVoltageGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'light':
-						return this.makeLightGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'humidity':
-						return this.makeHumidityGraph(this.graphsRefs[g.graphRef]);
-						break;
-
-					case 'temperature':
-						return this.makeTemperatureGraph(this.graphsRefs[g.graphRef]);
-						break;
-				}
-			})();
+		const axis = [];
+		const g = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(this.domGraph, {
+			fontSize: 14,
+			paddingLeft: 0,
+			paddingRight: 0,
+			paddingTop: 10,
+			paddingBottom: 0,
+			close: false
 		});
+
+		g.setWidth(600);
+		g.setHeight(pageHeight);
+
+		g.getBottomAxis().setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+
+		g.getBottomAxis(1).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+
+		g.getBottomAxis(2).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+
+		g.getBottomAxis(3).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+
+		axis['pce'] = g.getLeftAxis(0).setLabel("PCE").setUnit("%").setColor(colors.pce).setUnitDecade(true).setUnitWrapper("(", ")").setSpan(0.75, 1).forceMin(0).setLineAt([0]);
+
+		g.getBottomAxis(1).setFloating(axis.pce, 0);
+
+		axis['power'] = g.getLeftAxis(1).setLabel("Power output").setUnit("W").gridsOff().setColor(colors.power).setScientific(true).setUnitDecade(true).setUnitWrapper("(", ")").setSpan(0.5, 0.7).forceMin(0).setLineAt([0]);
+
+		g.getBottomAxis(2).setFloating(axis.power, 0);
+
+		axis['j'] = g.getRightAxis(0).setLabel("Current density").setUnit("A cm^-2").gridsOff().setScientific(true).setUnitDecade(true).setColor(colors.current).setUnitWrapper("(", ")").setSpan(0.5, 0.7).forceMin(0);
+
+		axis['v'] = g.getRightAxis(1).setLabel("Voltage").setUnit("V").gridsOff().setColor(colors.voltage).setUnitDecade(true).setUnitWrapper("(", ")").setSpan(0.5, 0.7).forceMin(0);
+
+		axis['jsc'] = g.getRightAxis(2).setLabel("Short circuit current").setUnit("A cm^-2").gridsOff().setScientific(true).setUnitDecade(true).setColor(colors.jsc).setUnitWrapper("(", ")").setSpan(0.25, 0.45).forceMin(0);
+
+		axis['voc'] = g.getRightAxis(3).setLabel("Open circuit voltage").setUnit("V").gridsOff().setUnitDecade(true).setColor(colors.voc).setUnitWrapper("(", ")").setSpan(0.25, 0.45).forceMin(0);
+
+		axis['ff'] = g.getLeftAxis(2).setLabel("Fill factor").setUnit("%").gridsOff().setUnitDecade(true).setColor(colors.ff).setUnitWrapper("(", ")").setSpan(0.25, 0.45).forceMin(0);
+
+		g.getBottomAxis(3).setFloating(axis.voc, 0);
+
+		axis['light'] = g.getLeftAxis(3).setLabel("Sun intensity").setUnit("W m^-2").gridsOff().setUnitDecade(true).setColor(colors.light).setUnitWrapper("(", ")").setSpan(0, 0.2).forceMin(0);
+
+		axis['humidity'] = g.getRightAxis(4).setLabel("Humidity").setUnit("%").setColor(colors.humidity).setUnitDecade(true).gridsOff().setUnitWrapper("(", ")").setSpan(0, 0.2).forceMin(0);
+
+		axis['temperature'] = g.getRightAxis(5).setLabel("Temperature").setUnit("°C").setColor(colors.temperature).setUnitDecade(true).gridsOff().setUnitWrapper("(", ")").setSpan(0, 0.2).forceMin(0);
+
+		this.axis = axis;
+
+		return g;
+
+		/*
+  		this.graphs['pce'] = this.makePCEGraph( this.graphsRefs[ 'pce' ] );
+  		this.graphs['power'] = this.makePowerGraph( this.graphsRefs[ 'power' ] );
+  		this.graphs['jscvocff'] = this.makeJscVocFFGraph( this.graphsRefs[ 'jscvocff' ] );
+  		this.graphs['lightTH'] = this.makeLightTemperatureHumidityGraph( this.graphsRefs[ g.graphRef ] );
+  */
 	}
 
 	updateGraphs() {
 
-		var nbShown = 0;
+		const graph = this.graph;
 
-		graphsCfg.forEach((g, index) => {
+		graph.newSerie("pce").setLabel("PCE").setXAxis(graph.getBottomAxis(1)).setYAxis(this.axis.pce).setLineColor(colors.pce).setLineWidth(2).setWaveform(this.data.pce);
 
-			if (this.props.config[g.graphRef]) {
-				nbShown++;
-			}
-			switch (g.type) {
+		graph.newSerie("power").setLabel("power").setXAxis(graph.getBottomAxis(2)).setYAxis(this.axis.power).setLineColor(colors.power).setLineWidth(2).setWaveform(this.data.power);
 
-				case 'pce':
-					this.updatePCEGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("current").setLabel("Current").setXAxis(graph.getBottomAxis(2)).setYAxis(this.axis.j).setLineColor(colors.current).setLineWidth(2).setWaveform(this.data.current);
 
-				case 'power':
-					this.updatePowerGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("voltage").setLabel("Voltage").setXAxis(graph.getBottomAxis(2)).setYAxis(this.axis.v).setLineColor(colors.voltage).setLineWidth(2).setWaveform(this.data.voltage);
 
-				case 'jsc':
-					this.updateJscGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("ff").setLabel("Fill factor").setXAxis(graph.getBottomAxis(3)).setYAxis(this.axis.ff).setLineColor(colors.ff).setLineWidth(2).setWaveform(this.data.ff);
 
-				case 'voc':
-					this.updateVocGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("jsc").setLabel("Short circuit current").setXAxis(graph.getBottomAxis(3)).setYAxis(this.axis.jsc).setLineColor(colors.jsc).setLineWidth(2).setWaveform(this.data.jsc);
 
-				case 'voltage':
-					this.updateVoltageGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("voc").setLabel("Open circuit voltage").setXAxis(graph.getBottomAxis(3)).setYAxis(this.axis.voc).setLineColor(colors.voc).setLineWidth(2).setWaveform(this.data.voc);
 
-				case 'current':
-					this.updateCurrentGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("temperature").setLabel("Temperature").autoAxis().setYAxis(this.axis.temperature).setLineColor(colors.temperature).setLineWidth(2).setWaveform(this.data.temperature);
 
-				case 'light':
-					this.updateLightGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("sun").setLabel("Sun intensity").autoAxis().setYAxis(this.axis.light).setLineColor(colors.light).setLineWidth(2).setWaveform(this.data.light);
 
-				case 'humidity':
-					this.updateHumidityGraph(this.graphs[g.graphRef]);
-					break;
+		graph.newSerie("humidity").setLabel("Humidity").autoAxis().setYAxis(this.axis.humidity).setLineColor(colors.humidity).setLineWidth(2).setWaveform(this.data.humidity);
 
-				case 'temperature':
-					this.updateTemperatureGraph(this.graphs[g.graphRef]);
-					break;
-			}
-		});
-
-		for (let ref in this.graphsRefs) {
-
-			if (this.props.config[ref]) {
-				// Ask for display
-				this.graphs[ref].setHeight(pageHeight / nbShown);
-				this.graphs[ref].draw();
-			}
-		}
+		graph.autoscaleAxes();
+		graph.draw();
+		/*var nbShown = 0;
+  	graphsCfg.forEach( ( g, index ) => {
+  		if( this.props.config[ g.graphRef ] ) {
+  		nbShown++;
+  	}
+  	switch (g.type) {
+  			case 'pce':
+  			this.updatePCEGraph( this.graphs[ g.graphRef ] );
+  		break;
+  				case 'power':
+  			this.updatePowerGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'jsc':
+  			this.updateJscGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'voc':
+  			this.updateVocGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'voltage':
+  			this.updateVoltageGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'current':
+  			this.updateCurrentGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'light':
+  			this.updateLightGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'humidity':
+  			this.updateHumidityGraph( this.graphs[ g.graphRef ] );
+  		break;
+  			case 'temperature':
+  			this.updateTemperatureGraph( this.graphs[ g.graphRef ] );
+  		break;
+  	}
+  } );
+  	for( let ref in this.graphsRefs ) {
+  		if( this.props.config[ ref ] ) { // Ask for display
+  		this.graphs[ ref ].setHeight( pageHeight / nbShown );
+  		this.graphs[ ref ].draw();
+  	}
+  }*/
 	}
 
 	graph_cfg_setBottomAxisTime(graph) {
@@ -649,7 +672,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	componentDidMount() {
 		this.updateProps(this.props);
 		//	ipcRenderer.on( "savePDF", this.savePDF );
-		this.makeGraphs();
+		this.graph = this.makeGraphs();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -682,12 +705,14 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 			console.warn(e);
 		}
 
+		this.data.ff = this.data.power.duplicate().divide(this.data.voc.duplicate().multiply(this.data.jsc)).multiply(100);
+
 		while (this.domJV.firstChild) {
 			this.domJV.removeChild(this.domJV.firstChild);
 		}
 
-		this.graphJV = new __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a(this.domJV, {
-			fontSize: 15,
+		this.graphJV = new __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a(this.domJV, {
+			fontSize: 14,
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingTop: 10,
@@ -714,11 +739,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 		var db = props.db.db;
 		let time,
-		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+		    wave = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
-		return Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(`SELECT time,voc FROM "${props.measurementName}_voc" ORDER BY time`, db, props.db).then(async results => {
+		return Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,voc FROM "${props.measurementName}_voc" ORDER BY time`, db, props.db).then(async results => {
 
 			if (!results[0].series) {
+				this.data.voc = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 				throw new Error(`No Voc data with the name "${props.measurementName}"`);
 			}
 
@@ -745,11 +771,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 		var db = props.db.db;
 		let time,
-		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+		    wave = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
-		return Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(`SELECT time,jsc FROM "${props.measurementName}_jsc" ORDER BY time`, db, props.db).then(async results => {
+		return Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,jsc FROM "${props.measurementName}_jsc" ORDER BY time`, db, props.db).then(async results => {
 
 			if (!results[0].series) {
+				this.data.jsc = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 				throw new Error(`No Jsc data with the name "${props.measurementName}"`);
 			}
 
@@ -776,7 +803,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		var db = props.db.db;
 		let jvCfg = props.config.jv || [];
 
-		await Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(`SELECT time,efficiency FROM "${props.measurementName}" ORDER BY time ASC limit 1; SELECT time,efficiency FROM "${props.measurementName}" ORDER BY time DESC limit 1;`, db, props.db).then(async results => {
+		await Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,efficiency FROM "${props.measurementName}" ORDER BY time ASC limit 1; SELECT time,efficiency FROM "${props.measurementName}" ORDER BY time DESC limit 1;`, db, props.db).then(async results => {
 
 			if (!results[0].series) {
 				throw "No measurement with the name " + props.measurementName + " or no associated data";
@@ -789,7 +816,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
-			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(qString, db, props.db).then(results => {
+			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(qString, db, props.db).then(results => {
 
 				if (!results[0].series) {
 					console.warn("Could not find any information linked to this serie");
@@ -799,13 +826,13 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 				let values = results[0].series[0].values,
 				    offset,
-				    waveEfficiency = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    wavePower = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    waveVoltage = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    waveCurrent = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    waveSun = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    waveTemperature = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
-				    waveHumidity = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+				    waveEfficiency = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    wavePower = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    waveVoltage = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    waveCurrent = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    waveSun = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    waveTemperature = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    waveHumidity = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
 				waveEfficiency.setUnit("%");
 				waveEfficiency.setXUnit("h");
@@ -855,6 +882,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 				this.data.power = wavePower;
 				this.data.voltage = waveVoltage;
 				this.data.current = waveCurrent;
+				this.data.ff = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 				this.data.light = waveSun;
 				this.data.temperature = waveTemperature;
 				this.data.humidity = waveHumidity;
@@ -874,7 +902,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 			let time_500h = tfrom + 1000000000 * 3600 * 500;
 			let time_1000h = tfrom + 1000000000 * 3600 * 1000;
 
-			this.data.timeEfficiencies = await Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(`
+			this.data.timeEfficiencies = await Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`
 				SELECT efficiency FROM "${props.measurementName}" WHERE time > ${time_1h} ORDER BY time ASC LIMIT 1;
 				SELECT efficiency FROM "${props.measurementName}" WHERE time > ${time_24h} ORDER BY time ASC LIMIT 1;
 				SELECT efficiency FROM "${props.measurementName}" WHERE time > ${time_100h} ORDER BY time ASC LIMIT 1;
@@ -896,7 +924,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
 			if (jvQuery.length > 0) {
 
-				this.data.jv = await Object(__WEBPACK_IMPORTED_MODULE_2__influx__["a" /* query */])(jvQuery, db, props.db).then(results => {
+				this.data.jv = await Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(jvQuery, db, props.db).then(results => {
 
 					return results.map((result, index) => {
 
@@ -905,7 +933,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						}
 
 						let jv = result.series[0].values[0][1].replace('"', '').split(',');
-						let waveform = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
+						let waveform = __WEBPACK_IMPORTED_MODULE_2_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
 						for (var i = 0; i < jv.length; i += 2) {
 							waveform.append(parseFloat(jv[i]), parseFloat(jv[i + 1]));
@@ -917,7 +945,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 							time: result.series[0].values[0][0],
 							ellapsed: Math.round((new Date(result.series[0].values[0][0]) - new Date(timefrom)) / 1000 / 3600 * 10) / 10,
 							waveform: waveform,
-							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_4__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), result.series[0].values[0][2] * 1000, true)
+							waveInfo: Object(__WEBPACK_IMPORTED_MODULE_3__app_util_iv__["a" /* getIVParameters */])(waveform, power, parseFloat(this.props.cellInfo.cellArea), result.series[0].values[0][2] * 1000, true)
 						};
 					});
 				});
@@ -1331,7 +1359,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'col-xs-5' },
-					graphsCfg.map(g => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: this.props.config && this.props.config[g.graphRef] ? 'show' : 'hidden', key: g.graphRef, ref: el => this.graphsRefs[g.graphRef] = el }))
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { id: 'graph', ref: el => this.domGraph = el })
 				)
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1353,7 +1381,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony default export */ __webpack_exports__["a"] = (HTMLReport);
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1361,9 +1389,9 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* unused harmony export ping */
 /* unused harmony export checkAuth */
 /* unused harmony export checkDB */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fs__);
 
 
@@ -1458,10 +1486,16 @@ let checkDB = async (cfg, u, p, db) => {
 };
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = jQuery;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
 
 /***/ }),
 /* 9 */

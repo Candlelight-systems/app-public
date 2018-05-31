@@ -296,22 +296,6 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					"h3",
 					null,
-					"Graphs"
-				),
-				availableGraphs.map(g => __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"div",
-					{ key: g.name, className: "checkbox" },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						"label",
-						null,
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "checkbox", checked: this.state["graph_" + g.name], name: "graph_" + g.name, onClick: this.handleInputChange }),
-						" ",
-						g.label
-					)
-				)),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					"h3",
-					null,
 					"j-V curves"
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

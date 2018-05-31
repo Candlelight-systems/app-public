@@ -10,15 +10,14 @@
   "repository": "https://github.com/cheminfo/candlelight",
   "keywords": [],
   "author": "Norman Pellet",
-  "devDependencies": {
-    "electron": "~1.6.2"
-  },
+  "devDependencies": {},
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "electron": "^2.0.2",
     "fix-path": "^2.1.0",
     "mathjax": "^2.7.4",
     "node-fetch": "^1.7.2",
-    "node-jsgraph": "^2.0.79",
+    "node-jsgraph": "^2.0.84",
     "pdfkit": "^0.8.3",
     "python-shell": "^0.4.0",
     "react": "^15.6.1",
