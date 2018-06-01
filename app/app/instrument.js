@@ -810,7 +810,15 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
     }).then(response => {
       if (response.status !== 200) throw "500 Internal server error";else return response;
-    }).then(response => response.json()).catch(error => {
+    }).then(response => response.json()).then(response => {
+
+      // An error has been notified on the server side
+      if (response.error) {
+        this.setState({ error: `An error has occured: ${error.toString}` });
+      }
+
+      return response;
+    }).catch(error => {
 
       /*
             setTimeout( () => {
@@ -1790,19 +1798,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 		this.parameter = parameter;
 
-		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > ${this.state._last_iv_time.getTime() * 1000}` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
+		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
-		console.log(`SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > ${this.state._last_iv_time.getTime() * 1000}` : ''} ORDER BY time ASC`);
+		//console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
 		Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(queries.join(";"), db, this.props.configDB).then(results => {
-			console.log(results[2]);
+
 			if (results[2].series && results[2].series[0]) {
 
 				newState.ivCurves = this.state.ivCurves.splice(0);
 				newState.ivCurves = newState.ivCurves.concat(results[2].series[0].values.map((value, index) => {
 
 					if (index == results[2].series[0].values.length - 1) {
-						newState._last_iv_time = new Date(value[0]);
+						newState._last_iv_time = value[0];
 					}
 
 					return {
@@ -1811,8 +1819,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						sun: value[2]
 					};
 				}));
-
-				console.log(newState.ivCurves.length);
 
 				//console.log( newState.ivCurves );
 
@@ -3069,7 +3075,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.props.data.forEach((data, index) => {
 
-			if (data.time - lastInterval > idealInterval) {
+			if (data.time - lastInterval > idealInterval || this.props.data.length <= 5) {
 				lastInterval = data.time;
 				indices.push(index);
 			}

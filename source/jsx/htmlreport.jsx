@@ -18,7 +18,7 @@ const colors = {
 	'light': '#8a9609'
 };
 
-const pageHeight = 795;//window.pageY;
+const pageHeight = 745;//window.pageY;
 
 const graphsCfg = [
 	{
@@ -502,8 +502,8 @@ class HTMLReport extends React.Component {
 			.setLabel("Time")
 			.setUnit("h")
 			.setUnitWrapper("(", ")")
-			.gridsOff()
-			.setNbTicksSecondary( 0 );
+			.secondaryGridOff()
+			.setNbTicksSecondary( 5 );
 
 
 		g.getBottomAxis( 1 )
@@ -511,7 +511,7 @@ class HTMLReport extends React.Component {
 			.setUnit("h")
 			.setUnitWrapper("(", ")")
 			.gridsOff()
-			.setNbTicksSecondary( 0 );
+			.setNbTicksSecondary( 5 );
 
 
 		g.getBottomAxis( 2 )
@@ -519,7 +519,7 @@ class HTMLReport extends React.Component {
 			.setUnit("h")
 			.setUnitWrapper("(", ")")
 			.gridsOff()
-			.setNbTicksSecondary( 0 );
+			.setNbTicksSecondary( 5 );
 
 
 		g.getBottomAxis( 3 )
@@ -527,7 +527,7 @@ class HTMLReport extends React.Component {
 			.setUnit("h")
 			.setUnitWrapper("(", ")")
 			.gridsOff()
-			.setNbTicksSecondary( 0 );
+			.setNbTicksSecondary( 5 );
 
 
 		axis['pce'] = g.getLeftAxis( 0 )
@@ -1239,10 +1239,10 @@ class HTMLReport extends React.Component {
 						</div>
 	
 
-						<h4>Power conversion efficiencies</h4>
+						<h4>Power conversion efficiencies (MPP)</h4>
 
 						<div className="row">
-							<div className="col-xs-4">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
+							<div className="col-xs-3">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
 						</div>	
 						{!! this.state.data && !! this.state.data.timeEfficiencies && [					
 							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-3">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),

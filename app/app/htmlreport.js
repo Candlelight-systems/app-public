@@ -156,7 +156,7 @@ const colors = {
 	'light': '#8a9609'
 };
 
-const pageHeight = 795; //window.pageY;
+const pageHeight = 745; //window.pageY;
 
 const graphsCfg = [{
 	graphRef: 'graph_pce',
@@ -500,13 +500,13 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		g.setWidth(600);
 		g.setHeight(pageHeight);
 
-		g.getBottomAxis().setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+		g.getBottomAxis().setLabel("Time").setUnit("h").setUnitWrapper("(", ")").secondaryGridOff().setNbTicksSecondary(5);
 
-		g.getBottomAxis(1).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+		g.getBottomAxis(1).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(5);
 
-		g.getBottomAxis(2).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+		g.getBottomAxis(2).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(5);
 
-		g.getBottomAxis(3).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(0);
+		g.getBottomAxis(3).setLabel("Time").setUnit("h").setUnitWrapper("(", ")").gridsOff().setNbTicksSecondary(5);
 
 		axis['pce'] = g.getLeftAxis(0).setLabel("PCE").setUnit("%").setColor(colors.pce).setUnitDecade(true).setUnitWrapper("(", ")").setSpan(0.75, 1).forceMin(0).setLineAt([0]);
 
@@ -1076,14 +1076,14 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'h4',
 						null,
-						'Power conversion efficiencies'
+						'Power conversion efficiencies (MPP)'
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Highest efficiency: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

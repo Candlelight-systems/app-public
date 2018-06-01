@@ -91,6 +91,15 @@ class TrackerInstrument extends React.Component {
     } )
     .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
     .then( response => response.json() )
+    .then( response => {
+
+      // An error has been notified on the server side
+      if( response.error ) {
+        this.setState( { error: `An error has occured: ${ error.toString }` } ); 
+      }
+
+      return response;
+    } )
     .catch( error => {
 
 /*

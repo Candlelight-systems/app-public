@@ -122,7 +122,7 @@ class statusIV extends GraphComponent {
 
 		this.props.data.forEach( ( data, index ) => {
 
-			if( data.time - lastInterval > idealInterval ) {
+			if( data.time - lastInterval > idealInterval || this.props.data.length <= 5 ) {
 				lastInterval = data.time;
 				indices.push( index ); 
 			}
