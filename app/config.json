@@ -8,10 +8,10 @@
 		}
 	],
 	"database": {
-		"host": "influxdb2.epfl.ch",
-		"username": "lpi",
-		"password": "lpi77",
-		"port": 8086,
+		"host": "isicgesrv10.epfl.ch",
+		"username": "GMF",
+		"password": "Jd8h38dh_1.",
+		"port": 80,
 		"db": "GMF"
 	},
 	"githubtokens": {

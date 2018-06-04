@@ -5,6 +5,7 @@ import LightStatus from './status/light/main.jsx';
 import HeatStatus from './status/heat/main.jsx';
 import InstrumentStatus from './status/instrument/main.jsx'
 
+
 import { setChannelStatuses } from '../../queries'
 
 class TrackerGroupDevices extends React.Component {
@@ -227,17 +228,13 @@ class TrackerGroupDevices extends React.Component {
       { !!this.props.showHeader && <h4>Group: { this.props.name }</h4> }
 
         <div className="row statuses">
-        
-      
-        <InstrumentStatus {...this.props } />
-        <LightStatus {...this.props } />
-        <HeatStatus {...this.props } />
-           
-
-
-        <div className="clearfix"></div>
+          <InstrumentStatus {...this.props } />
+          <LightStatus {...this.props } />
+          <HeatStatus {...this.props } />
+          <div className="clearfix"></div>
         </div>
 
+        
         
         <div className="row">
             

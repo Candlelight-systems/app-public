@@ -116,12 +116,16 @@ function wsIncoming( data ) {
   if( data.instrumentId && windows[ 'instrumentMain' ]) {
 
     if( data.chanId ) {
-      windows[ 'instrumentMain' ].webContents.send( "channel.update." + data.instrumentId + "." + data.chanId, data ); 
+      windows[ 'instrumentMain' ].webContents.send( `channel.update.${ data.instrumentId }.${ data.chanId}`, data ); 
     }
 
     if( data.groupName ) {
-      
-      windows[ 'instrumentMain' ].webContents.send( "group.update." + data.instrumentId + "." + data.groupName, data ); 
+      windows[ 'instrumentMain' ].webContents.send( `group.update.${ data.instrumentId }.${ data.groupName }`, data ); 
+    }
+
+    if( data.log ) {
+      data.log.time = Date.now();
+      windows[ 'instrumentMain' ].webContents.send( `instrument.log.${ data.instrumentId }`, data.log );  
     }
   }
 }

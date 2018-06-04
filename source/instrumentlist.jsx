@@ -13,7 +13,7 @@ ipcRenderer.on("reloadInstruments", () => {
 });
  
 ipcRenderer.on("dbInformation", async ( event, db ) => {
-console.log('r');
+
   influx_error = false;
 
   try {

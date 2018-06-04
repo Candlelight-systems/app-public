@@ -126,7 +126,7 @@ __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("reloadInstruments", ()
 });
 
 __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("dbInformation", async (event, db) => {
-  console.log('r');
+
   influx_error = false;
 
   try {
@@ -527,7 +527,11 @@ const address = cfg => {
 };
 
 let ping = cfg => {
-	return fetch(address(cfg) + "ping", { method: 'GET' });
+
+	return new Promise((resolver, rejecter) => {
+		fetch(address(cfg) + "ping", { method: 'GET' }).then(data => resolver(data));
+		setTimeout(rejecter, 1000);
+	});
 };
 
 let checkAuth = async (cfg, u, p, db) => {

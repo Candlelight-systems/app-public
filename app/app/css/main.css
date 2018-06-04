@@ -6915,6 +6915,10 @@ ul.formTabs {
   background-color: #f2dede;
   color: grey;
 }
+.activityLog {
+  height: 150px;
+  overflow-y: scroll;
+}
 .state-message {
   padding: 10px;
 }

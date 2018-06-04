@@ -270,12 +270,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports) {
-
-module.exports = require("node-jsgraph/dist/jsgraph-es6");
-
-/***/ }),
-/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -382,6 +376,12 @@ const channelExecuteJsc = (urlProps, instrumentId, chanId) => {
 };
 /* harmony export (immutable) */ __webpack_exports__["c"] = channelExecuteJsc;
 
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = require("node-jsgraph/dist/jsgraph-es6");
 
 /***/ }),
 /* 6 */
@@ -567,7 +567,11 @@ const address = cfg => {
 };
 
 let ping = cfg => {
-	return fetch(address(cfg) + "ping", { method: 'GET' });
+
+	return new Promise((resolver, rejecter) => {
+		fetch(address(cfg) + "ping", { method: 'GET' }).then(data => resolver(data));
+		setTimeout(rejecter, 1000);
+	});
 };
 
 let checkAuth = async (cfg, u, p, db) => {
@@ -712,12 +716,14 @@ function render(cfg) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group_jsx__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_jsx__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lodash_debounce__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__influx__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__status_activity_main_jsx__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error_jsx__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_lodash_debounce__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_lodash_debounce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_lodash_debounce__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__influx__ = __webpack_require__(9);
+
 
 
 
@@ -769,13 +775,13 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
       this.ping();
     });
 
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("light.updated", () => {
+    __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("light.updated", () => {
       this.updateInstrument();
     });
   }
 
   async ping(props = this.props) {
-    return Object(__WEBPACK_IMPORTED_MODULE_5__influx__["a" /* ping */])(this.props.configDB).catch(error => {
+    return Object(__WEBPACK_IMPORTED_MODULE_6__influx__["a" /* ping */])(this.props.configDB).catch(error => {
 
       console.warn("Cannot reach influx DB. Error was: ", error);
 
@@ -834,7 +840,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
   }
 
   editInstrument() {
-    __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
+    __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].send("editInstrument", this.props.config.trackerHost);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -889,9 +895,9 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
     if (this.state.error || !this.state.serverState) {
 
       content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "div",
+        'div',
         null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, methods: this.state.errorMethods })
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__error_jsx__["a" /* default */], { message: this.state.error || this.state.error_influxdb || this.state.error_tracker, methods: this.state.errorMethods })
       );
     } else if (this.state.groups) {
 
@@ -918,16 +924,26 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
         });
       });
 
-      content = groupsDoms;
+      content = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'row statuses' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__status_activity_main_jsx__["a" /* default */], this.props),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { className: 'clearfix' })
+        ),
+        groupsDoms
+      );
     }
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      "div",
+      'div',
       null,
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        "h3",
+        'h3',
         null,
-        "Instrument: ",
+        'Instrument: ',
         this.props.instrumentId
       ),
       content
@@ -936,7 +952,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 }
 
 var _initialiseProps = function () {
-  this.updateInstrument = __WEBPACK_IMPORTED_MODULE_4_lodash_debounce___default()((props = this.props) => {
+  this.updateInstrument = __WEBPACK_IMPORTED_MODULE_5_lodash_debounce___default()((props = this.props) => {
 
     return Promise.all([this.getConfig(props), this.getStatus(props), this.ping(props)]).then(args => {
 
@@ -971,7 +987,7 @@ var _initialiseProps = function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__status_light_main_jsx__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__status_heat_main_jsx__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__status_instrument_main_jsx__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__queries__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__queries__ = __webpack_require__(4);
 
 
 
@@ -1235,7 +1251,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cellstatusgraph_jsx__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellstatusiv_jsx__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellbuttons_jsx__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__timer_jsx__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_extend__ = __webpack_require__(8);
@@ -1248,7 +1264,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10__app_environment_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__queries__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__queries__ = __webpack_require__(4);
 
 
 
@@ -1453,7 +1469,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		if (data.state.efficiency) {
 			newState.efficiency = round(data.state.efficiency, 2);
 		}
-		console.log(data);
+
 		if (data.state.current) {
 			// Convert to mA
 			newState.current = round(data.state.current * 1000, 2);
@@ -1544,19 +1560,19 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			switch (this.parameter) {
 
 				case "efficiency":
-					statedata.append(lastTime, data.action.data.pce);
+					statedata.append(lastTime, data.state.efficiency);
 					break;
 
 				case "voltage_mean":
-					statedata.append(lastTime, data.action.data.voltage);
+					statedata.append(lastTime, data.state.voltage);
 					break;
 
 				case "current_mean":
-					statedata.append(lastTime, data.action.data.curent);
+					statedata.append(lastTime, data.state.curent);
 					break;
 
 				case "power_mean":
-					statedata.append(lastTime, data.action.data.power);
+					statedata.append(lastTime, data.state.power);
 					break;
 
 				default:
@@ -2722,7 +2738,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_extend___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_extend__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6__);
 
 
@@ -2974,7 +2990,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
@@ -3075,13 +3091,11 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.props.data.forEach((data, index) => {
 
-			if (data.time - lastInterval > idealInterval || this.props.data.length <= 5) {
+			if (data.time - lastInterval > idealInterval || this.props.data.length <= 5 || index == this.props.data.length - 1) {
 				lastInterval = data.time;
 				indices.push(index);
 			}
 		});
-
-		indices.push(this.props.data.length - 1);
 
 		const colors = ['#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18'];
 		let k = 0;
@@ -5068,7 +5082,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__queries__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__queries__ = __webpack_require__(4);
 
 
 
@@ -5338,6 +5352,211 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__app_environment_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_url_lib__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__queries__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__messages_jsx__ = __webpack_require__(32);
+
+
+
+
+
+
+
+
+
+//import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
+
+
+let speedOptions = [];
+
+/*
+	ADS1259
+	0b00000000 ==> 10SPS
+	0b00000001 ==> 16SPS
+	0b00000010 ==> 50SPS
+	0b00000011 ==> 60SPS
+	0b00000100 ==> 400SPS
+	0b00000101 ==> 1.2kSPS
+	0b00000110 ==> 3.6kSPS
+	0b00000111 ==> 14kSPS
+
+	ADS1147
+	0b00000000 ==> 5SPS
+	0b00000001 ==> 10SPS
+	0b00000010 ==> 20SPS
+	0b00000011 ==> 40SPS
+	0b00000100 ==> 80SPS
+	0b00000101 ==> 160SPS
+	0b00000110 ==> 320SPS
+	0b00000111 ==> 640SPS
+	0b00000111 ==> 1000SPS
+	0b00000111 ==> 2000SPS
+*/
+
+class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+	constructor() {
+
+		super(...arguments);
+		this.state = {
+			messages: []
+		};
+
+		this.wsUpdate = this.wsUpdate.bind(this);
+	}
+
+	componentDidUpdate() {
+		if (this.atBottom) {
+			this.logDiv.scrollTop = this.logDiv.scrollHeight;
+		}
+	}
+
+	componentWillUpdate() {
+
+		this.atBottom = this.logDiv.scrollTop >= this.logDiv.scrollHeight - 150;
+	}
+
+	componentDidMount() {
+
+		__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].on("instrument.log." + this.props.instrumentId, this.wsUpdate);
+	}
+
+	componentWillUnmount() {
+
+		__WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].removeListener("instrument.log." + this.props.instrumentId, this.wsUpdate);
+	}
+
+	wsUpdate(event, message) {
+
+		this.state.messages.push(message);
+		if (this.state.messages.length > 100) {
+			this.state.messages.shift();
+		}
+
+		this.setState({
+			message: this.state.message
+		});
+	}
+
+	render() {
+
+		const messages = this.state.messages.map(message => {
+
+			switch (message.type) {
+
+				case 'info':
+					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__messages_jsx__["b" /* MessageInfo */], message);
+					break;
+
+				case 'warning':
+					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__messages_jsx__["c" /* MessageWarning */], message);
+					break;
+
+				case 'error':
+					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__messages_jsx__["a" /* MessageError */], message);
+					break;
+			}
+		});
+
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			{ className: "col-lg-2 group-status group-status-instrument" },
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"h4",
+				null,
+				"Activity log"
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				"div",
+				{ className: "activityLog", ref: el => this.logDiv = el },
+				messages.length > 0 ? messages : 'No message to display'
+			)
+		);
+	}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (InstrumentStatus);
+
+/***/ }),
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessageError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return MessageWarning; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return MessageInfo; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+
+const pad = val => {
+	if (val < 10) {
+		return "0" + val;
+	}
+	return val;
+};
+
+class Message extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
+
+	constructor() {
+		super();
+	}
+
+	render() {
+
+		const time = this.props.time;
+		const date = new Date(time);
+
+		const timeText = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+		const channel = this.props.channel ? `(Chan ${this.props.channel})` : ``;
+		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+			"div",
+			{ className: this.divClass },
+			"[ ",
+			timeText,
+			" ]: ",
+			channel,
+			" ",
+			this.props.message
+		);
+	}
+}
+
+class MessageError extends Message {
+	constructor() {
+		super();
+		this.divClass = "text-danger";
+	}
+}
+
+class MessageWarning extends Message {
+	constructor() {
+		super();
+		this.divClass = "text-warning";
+	}
+}
+
+class MessageInfo extends Message {
+	constructor() {
+		super();
+		this.divClass = "text-info";
+	}
+}
+
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 
 
 
@@ -5385,7 +5604,7 @@ class Error extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 /* harmony default export */ __webpack_exports__["a"] = (Error);
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports) {
 
 /**
