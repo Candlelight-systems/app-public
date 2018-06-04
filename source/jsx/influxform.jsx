@@ -3,6 +3,7 @@ import $ from "jquery";
 import fetch from 'node-fetch'
 import { shell } from 'electron'
 import { postJSON } from '../../app/util/fetch'
+import { ping, checkAuth, checkDB } from '../influx'
 
 const openDocs = () => {
 	shell.openExternal( 'https://docs.influxdata.com/influxdb/v1.5/query_language/authentication_and_authorization' );
@@ -66,9 +67,9 @@ class AppForm extends React.Component {
 
 
 		let address = `http://${ this.state.host }:${ this.state.port }`;
-		let query = `${address}/ping`;
-		let query_auth = `${address}/query?u=${ u }&p=${ p }&q=${ encodeURIComponent( `SHOW GRANTS FOR "${ u }"` ) }`;
-		let query_db = `${address}/query?u=${ u }&p=${ p }&q=${ encodeURIComponent( `SHOW DATABASES` ) }`;
+		//let query = `${address}/ping`;
+		//let query_auth = `${address}/query?u=${ u }&p=${ p }&q=${ encodeURIComponent( `SHOW GRANTS FOR "${ u }"` ) }`;
+		//let query_db = `${address}/query?u=${ u }&p=${ p }&q=${ encodeURIComponent( `SHOW DATABASES` ) }`;
 //
 
 		const state = {};
@@ -83,91 +84,35 @@ class AppForm extends React.Component {
 				throw "The address must not be local (the tracker must also access it)";	
 			}
 
-			await fetch( query );
+			await ping( this.state );
+		//	await fetch( query );
 			state.db_connection = 'ok';
+			
+
+
+			try {
+				const dbs = await checkDB( this.state, u, p, db );
+				state.db_dbexists = 'ok';
+			} catch( e ) {
+				state.db_dbexists = e.toString();
+			}
+
+			
+			try {
+				
+				await checkAuth( this.state, u, p, db );
+				state.db_authentication = 'ok';
+
+			} catch( e ) {
+				
+				state.db_authentication = e.toString();
+			}
+
 		} catch( e ) {
 			console.log( e );
 			state.db_connection = e.toString();
 		}
-		
-		try {
-			
-			const auth = await fetch( query_auth ).then( response => response.json() );
 
-			if( auth.error ) {
-				throw "Bad credentials";
-			}
-
-
-			try {
-				
-				const dbs = await fetch( query_db ).then( response => response.json() );
-
-				if( ! dbs.results[ 0 ].series ) {
-					throw "Database not found";
-				}
-
-				if( ! dbs.results[ 0 ].series[ 0 ].values ) {
-					throw "Database not found";
-				}
-
-
-				let accept = false;
-				dbs.results[ 0 ].series[ 0 ].values.forEach( ( v ) => {
-
-					if( v[ 0 ] == db ) {
-						accept = true;
-					}
-				});
-
-				if( ! accept ) {
-					throw "Database not found";
-				}
-
-				state.db_dbexists = 'ok';
-			} catch( e ) {
-				
-				state.db_dbexists = e.toString();
-			}
-
-
-			if( auth.results[ 0 ].error ) {
-
-				if( u == "" ) {
-					throw "No user defined";	
-				}
-				
-
-				throw "User not found";
-			}
-
-			if( ! auth.results[ 0 ].series[ 0 ] || ! auth.results[ 0 ].series[ 0 ].values ) {
-				console.log( auth.results );
-				throw "No privileges found";
-			}
-
-			let accept = false;
-			auth.results[ 0 ].series[ 0 ].values.forEach( v => {
-				
-				if( v[ 0 ] == db && v[ 1 ] == "ALL PRIVILEGES" ) {
-					accept = true;
-				}
-			} );
-
-			if( ! accept ) {
-				throw `Wrong privileges were found for user ${ u }`;
-			}
-
-			state.db_authentication = 'ok';
-
-		} catch( e ) {
-			
-			state.db_authentication = e.toString();
-		}
-
-		
-
-		console.log( state );
 		this.setState( state );
 	}
 

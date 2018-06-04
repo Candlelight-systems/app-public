@@ -2,7 +2,7 @@ import React from 'react';
 const {dialog} = require('electron').remote;
 import fs from 'fs';
 import { CSVBuilder, ITXBuilder } from "../../app/util/filebuilder"
-import { query as influxquery } from "./influx";
+import { query as influxquery } from "../influx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import svgToPDF from "../../app/util/svgToPDF"
 import PDFDocument from 'pdfkit'
@@ -307,17 +307,16 @@ class DownloadForm extends React.Component {
 						time = ( date.getTime() - offset ) / 1000 / 3600;
 					}
 
-					if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
+					/*if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
 						value[ 1 ] = NaN;
 						value[ 2 ] = NaN;
-					}
+					}*/
 
 					waveEfficiency.append( time, value[ 1 ] );					
 					waveVoltage.append( time, value[ 2 ] );					
 					waveCurrent.append( time, value[ 3 ] );
-
-					waveSun.append( time, value[ 4 ] );
-					waveHumidity.append( time, value[ 5 ] );
+					waveHumidity.append( time, value[ 4 ] );
+					waveSun.append( time, value[ 5 ] );
 					waveTemperature.append( time, value[ 6 ] );		
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );

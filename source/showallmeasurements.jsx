@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';	
 import InfluxForm from "./jsx/influxform.jsx"
 import Error from "./jsx/error.jsx"
-import { query as influxquery } from "./jsx/influx";
+import { query as influxquery } from "./influx";
 import { ipcRenderer, remote } from 'electron';
 const dialog = remote.dialog;
 	

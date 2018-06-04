@@ -1,11 +1,11 @@
 import TrackerDevice from "./device.jsx"
 import React from 'react';
-import CellButtons from "../cellbuttons.jsx"
 import { ipcRenderer } from "electron";
-import { query as influxquery } from "../influx";
 import LightStatus from './status/light/main.jsx';
 import HeatStatus from './status/heat/main.jsx';
 import InstrumentStatus from './status/instrument/main.jsx'
+
+import { setChannelStatuses } from '../../queries'
 
 class TrackerGroupDevices extends React.Component {
 
@@ -92,32 +92,11 @@ class TrackerGroupDevices extends React.Component {
       delete response.enable;
       
       for( var i = 0; i < chanIds.length; i ++ ) {
-
-        data.chanStatuses[ chanIds[ i ] ] = Object.assign( {}, response, { cellName: response["__cellName_" + chanIds[ i ] ] } );;
-
+        data.chanStatuses[ chanIds[ i ] ] = Object.assign( {}, response, { cellName: response["__cellName_" + chanIds[ i ] ] } );
         //delete response["__cellName_" + chanIds[ i ] ];
       }
 
-      let body = JSON.stringify( data );
-      let headers = new Headers({
-        "Content-Type": "application/json",
-        "Content-Length": body.length.toString()
-      });
-
-
-      fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/setStatuses", {
-
-        headers: headers,
-        method: 'POST',
-        body: body
-
-      } ).then( ( response ) => {
-
-        this.props.getStatus();
-
-      } ).catch( () => {
-
-      } );
+      return setChannelStatuses( this.props.config, data )
     });
 
   
@@ -217,7 +196,6 @@ class TrackerGroupDevices extends React.Component {
           configDB={ this.props.configDB } 
           chanId={ chan.chanId } 
           serverState={ this.props.serverState.channels[ chan.chanId ] }
-          updateStatus={ this.props.getStatus }
           toggleChannelCheck={ () => this.toggleChannelCheck( chan.chanId ) }
           channelChecked={ this.state.channelChecked[ chan.chanId ]}  />
       });

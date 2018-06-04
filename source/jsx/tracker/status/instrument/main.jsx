@@ -3,7 +3,7 @@ import React from "react";
 import { ipcRenderer } from "electron";
 import environment from "../../../../../app/environment.json"
 import urllib from 'url-lib'
-
+import { autoZero } from '../../../../queries'
 
 //import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
 
@@ -35,8 +35,6 @@ let speedOptions = [];
 	0b00000111 ==> 2000SPS
 */
 
-
-
 class InstrumentStatus extends React.Component {
 
 	constructor() {
@@ -45,6 +43,7 @@ class InstrumentStatus extends React.Component {
 		this.state = {};
 		this.togglePause = this.togglePause.bind( this );
 		this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind( this );
+		this.autoZero = this.autoZero.bind( this );
 	}
 
 	componentDidMount() {
@@ -61,6 +60,11 @@ class InstrumentStatus extends React.Component {
 			break;
 		}
 	}
+
+	async autoZero( event ) {
+		await autoZero( this.props.config, this.props.instrumentId );
+	}
+
 	async changeAcquisitionSpeed( event ) {
 
 		let val = event.target.value;
@@ -118,6 +122,19 @@ class InstrumentStatus extends React.Component {
               <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.togglePause }>{ this.state.paused ? <span><span className="glyphicon glyphicon-start"></span>Resume</span> : <span><span className="glyphicon glyphicon-pause"></span>Pause</span> }</button>
             </div>
           </div>
+
+
+          { environment.instrument[ this.props.instrumentId ].autoZero === "instrument" &&
+           <div className="row">
+            <div className="col-lg-5">
+                <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.autoZero }><span>Auto-zero</span></button>              
+            </div>
+            <div className="col-lg-4">
+
+            </div>
+          </div>
+      		}
+
 
           { environment.instrument[ this.props.instrumentId ].groups[ this.props.name ].resettable !== false &&
            <div className="row">

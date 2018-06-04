@@ -656,7 +656,9 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		this.updateProps(nextProps);
 	}
 
-	componentDidUpdate() {}
+	componentDidUpdate() {
+		this.updateGraphJV(this.state.data);
+	}
 
 	async updateProps(props = this.props) {
 
@@ -696,7 +698,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		});
 
 		this.updateGraphs();
-		this.updateGraphJV(this.data);
+
 		this.setState({ data: this.data });
 	}
 
@@ -920,7 +922,6 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 					});
 				});
 			} else {
-
 				this.data.jv = [];
 			}
 		});
@@ -967,7 +968,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Start date: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -981,7 +982,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'End date: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -995,7 +996,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Ageing time: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1015,7 +1016,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Cell active area: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1035,7 +1036,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Comment: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1069,7 +1070,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Efficiency after 1h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1083,7 +1084,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Efficiency after 24h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1097,7 +1098,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Efficiency after 100h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1111,7 +1112,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Efficiency after 500h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1125,7 +1126,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Efficiency after 1\'000h:'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1140,7 +1141,7 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						{ className: 'row' },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'div',
-							{ className: 'col-xs-4' },
+							{ className: 'col-xs-3' },
 							'Final efficiency: '
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -1358,6 +1359,8 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return query; });
 /* unused harmony export ping */
+/* unused harmony export checkAuth */
+/* unused harmony export checkDB */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fs__ = __webpack_require__(2);
@@ -1382,8 +1385,76 @@ let query = function (query, db, cfg) {
 	});
 };
 
-let ping = function (cfg) {
-	return fetch("http://" + cfg.host + ":" + cfg.port + "/ping", { method: 'GET' });
+const address = cfg => {
+	return "http://" + cfg.host + ":" + cfg.port + "/";
+};
+
+let ping = cfg => {
+	return fetch(address(cfg) + "ping", { method: 'GET' });
+};
+
+let checkAuth = async (cfg, u, p, db) => {
+
+	const query_auth = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW GRANTS FOR "${u}"`)}`;
+
+	const auth = await fetch(query_auth).then(r => r.json());
+
+	if (auth.error) {
+		throw "Bad credentials";
+	}
+
+	if (auth.results[0].error) {
+		if (u == "") {
+			throw "No user defined";
+		}
+		throw "User not found";
+	}
+
+	if (!auth.results[0].series[0] || !auth.results[0].series[0].values) {
+		throw "No privileges found";
+	}
+
+	let accept = false;
+	auth.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db && v[1] == "ALL PRIVILEGES") {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw `Wrong privileges were found for user ${u}`;
+	}
+};
+
+let checkDB = async (cfg, u, p, db) => {
+
+	if (u == null || u.length == 0) {
+		return;
+	}
+
+	const query_db = `${address(cfg)}query?u=${u}&p=${p}&q=${encodeURIComponent(`SHOW DATABASES`)}`;
+	const dbs = await fetch(query_db).then(r => r.json());
+
+	if (!dbs.results[0].series) {
+		throw "Database not found";
+	}
+
+	if (!dbs.results[0].series[0].values) {
+		throw "Database not found";
+	}
+
+	let accept = false;
+	dbs.results[0].series[0].values.forEach(v => {
+
+		if (v[0] == db) {
+			accept = true;
+		}
+	});
+
+	if (!accept) {
+		throw "Database not found";
+	}
 };
 
 /***/ }),

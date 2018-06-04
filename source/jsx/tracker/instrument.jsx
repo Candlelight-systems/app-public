@@ -6,7 +6,7 @@ import Error from "../error.jsx"
 import { ipcRenderer } from "electron";
 
 import debounce from "lodash.debounce"
-import { ping } from "../influx";
+import { ping } from "../../influx";
 
 class TrackerInstrument extends React.Component {
 
@@ -57,6 +57,7 @@ class TrackerInstrument extends React.Component {
     return ping( this.props.configDB ).catch( ( error ) => { 
 
       console.warn("Cannot reach influx DB. Error was: ", error );
+      
       this.setState( {
         error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
       } );
@@ -92,12 +93,12 @@ class TrackerInstrument extends React.Component {
     .then( response => response.json() )
     .catch( error => {
 
-
+/*
       setTimeout( () => {
         
         this.updateInstrument();
       }, 3000 );
-
+*/
       this.setState( {
         error: `Error while retrieving the instrument status. The returned error was ${ error.toString() }.`,
         errorMethods: [ [ "Retry", this.updateInstrument ] ] 
@@ -135,6 +136,10 @@ class TrackerInstrument extends React.Component {
     .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
     .then( ( response ) => response.json() )
     .catch( error => {
+
+      setTimeout( () => {        
+        this.updateInstrument();
+      }, 3000 );
 
       this.setState( { 
         error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network", 
@@ -189,8 +194,6 @@ class TrackerInstrument extends React.Component {
 
     let content;
     
-
-
     if( this.state.error || ! this.state.serverState ) {
       
       content = (
@@ -206,22 +209,22 @@ class TrackerInstrument extends React.Component {
 
          return <TrackerGroupDevices 
 
-         showHeader={this.state.groups.length > 1}
-         key={ group.groupID } 
-         instrumentId={ this.props.instrumentId } 
-         id={ group.groupID } 
-         name={ group.groupName }
-         channels={ group.channels }
-         groupConfig={ group }
-         config={ this.props.config } 
-         configDB={ this.props.configDB } 
-         serverState={ this.state.serverState[ group.groupName ] }
-         update={ this.updateInstrument }
-         getStatus={ this.updateStatus }
+           showHeader={this.state.groups.length > 1}
+           key={ group.groupID } 
+           instrumentId={ this.props.instrumentId } 
+           id={ group.groupID } 
+           name={ group.groupName }
+           channels={ group.channels }
+           groupConfig={ group }
+           config={ this.props.config } 
+           configDB={ this.props.configDB } 
+           serverState={ this.state.serverState[ group.groupName ] }
+           update={ this.updateInstrument }
+           getStatus={ this.updateStatus }
 
-         error_influxdb={ this.state.error_influxdb }
-         error_tracker={ this.state.error_tracker }
-         paused={ this.state.paused }
+           error_influxdb={ this.state.error_influxdb }
+           error_tracker={ this.state.error_tracker }
+           paused={ this.state.paused }
          />
        } );
     
