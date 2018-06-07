@@ -158,7 +158,7 @@ class TrackerDevice extends React.Component {
 		if( data.state.efficiency ) {
 			newState.efficiency = round( data.state.efficiency, 2 );
 		}
-console.log( data );
+
 		if( data.state.current ) {
 			// Convert to mA
 			newState.current = round( data.state.current * 1000, 2 );
@@ -224,12 +224,9 @@ console.log( data );
 			newState.timer_ellapsed = { time: data.timer.ellapsed, updated: Date.now() }
 		}
 
-
-
 		if( data.action.data ) {
 
 			let lastTime;
-
 
 			if( this.state.data && this.state.data.getLength && this.state.data.getLength() > 0 ) {
 				lastTime = this.state.data.xdata.data[ this.state.data.getLength() - 1 ];
@@ -245,23 +242,22 @@ console.log( data );
 				statedata = Graph.newWaveform();
 			}
 				
-			
 			switch( this.parameter ) {
 
 				case "efficiency":
-					statedata.append( lastTime, data.action.data.pce );
+					statedata.append( lastTime, data.state.efficiency );
 				break;
 
 				case "voltage_mean":
-					statedata.append( lastTime, data.action.data.voltage );
+					statedata.append( lastTime, data.state.voltage );
 				break;
 
 				case "current_mean":
-					statedata.append( lastTime, data.action.data.curent );
+					statedata.append( lastTime, data.state.curent );
 				break;
 
 				case "power_mean":
-					statedata.append( lastTime, data.action.data.power );
+					statedata.append( lastTime, data.state.power );
 				break;
 
 				default:
@@ -519,22 +515,22 @@ console.log('update influx');
 		let queries = [
 		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
 		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
-		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`,
+		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
 		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,
 		`SELECT jsc FROM "${ serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`
 		];
 		
 		let newIvCurves = false;
-console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
+//console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
 		influxquery( queries.join(";"), db, this.props.configDB ).then( ( results ) => {
-			console.log( results[ 2 ] );
+			
 			if( results[ 2 ].series && results[ 2 ].series[ 0 ] ) {
 				
 				newState.ivCurves = this.state.ivCurves.splice( 0 );
 				newState.ivCurves = newState.ivCurves.concat( results[ 2 ].series[ 0 ].values.map( ( value, index ) => {
 
 					if( index == results[ 2 ].series[ 0 ].values.length - 1 ) {
-						newState._last_iv_time = new Date( value[ 0 ] );
+						newState._last_iv_time = value[ 0 ];
 					}	
 
 					return {
@@ -543,9 +539,7 @@ console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${
 						sun: value[ 2 ]
 					}
 				} ) );
-
-				console.log( newState.ivCurves.length );
-
+				
 				//console.log( newState.ivCurves );
 
 				newState.iv_values = newState.ivCurves.map( ( ivCurve ) => {

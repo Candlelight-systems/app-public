@@ -4,10 +4,8 @@
 
 		"statuses": {
 			"light": {
-				"version": "readonly"
-			},
-			"heat": {
-				"version": "2.0"
+				"version": "2.0",
+				"readonly": false
 			}
 		},
 
@@ -18,17 +16,21 @@
 				"ADC": {
 					"model": "ADS1259"
 				},
+				"changeSpeed": false,
 				"fsr": 30,
+				"LSB": 1.22,
+				"LSBValue": 1,
 				"voltageRange": 2.5,
-
+				"autoZero": "instrument",
 				"groups": {
 
-					"Box 1": {
+					"Sample holder": {
 
+						"resettable": false,
 						"displayDeviceInformation": {
 							"time_ellapsed": true,
 							"pce": true,
-							"power": true,
+							"power": false,
 							"sun": true,
 							"voc": true,
 							"jsc": true,
@@ -37,7 +39,7 @@
 							"jnow": true,
 							"temperature": true,
 							"humidity": true,
-							"kwh_yr": true
+							"kwh_yr": false
 						}
 
 
@@ -50,18 +52,17 @@
 	},		
 
 	"development": true,
-
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.1.103",
+				"trackerHost": "192.168.1.101",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "localhost",
+			"host": "192.168.1.101",
 			"username": "",
 			"password": "",
 			"port": 8086,

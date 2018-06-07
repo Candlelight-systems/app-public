@@ -1,12 +1,14 @@
 
 import React from 'react';
 
-import TrackerGroupDevices from "./group.jsx"
+import Group from "./group.jsx"
+import ActivityStatus from './status/activity/main.jsx'
 import Error from "../error.jsx"
 import { ipcRenderer } from "electron";
 
 import debounce from "lodash.debounce"
 import { ping } from "../../influx";
+
 
 class TrackerInstrument extends React.Component {
 
@@ -91,6 +93,15 @@ class TrackerInstrument extends React.Component {
     } )
     .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
     .then( response => response.json() )
+    .then( response => {
+
+      // An error has been notified on the server side
+      if( response.error ) {
+        this.setState( { error: `An error has occured: ${ error.toString }` } ); 
+      }
+
+      return response;
+    } )
     .catch( error => {
 
 /*
@@ -204,10 +215,9 @@ class TrackerInstrument extends React.Component {
 
     } else if( this.state.groups ) {
 
-
         var groupsDoms = this.state.groups.map( ( group, i ) => {
 
-         return <TrackerGroupDevices 
+         return <Group 
 
            showHeader={this.state.groups.length > 1}
            key={ group.groupID } 
@@ -229,8 +239,14 @@ class TrackerInstrument extends React.Component {
        } );
     
 
-      content = groupsDoms;
-
+      content = ( 
+      <div>
+        <div className="row statuses">
+          <ActivityStatus {...this.props } />
+          <div className="clearfix"></div>
+        </div>
+        { groupsDoms }
+      </div> );
     }
 
     return (

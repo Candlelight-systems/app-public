@@ -173,18 +173,8 @@ class HTMLReportControl extends React.Component {
 			
 			<div className="container-fluid">
 				<form className="form-horizontal">
-						<h3>Graphs</h3>
-						{
-							availableGraphs.map( ( g ) => 
-								<div key={ g.name } className="checkbox">
-								
-									<label>
-										<input type="checkbox" checked={ this.state[ "graph_" + g.name ] } name={ "graph_" + g.name } onClick={ this.handleInputChange } /> { g.label }
-									</label>
-								</div>
-							)
-						}
 						
+					
 						<h3>j-V curves</h3>
 						<div className="form-group">
 							<label className="col-sm-3">Select the j-V curves for the report</label>

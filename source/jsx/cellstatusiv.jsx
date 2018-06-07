@@ -122,13 +122,11 @@ class statusIV extends GraphComponent {
 
 		this.props.data.forEach( ( data, index ) => {
 
-			if( data.time - lastInterval > idealInterval ) {
+			if( data.time - lastInterval > idealInterval || this.props.data.length <= 5 || index == this.props.data.length - 1 ) {
 				lastInterval = data.time;
 				indices.push( index ); 
 			}
 		});
-
-		indices.push( this.props.data.length - 1 );
 
 		const colors = [ '#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18' ];
 		let k = 0;

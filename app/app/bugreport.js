@@ -228,7 +228,7 @@ module.exports = require("react-dom");
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = {"instruments":[{"trackerHost":"128.178.118.3","trackerName":"Main Instrument","trackerPort":8080,"trackerPortWS":8081}],"database":{"host":"influxdb2.epfl.ch","username":"lpi","password":"lpi77","port":8086,"db":"GMF"},"githubtokens":{"issuetracker":"81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"}}
+module.exports = {"instruments":[{"trackerHost":"172.18.10.10","trackerName":"Main Instrument","trackerPort":8080,"trackerPortWS":8081}],"database":{"host":"172.18.7.248","username":"","password":"","port":8086,"db":"matahari"},"githubtokens":{"issuetracker":"81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"}}
 
 /***/ })
 /******/ ]);

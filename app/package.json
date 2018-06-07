@@ -12,7 +12,7 @@
   "author": "Norman Pellet",
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "electron": "^2.0.0"
+    "electron": "^2.0.2"
   },
   "dependencies": {
     "fix-path": "^2.1.0",

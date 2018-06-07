@@ -126,7 +126,7 @@ __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("reloadInstruments", ()
 });
 
 __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("dbInformation", async (event, db) => {
-  console.log('r');
+
   influx_error = false;
 
   try {
@@ -489,7 +489,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{"version":"ssr_1.0"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
 
 /***/ }),
 /* 12 */
@@ -529,7 +529,11 @@ const address = cfg => {
 };
 
 let ping = cfg => {
-	return fetch(address(cfg) + "ping", { method: 'GET' });
+
+	return new Promise((resolver, rejecter) => {
+		fetch(address(cfg) + "ping", { method: 'GET' }).then(data => resolver(data));
+		setTimeout(rejecter, 1000);
+	});
 };
 
 let checkAuth = async (cfg, u, p, db) => {

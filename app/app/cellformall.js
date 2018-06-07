@@ -245,7 +245,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'label',
 					{ htmlFor: 'tracking_interval', className: 'col-sm-3' },
-					'Tracking interval'
+					'Sampling rate'
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
@@ -293,59 +293,7 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'help-block col-sm-9' },
-					'This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.'
-				)
-			),
-			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ className: 'form-group' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'label',
-					{ htmlFor: 'tracking_record_interval', className: 'col-sm-3' },
-					'Record interval'
-				),
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'div',
-					{ className: 'col-sm-9' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-						'select',
-						{ name: 'tracking_record_interval', id: 'tracking_record_interval', className: 'form-control', value: this.props.tracking_record_interval, onChange: this.handleInputChange },
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: 'never_record', value: 'null' },
-							'Never'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '500sps_record', value: '500' },
-							'2 sample per second'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '1000sps_record', value: '1000' },
-							'1 sample per second'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '10000sps_record', value: '10000' },
-							'6 samples per minute'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '60000sps_record', value: '60000' },
-							'1 sample per minute'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '600000sps_record', value: '600000' },
-							'6 samples per hour'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
-							{ key: '3600000sps_record', value: '3600000' },
-							'1 sample per hour'
-						)
-					)
+					'The number of points per second sampled by the tracking algorithm. This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.'
 				)
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -638,6 +586,58 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							)
 						)
 					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'label',
+					{ htmlFor: 'tracking_record_interval', className: 'col-sm-3' },
+					'Recording rate'
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'col-sm-9' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'select',
+						{ name: 'tracking_record_interval', id: 'tracking_record_interval', className: 'form-control', value: this.props.tracking_record_interval, onChange: this.handleInputChange },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: 'never_record', value: 'null' },
+							'Never'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '1000sps_record', value: '1000' },
+							'1 sample per second'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '10000sps_record', value: '10000' },
+							'6 samples per minute'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '60000sps_record', value: '60000' },
+							'1 sample per minute'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '600000sps_record', value: '600000' },
+							'6 samples per hour'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ key: '3600000sps_record', value: '3600000' },
+							'1 sample per hour'
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block col-sm-9' },
+					'The number of points per second recorded into the database.'
 				)
 			)
 		);
@@ -1148,7 +1148,7 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{"version":"ssr_1.0"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
 
 /***/ }),
 /* 8 */

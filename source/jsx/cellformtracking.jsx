@@ -126,7 +126,7 @@ class CellFormTracking extends React.Component {
 				</div>
 
 				<div className="form-group">
-					<label htmlFor="tracking_interval" className="col-sm-3">Tracking interval</label>
+					<label htmlFor="tracking_interval" className="col-sm-3">Sampling rate</label>
 					<div className="col-sm-9">
 						<select name="tracking_interval" id="tracking_interval" className="form-control" value={this.props.tracking_interval} onChange={this.handleInputChange}>
 							<option key="0sps" value="0">As fast as possible</option>
@@ -140,26 +140,11 @@ class CellFormTracking extends React.Component {
 					</div>
 					
 					<div className="help-block col-sm-9">
-						This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.
+						The number of points per second sampled by the tracking algorithm. This value is not guaranteed. It depends on the aquistion speed and the number of channels enabled.
 					</div>
 
 				</div>
 
-
-				<div className="form-group">
-					<label htmlFor="tracking_record_interval" className="col-sm-3">Record interval</label>
-					<div className="col-sm-9">
-						<select name="tracking_record_interval" id="tracking_record_interval" className="form-control" value={this.props.tracking_record_interval} onChange={this.handleInputChange}>
-							<option key="never_record" value="null">Never</option>
-							<option key="500sps_record" value="500">2 sample per second</option>
-							<option key="1000sps_record" value="1000">1 sample per second</option>
-							<option key="10000sps_record" value="10000">6 samples per minute</option>
-							<option key="60000sps_record" value="60000">1 sample per minute</option>
-							<option key="600000sps_record" value="600000">6 samples per hour</option>
-							<option key="3600000sps_record" value="3600000">1 sample per hour</option>
-						</select>
-					</div>
-				</div>
 
 
 				<div className="form-group">
@@ -249,6 +234,27 @@ class CellFormTracking extends React.Component {
 						</div>
 					</div> }
 				</div> }
+
+
+				<div className="form-group">
+					<label htmlFor="tracking_record_interval" className="col-sm-3">Recording rate</label>
+					<div className="col-sm-9">
+						<select name="tracking_record_interval" id="tracking_record_interval" className="form-control" value={this.props.tracking_record_interval} onChange={this.handleInputChange}>
+							<option key="never_record" value="null">Never</option>
+							<option key="1000sps_record" value="1000">1 sample per second</option>
+							<option key="10000sps_record" value="10000">6 samples per minute</option>
+							<option key="60000sps_record" value="60000">1 sample per minute</option>
+							<option key="600000sps_record" value="600000">6 samples per hour</option>
+							<option key="3600000sps_record" value="3600000">1 sample per hour</option>
+						</select>
+					</div>
+
+					<div className="help-block col-sm-9">
+						The number of points per second recorded into the database.
+					</div>
+				</div>
+
+
 			</div> );
 	}
 }

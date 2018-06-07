@@ -1,13 +1,24 @@
 import React from 'react';
-import fs from 'fs';
 import { query as influxquery } from "../influx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import { getIVParameters } from '../../app/util/iv'
 import { ipcRenderer } from 'electron';
-const { dialog }  = require('electron').remote;
 
 
-const pageHeight = 795;//window.pageY;
+const colors = {
+	'pce': '#ae1826',
+	'power': '#2618ae',
+	'voltage': '#18ae77',
+	'current': '#d59a1c',
+	'jsc': '#9017c3',
+	'voc': '#1770c3',
+	'ff': '#719f40',
+	'humidity': '#5ca1b2',
+	'temperature': '#b44736',
+	'light': '#8a9609'
+};
+
+const pageHeight = 745;//window.pageY;
 
 const graphsCfg = [
 	{
@@ -473,61 +484,285 @@ class HTMLReport extends React.Component {
 
 
 	makeGraphs() {
-		graphsCfg.map( ( g ) => {
 
-			this.graphs[ g.graphRef ] = ( () => {
+		const axis = [];
+		const g = new Graph( this.domGraph, {
+			fontSize: 14, 
+			paddingLeft: 0, 
+			paddingRight: 0, 
+			paddingTop: 10, 
+			paddingBottom: 0,
+			close: false
+		}  );
+		
+		g.setWidth( 600 );
+		g.setHeight( pageHeight );
 
-				if( ! this.graphsRefs[ g.graphRef ] ) {
-					return;
-				}
-
-				switch (g.type) {
-
-					case 'pce':
-						return this.makePCEGraph( this.graphsRefs[ g.graphRef ] );
-					break;
-
-					case 'power':
-						return this.makePowerGraph( this.graphsRefs[ g.graphRef ] );
-					break;
-
-					case 'jsc':
-						return this.makeJscGraph( this.graphsRefs[ g.graphRef ] );
-					break;
-
-					case 'voc':
-						return this.makeVocGraph( this.graphsRefs[ g.graphRef ] );
-					break;
+		g.getBottomAxis()
+			.setLabel("Time")
+			.setUnit("h")
+			.setUnitWrapper("(", ")")
+			.secondaryGridOff()
+			.setNbTicksSecondary( 5 );
 
 
-					case 'current':
-						return this.makeCurrentGraph( this.graphsRefs[ g.graphRef ] );
-					break;
+		g.getBottomAxis( 1 )
+			.setLabel("Time")
+			.setUnit("h")
+			.setUnitWrapper("(", ")")
+			.gridsOff()
+			.setNbTicksSecondary( 5 );
 
-					case 'voltage':
-						return this.makeVoltageGraph( this.graphsRefs[ g.graphRef ] );
-					break;
 
-					case 'light':
-						return this.makeLightGraph( this.graphsRefs[ g.graphRef ] );
-					break;
+		g.getBottomAxis( 2 )
+			.setLabel("Time")
+			.setUnit("h")
+			.setUnitWrapper("(", ")")
+			.gridsOff()
+			.setNbTicksSecondary( 5 );
 
-					case 'humidity':
-						return this.makeHumidityGraph( this.graphsRefs[ g.graphRef ] );
-					break;
 
-					case 'temperature':
-						return this.makeTemperatureGraph( this.graphsRefs[ g.graphRef ] );
-					break;
-				}
-			})()
-		} );
+		g.getBottomAxis( 3 )
+			.setLabel("Time")
+			.setUnit("h")
+			.setUnitWrapper("(", ")")
+			.gridsOff()
+			.setNbTicksSecondary( 5 );
+
+
+		axis['pce'] = g.getLeftAxis( 0 )
+				.setLabel("PCE")
+				.setUnit("%")
+				.setColor( colors.pce )
+				.setUnitDecade( true )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.75, 1 )
+				.forceMin( 0 )
+				.setLineAt( [ 0 ] );
+
+		g.getBottomAxis( 1 )
+			.setFloating( axis.pce, 0 )
+
+		axis['power'] = g.getLeftAxis( 1 )
+				.setLabel("Power output")
+				.setUnit("W")
+				.gridsOff()
+				.setColor( colors.power )
+				.setScientific( true )
+				.setUnitDecade( true )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.5, 0.7 )
+				.forceMin( 0 )
+				.setLineAt( [ 0 ] );
+
+
+		g.getBottomAxis( 2 )
+			.setFloating( axis.power, 0 );
+
+
+
+		axis['j'] = g.getRightAxis( 0 )
+				.setLabel("Current density")
+				.setUnit("A cm^-2")
+				.gridsOff()
+				.setScientific( true )
+				.setUnitDecade( true )
+				.setColor( colors.current )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.5, 0.7 )
+				.forceMin( 0 );
+
+
+		axis['v'] = g.getRightAxis( 1 )
+				.setLabel("Voltage")
+				.setUnit("V")
+				.gridsOff()
+				.setColor( colors.voltage )
+				.setUnitDecade( true )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.5, 0.7 )
+				.forceMin( 0 );
+
+
+		axis['jsc'] = g.getRightAxis( 2 )
+				.setLabel("Short circuit current")
+				.setUnit("A cm^-2")
+				.gridsOff()
+				.setScientific( true )
+				.setUnitDecade( true )
+				.setColor( colors.jsc )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.25, 0.45 )
+				.forceMin( 0 );
+
+		axis['voc'] = g.getRightAxis( 3 )
+				.setLabel("Open circuit voltage")
+				.setUnit("V")
+				.gridsOff()
+				.setUnitDecade( true )
+				.setColor( colors.voc )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.25, 0.45 )
+				.forceMin( 0 );
+
+		axis['ff'] = g.getLeftAxis( 2 )
+				.setLabel("Fill factor")
+				.setUnit("%")
+				.gridsOff()
+				.setUnitDecade( true )
+				.setColor( colors.ff )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0.25, 0.45 )
+				.forceMin( 0 );
+
+
+		g.getBottomAxis( 3 )
+			.setFloating( axis.voc, 0 );
+
+
+		axis['light'] = g.getLeftAxis( 3 )
+				.setLabel("Sun intensity")
+				.setUnit("W m^-2")
+				.gridsOff()
+				.setUnitDecade( true )
+				.setColor( colors.light )
+				.setUnitWrapper("(", ")")
+				.setSpan( 0, 0.2 )
+				.forceMin( 0 );
+
+
+		axis['humidity'] = g.getRightAxis( 4 )
+				.setLabel("Humidity")
+				.setUnit("%")
+				.setColor( colors.humidity )
+				.setUnitDecade( true )
+				.gridsOff()
+				.setUnitWrapper("(", ")")
+				.setSpan( 0, 0.2 )
+				.forceMin( 0 );
+
+
+		axis['temperature'] = g.getRightAxis( 5 )
+				.setLabel("Temperature")
+				.setUnit("°C")
+				.setColor( colors.temperature )
+				.setUnitDecade( true )
+				.gridsOff()
+				.setUnitWrapper("(", ")")
+				.setSpan( 0, 0.2 )
+				.forceMin( 0 );
+
+		this.axis = axis;
+
+		return g;
+
+/*
+		this.graphs['pce'] = this.makePCEGraph( this.graphsRefs[ 'pce' ] );
+		this.graphs['power'] = this.makePowerGraph( this.graphsRefs[ 'power' ] );
+		this.graphs['jscvocff'] = this.makeJscVocFFGraph( this.graphsRefs[ 'jscvocff' ] );
+		this.graphs['lightTH'] = this.makeLightTemperatureHumidityGraph( this.graphsRefs[ g.graphRef ] );
+*/
 	}
 
 	updateGraphs() {
 
+		const graph = this.graph;
 
-		var nbShown = 0;
+		graph
+			.newSerie("pce")
+			.setLabel("PCE")
+			.setXAxis( graph.getBottomAxis( 1 ) )
+			.setYAxis( this.axis.pce )
+			.setLineColor( colors.pce )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.pce );
+
+
+		graph
+			.newSerie("power")
+			.setLabel("power")
+			.setXAxis( graph.getBottomAxis( 2 ) )
+			.setYAxis( this.axis.power )
+			.setLineColor( colors.power )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.power );
+
+		graph
+			.newSerie("current")
+			.setLabel("Current")
+			.setXAxis( graph.getBottomAxis( 2 ) )
+			.setYAxis( this.axis.j )
+			.setLineColor( colors.current )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.current );
+
+		graph
+			.newSerie("voltage")
+			.setLabel("Voltage")
+			.setXAxis( graph.getBottomAxis( 2 ) )
+			.setYAxis( this.axis.v )
+			.setLineColor( colors.voltage )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.voltage );
+
+		graph
+			.newSerie("ff")
+			.setLabel("Fill factor")
+			.setXAxis( graph.getBottomAxis( 3 ) )
+			.setYAxis( this.axis.ff )
+			.setLineColor( colors.ff )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.ff );
+
+		graph
+			.newSerie("jsc")
+			.setLabel("Short circuit current")
+			.setXAxis( graph.getBottomAxis( 3 ) )
+			.setYAxis( this.axis.jsc )
+			.setLineColor( colors.jsc )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.jsc );
+
+		graph
+			.newSerie("voc")
+			.setLabel("Open circuit voltage")
+			.setXAxis( graph.getBottomAxis( 3 ) )
+			.setYAxis( this.axis.voc )
+			.setLineColor( colors.voc )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.voc );
+
+		graph
+			.newSerie("temperature")
+			.setLabel("Temperature")
+			.autoAxis()
+			.setYAxis( this.axis.temperature )
+			.setLineColor( colors.temperature )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.temperature );
+
+		graph
+			.newSerie("sun")
+			.setLabel("Sun intensity")
+			.autoAxis()
+			.setYAxis( this.axis.light )
+			.setLineColor( colors.light )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.light );
+
+		graph
+			.newSerie("humidity")
+			.setLabel("Humidity")
+			.autoAxis()
+			.setYAxis( this.axis.humidity )
+			.setLineColor( colors.humidity )
+			.setLineWidth( 2 )
+			.setWaveform( this.data.humidity );
+
+
+			graph.autoscaleAxes();
+			graph.draw();
+		/*var nbShown = 0;
 
 		graphsCfg.forEach( ( g, index ) => {
 
@@ -581,7 +816,7 @@ class HTMLReport extends React.Component {
 				this.graphs[ ref ].setHeight( pageHeight / nbShown );
 				this.graphs[ ref ].draw();
 			}
-		}
+		}*/
 	}
 
 
@@ -669,7 +904,7 @@ class HTMLReport extends React.Component {
 	componentDidMount() {
 		this.updateProps( this.props );
 	//	ipcRenderer.on( "savePDF", this.savePDF );
-		this.makeGraphs();
+		this.graph = this.makeGraphs();
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -701,13 +936,15 @@ class HTMLReport extends React.Component {
 		} catch( e ) {
 			console.warn( e );
 		}
+		
+		this.data.ff = this.data.power.duplicate().divide( this.data.voc.duplicate().multiply( this.data.jsc ) ).multiply( 100 );
 			
 		while( this.domJV.firstChild ) {
 			this.domJV.removeChild( this.domJV.firstChild );
 		}
 
 		this.graphJV = new Graph( this.domJV, { 
-			fontSize: 15, 
+			fontSize: 14, 
 			paddingLeft: 0, 
 			paddingRight: 0, 
 			paddingTop: 10, 
@@ -738,6 +975,7 @@ class HTMLReport extends React.Component {
 		return influxquery( `SELECT time,voc FROM "${ props.measurementName }_voc" ORDER BY time`, db, props.db ).then( async ( results ) => {
 
 			if( ! results[ 0 ].series ) {
+				this.data.voc = Graph.newWaveform();
 				throw new Error(`No Voc data with the name "${props.measurementName}"`);
 			}
 
@@ -769,6 +1007,7 @@ class HTMLReport extends React.Component {
 		return influxquery( `SELECT time,jsc FROM "${ props.measurementName }_jsc" ORDER BY time`, db, props.db ).then( async ( results ) => {
 
 			if( ! results[ 0 ].series ) {
+				this.data.jsc = Graph.newWaveform();
 				throw new Error(`No Jsc data with the name "${props.measurementName}"`);
 			}
 
@@ -876,6 +1115,7 @@ class HTMLReport extends React.Component {
 				this.data.power = wavePower;
 				this.data.voltage = waveVoltage;
 				this.data.current = waveCurrent;
+				this.data.ff = Graph.newWaveform();
 				this.data.light = waveSun;
 				this.data.temperature = waveTemperature;
 				this.data.humidity = waveHumidity;
@@ -999,10 +1239,10 @@ class HTMLReport extends React.Component {
 						</div>
 	
 
-						<h4>Power conversion efficiencies</h4>
+						<h4>Power conversion efficiencies (MPP)</h4>
 
 						<div className="row">
-							<div className="col-xs-4">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
+							<div className="col-xs-3">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
 						</div>	
 						{!! this.state.data && !! this.state.data.timeEfficiencies && [					
 							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-3">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
@@ -1054,11 +1294,7 @@ class HTMLReport extends React.Component {
 
 					</div>	
 					<div className="col-xs-5">
-
-						{
-							graphsCfg.map( g => <div className={ this.props.config && this.props.config[ g.graphRef ] ? 'show' : 'hidden' } key={ g.graphRef } ref={ el => this.graphsRefs[ g.graphRef ] = el } /> )
-						}
-
+						<div id="graph" ref={ el => this.domGraph = el }></div>
 					</div>
 				</div>
 				<div className="row footer">

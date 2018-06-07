@@ -27,7 +27,11 @@ const address = ( cfg ) => {
 }
 
 export let ping = ( cfg ) => {
-	return fetch( address( cfg ) + "ping", { method: 'GET' } );
+	
+	return new Promise( ( resolver, rejecter ) => {
+		fetch( address( cfg ) + "ping", { method: 'GET' } ).then( data => resolver( data ) );
+		setTimeout( rejecter, 1000 );
+	});
 }
 
 export let checkAuth = async ( cfg, u, p, db ) => {
