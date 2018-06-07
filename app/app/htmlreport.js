@@ -1308,10 +1308,6 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						!!this.state.data && !!this.state.data.jv && this.state.data.jv.map((jv, index) => {
 
-							if (index > 4) {
-								return null;
-							}
-
 							return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								'div',
 								{ className: 'row ivData' },

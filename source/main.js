@@ -597,6 +597,8 @@ function loadInstrument( event, tracker ) {
   windows[ 'instrumentMain' ].once("close", () => {
     windows[ 'instrumentMain' ] = null;
   });
+
+  doMenu();
   
   openSocket( instrumentConfig );
 }

@@ -103,7 +103,7 @@
 			"host": "isicgesrv10.epfl.ch",
 			"username": "GMF",
 			"password": "Jd8h38dh_1.",
-			"port": 80,
+			"port": 8086,
 			"db": "GMF"
 		},
 

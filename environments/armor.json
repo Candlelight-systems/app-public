@@ -7,9 +7,6 @@
 				"version": "readonly",
 				"readonly": true,
 				"type": "pyranometer"
-			},
-			"heat": {
-				"version": "ssr_1.0"
 			}
 		},
 
@@ -22,11 +19,15 @@
 				},
 				"fsr": 30,
 				"voltageRange": 2.5,
+				"changeSpeed": false,
 
 				"groups": {
 
 					"Box 1": {
-
+						"resettable": false,
+						"autoZero": "device",
+						"manualLightIntensity": true,
+						
 						"displayDeviceInformation": {
 							"time_ellapsed": true,
 							"pce": true,
@@ -56,7 +57,7 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.1.103",
+				"trackerHost": "localhost",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081

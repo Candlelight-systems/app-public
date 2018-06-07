@@ -228,7 +228,7 @@ module.exports = require("react-dom");
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = {"instruments":[{"trackerHost":"128.178.118.3","trackerName":"Main Instrument","trackerPort":8080,"trackerPortWS":8081}],"database":{"host":"isicgesrv10.epfl.ch","username":"GMF","password":"Jd8h38dh_1.","port":80,"db":"GMF"},"githubtokens":{"issuetracker":"81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"}}
+module.exports = {"instruments":[{"trackerHost":"localhost","trackerName":"Main Instrument","trackerPort":8080,"trackerPortWS":8081}],"database":{"host":"localhost","username":"","password":"","port":8086,"db":"matahari"},"githubtokens":{"issuetracker":"81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"}}
 
 /***/ })
 /******/ ]);

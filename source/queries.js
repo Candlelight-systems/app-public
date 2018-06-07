@@ -53,7 +53,7 @@ export const saveChannelStatus = ( urlProps, newStatus ) => {
 
 
 export const saveChannelStatuses = ( urlProps, newStatuses ) => {
-	return fetchPOST( `${ buildURL( urlProps ) }setStatuses`, newStatus );
+	return fetchPOST( `${ buildURL( urlProps ) }setStatuses`, newStatuses );
 }
 
 export const resetChannelStatus = ( urlProps, instrumentId, chanId ) => {

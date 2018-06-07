@@ -23,7 +23,7 @@ function onClose() {
 
 
 function render( data ) {
-;
+
 	ReactDOM.render(
 	<CellForm 
 		instrumentConfig={ data.instrumentConfig } 

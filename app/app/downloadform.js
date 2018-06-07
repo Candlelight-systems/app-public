@@ -231,6 +231,11 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			waveNameX: "Time_MPP_h"
 		});
 
+		outputfile.addWaveform(data.power, {
+			waveName: "Power",
+			noXWave: true
+		});
+
 		outputfile.addWaveform(data.voltage, {
 			waveName: "Voltage",
 			noXWave: true
@@ -409,13 +414,14 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			    timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
 			    grouping = Math.max(1, Math.round(timeDifference / 1000));
 
-			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + this.props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db).then(results => {
+			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + this.props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db).then(results => {
 
 				let values = results[0].series[0].values,
 				    offset,
 				    waveEfficiency = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
 				    waveVoltage = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
 				    waveCurrent = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
+				    wavePower = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
 				    waveSun = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
 				    waveTemperature = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform(),
 				    waveHumidity = __WEBPACK_IMPORTED_MODULE_4_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
@@ -423,6 +429,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 				waveEfficiency.setUnit("%");
 				waveEfficiency.setXUnit("h");
 				waveVoltage.setUnit("V");
+				wavePower.setUnit("W");
 				waveCurrent.setUnit("mA cm-2");
 
 				waveSun.setUnit("-");
@@ -452,6 +459,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					waveEfficiency.append(time, value[1]);
 					waveVoltage.append(time, value[2]);
 					waveCurrent.append(time, value[3]);
+					wavePower.append(time, value[8]);
 					waveHumidity.append(time, value[4]);
 					waveSun.append(time, value[5]);
 					waveTemperature.append(time, value[6]);
@@ -468,6 +476,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 					sun: waveSun,
 					temperature: waveTemperature,
 					humidity: waveHumidity,
+					power: wavePower,
 
 					maxEfficiency: maxEfficiency,
 					finalEfficiency: finalEfficiency,

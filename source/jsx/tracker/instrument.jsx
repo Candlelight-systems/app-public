@@ -56,7 +56,13 @@ class TrackerInstrument extends React.Component {
   }
 
   async ping( props = this.props ) {
-    return ping( this.props.configDB ).catch( ( error ) => { 
+    return ping( this.props.configDB ).then( () => {
+
+      this.setState( {
+        error_influxdb: false
+      } );
+
+    }).catch( ( error ) => { 
 
       console.warn("Cannot reach influx DB. Error was: ", error );
       
@@ -64,7 +70,7 @@ class TrackerInstrument extends React.Component {
         error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
       } );
 
-      return Promise.reject();
+      return Promise.resolve();
 
     } );
   }
@@ -76,6 +82,7 @@ class TrackerInstrument extends React.Component {
       serverState: serverState, 
       error_tracker: false 
     } ); 
+
    } ).catch( ( error ) => {
 
     console.warn("Cannot retrieve channel statuses. Error was: ", error );
@@ -157,8 +164,6 @@ class TrackerInstrument extends React.Component {
         errorMethods: [ [ "Edit the instrument config", this.editInstrument ], [ "Retry", this.updateInstrument ] ] 
       } ); 
 
-
-
       return Promise.reject();
     } );
   }
@@ -184,8 +189,7 @@ class TrackerInstrument extends React.Component {
           groups: groups.groups,
           serverState: status,
           paused: status.paused,
-          error_influxdb: false,
-          error_tracker: false,
+          
           error: false
         } );
 
