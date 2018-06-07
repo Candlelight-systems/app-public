@@ -1268,10 +1268,7 @@ class HTMLReport extends React.Component {
 							{
 								!! this.state.data && !! this.state.data.jv && this.state.data.jv.map( ( jv, index ) => {
 									
-									if( index > 4 ) {
-										return null;
-									}
-
+								
 									return ( 
 
 									<div className="row ivData">

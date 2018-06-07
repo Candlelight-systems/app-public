@@ -421,6 +421,10 @@ class TrackerDevice extends React.Component {
 				return;
 			}
 
+			if( data.lightSource !== "manual" ) {
+				data.lightRefValue = 0;
+			}
+			
 			this.saveStatus( data );
 		});
 
@@ -513,7 +517,7 @@ console.log('update influx');
 		this.parameter = parameter;
 
 		let queries = [
-		`SELECT time, efficiency FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
+		`SELECT time, efficiency, power FROM "${ serverState.measurementName }" ORDER BY time ASC limit 1`,
 		`SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${ serverState.measurementName }" ORDER BY time DESC limit 1`,
 		`SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > '${ this.state._last_iv_time }'` : '' } ORDER BY time ASC`,
 		`SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`,

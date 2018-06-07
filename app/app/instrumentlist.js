@@ -489,7 +489,11 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 /* 11 */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{"version":"ssr_1.0"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+=======
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"changeSpeed":false,"groups":{"Box 1":{"resettable":false,"autoZero":"device","manualLightIntensity":true,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+>>>>>>> 483b477ba45a5c092e53a5a917f3a3668923deca
 
 /***/ }),
 /* 12 */

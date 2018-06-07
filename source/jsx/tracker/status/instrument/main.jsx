@@ -91,7 +91,7 @@ class InstrumentStatus extends React.Component {
 
 	render() {
 
-
+console.log(  this.props );
 		return ( 
 
 		<div className="col-lg-2 group-status group-status-instrument">

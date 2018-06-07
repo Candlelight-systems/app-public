@@ -43,11 +43,8 @@ class CellFormAll extends CellForm {
 
 		if( props.formState ) {
 			Object.assign( stateObj, props.formState );
-
 		}
 
-		console.log( props );
-	
 		this.setState( stateObj );
 				
 	}

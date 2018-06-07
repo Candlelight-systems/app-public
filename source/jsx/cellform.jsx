@@ -1,7 +1,7 @@
 import React from 'react';
 import CellFormTracking from "./cellformtracking.jsx"
 import CellFormIV from "./cellformjv.jsx"
-
+import environment from "../../app/environment.json"
 
 class CellForm extends React.Component {
 	
@@ -14,7 +14,8 @@ class CellForm extends React.Component {
 		this.state = {
 			cellArea: 0,
 			cellName: "",
-			connection: "group"
+			connection: "group",
+			lightSource: "pd_pyr"
 		};
 		this.close = this.close.bind( this );
 	}
@@ -50,11 +51,17 @@ class CellForm extends React.Component {
 
 
 		this.setState( this.props.formState );
+		this.setState( { lightSource: this.props.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
+
+	
 	}
 
 	componentWillReceiveProps( nextProps ) {
 
 		this.setState( nextProps.formState );
+		this.setState( { lightSource: nextProps.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
+
+	
 	}
 
 	render() {	 
@@ -62,12 +69,15 @@ class CellForm extends React.Component {
 		let active = !! this.state.enable && this.state.tracking_mode > 0;
 		let groups = this.props.instrumentConfig.groups;
 		let relayController = false;
+		
+		let lightSourceSelect = environment.instrument[ this.props.instrumentConfig.instrumentId ].groups[ this.props.groupName ].manualLightIntensity;
+
 		for( var i = 0; i < groups.length; i ++ ) {
 			if( groups[ i ].groupName == this.props.groupName ) {
 				relayController = groups[ i ].dualOutput || groups[ i ].relayController;
 			}
 		}
-
+console.log( this.state );
 		return (
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
@@ -119,7 +129,27 @@ class CellForm extends React.Component {
 						</div>
 					}
 
-					{ this.state.connection ==  "external" &&
+					{ lightSourceSelect &&
+						<div className="form-group">
+							<label htmlFor="cellarea" className="col-sm-3">Light source</label>
+							<div className="col-sm-9">
+
+								<div className="radio">
+									<label>
+										<input type="radio" name="lightSource" value="pd_pyr" onClick={ this.handleInputChange } checked={ this.state.lightSource == 'pd_pyr' } /> Photodiode / Pyranometer
+									</label>
+								</div>
+							
+								<div className="radio">
+									<label>
+										<input type="radio" name="lightSource" value="manual" onClick={ this.handleInputChange } checked={ this.state.lightSource == 'manual' } /> Manual value
+									</label>
+								</div>
+							</div>
+						</div>
+					}
+
+					{ ( this.state.connection ==  "external" || this.state.lightSource == "manual" ) &&
 						<div className="form-group">
 							<label htmlFor="cellarea" className="col-sm-3">Light intensity</label>
 							<div className="col-sm-9">
@@ -145,8 +175,6 @@ class CellForm extends React.Component {
 					<CellFormIV {...this.state} onFormChange={ this.subFormChanged } />
 				</div>
 			
-			
-
 				</div>
 			</form>
 

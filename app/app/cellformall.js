@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -76,7 +76,7 @@ module.exports = require("react");
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_environment_json__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_environment_json__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__app_environment_json__);
 
 
@@ -648,6 +648,12 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"changeSpeed":false,"groups":{"Box 1":{"resettable":false,"autoZero":"device","manualLightIntensity":true,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+
+/***/ }),
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -834,23 +840,23 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 /* harmony default export */ __webpack_exports__["a"] = (CellFormTracking);
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(4);
+module.exports = __webpack_require__(5);
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_cellformall_jsx__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__jsx_cellformall_jsx__ = __webpack_require__(7);
 
 
 
@@ -886,20 +892,20 @@ function render(data) {
 }
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__ = __webpack_require__(8);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -949,8 +955,6 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 		if (props.formState) {
 			Object.assign(stateObj, props.formState);
 		}
-
-		console.log(props);
 
 		this.setState(stateObj);
 	}
@@ -1145,12 +1149,15 @@ class CellFormAll extends __WEBPACK_IMPORTED_MODULE_3__cellform_jsx__["a" /* def
 /* harmony default export */ __webpack_exports__["a"] = (CellFormAll);
 
 /***/ }),
+<<<<<<< HEAD
 /* 7 */
 /***/ (function(module, exports) {
 
 module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{"version":"ssr_1.0"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
 
 /***/ }),
+=======
+>>>>>>> 483b477ba45a5c092e53a5a917f3a3668923deca
 /* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1158,8 +1165,11 @@ module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","reado
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__cellformtracking_jsx__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cellformjv_jsx__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__app_environment_json__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 
 
 
@@ -1175,7 +1185,8 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		this.state = {
 			cellArea: 0,
 			cellName: "",
-			connection: "group"
+			connection: "group",
+			lightSource: "pd_pyr"
 		};
 		this.close = this.close.bind(this);
 	}
@@ -1208,11 +1219,13 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		});
 
 		this.setState(this.props.formState);
+		this.setState({ lightSource: this.props.formState.lightRefValue > 0 ? 'manual' : 'pd_pyr' });
 	}
 
 	componentWillReceiveProps(nextProps) {
 
 		this.setState(nextProps.formState);
+		this.setState({ lightSource: nextProps.formState.lightRefValue > 0 ? 'manual' : 'pd_pyr' });
 	}
 
 	render() {
@@ -1220,12 +1233,15 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		let active = !!this.state.enable && this.state.tracking_mode > 0;
 		let groups = this.props.instrumentConfig.groups;
 		let relayController = false;
+
+		let lightSourceSelect = __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].groups[this.props.groupName].manualLightIntensity;
+
 		for (var i = 0; i < groups.length; i++) {
 			if (groups[i].groupName == this.props.groupName) {
 				relayController = groups[i].dualOutput || groups[i].relayController;
 			}
 		}
-
+		console.log(this.state);
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "container-fluid" },
@@ -1354,7 +1370,40 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 								)
 							)
 						),
-						this.state.connection == "external" && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						lightSourceSelect && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"div",
+							{ className: "form-group" },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"label",
+								{ htmlFor: "cellarea", className: "col-sm-3" },
+								"Light source"
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "col-sm-9" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "lightSource", value: "pd_pyr", onClick: this.handleInputChange, checked: this.state.lightSource == 'pd_pyr' }),
+										" Photodiode / Pyranometer"
+									)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "lightSource", value: "manual", onClick: this.handleInputChange, checked: this.state.lightSource == 'manual' }),
+										" Manual value"
+									)
+								)
+							)
+						),
+						(this.state.connection == "external" || this.state.lightSource == "manual") && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
 							{ className: "form-group" },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

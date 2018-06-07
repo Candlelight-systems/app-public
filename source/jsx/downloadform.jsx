@@ -87,6 +87,11 @@ class DownloadForm extends React.Component {
 			waveNameX: "Time_MPP_h"
 		} );
 
+		outputfile.addWaveform( data.power, { 
+			waveName: "Power",
+			noXWave: true
+		} );
+
 		outputfile.addWaveform( data.voltage, { 
 			waveName: "Voltage",
 			noXWave: true
@@ -272,13 +277,14 @@ class DownloadForm extends React.Component {
 				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
 				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
 
-			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + this.props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
+			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + this.props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
 	
 				let values = results[ 0 ].series[ 0 ].values,
 					offset,
 					waveEfficiency = Graph.newWaveform(),
 					waveVoltage = Graph.newWaveform(),
 					waveCurrent = Graph.newWaveform(),
+					wavePower = Graph.newWaveform(),
 					waveSun = Graph.newWaveform(),
 					waveTemperature = Graph.newWaveform(),
 					waveHumidity = Graph.newWaveform();
@@ -286,6 +292,7 @@ class DownloadForm extends React.Component {
 				waveEfficiency.setUnit("%");
 				waveEfficiency.setXUnit("h");
 				waveVoltage.setUnit("V");
+				wavePower.setUnit("W");
 				waveCurrent.setUnit("mA cm-2");
 
 				waveSun.setUnit("-");
@@ -315,6 +322,7 @@ class DownloadForm extends React.Component {
 					waveEfficiency.append( time, value[ 1 ] );					
 					waveVoltage.append( time, value[ 2 ] );					
 					waveCurrent.append( time, value[ 3 ] );
+					wavePower.append( time, value[ 8 ] );
 					waveHumidity.append( time, value[ 4 ] );
 					waveSun.append( time, value[ 5 ] );
 					waveTemperature.append( time, value[ 6 ] );		
@@ -331,6 +339,7 @@ class DownloadForm extends React.Component {
 					sun: waveSun,
 					temperature: waveTemperature, 
 					humidity: waveHumidity,
+					power: wavePower,
 
 					maxEfficiency: maxEfficiency,
 					finalEfficiency: finalEfficiency,

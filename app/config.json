@@ -1,14 +1,22 @@
 {
 	"instruments": [
 		{
+<<<<<<< HEAD
 			"trackerHost": "172.18.10.10",
+=======
+			"trackerHost": "localhost",
+>>>>>>> 483b477ba45a5c092e53a5a917f3a3668923deca
 			"trackerName": "Main Instrument",
 			"trackerPort": 8080,
 			"trackerPortWS": 8081
 		}
 	],
 	"database": {
+<<<<<<< HEAD
 		"host": "172.18.7.248",
+=======
+		"host": "localhost",
+>>>>>>> 483b477ba45a5c092e53a5a917f3a3668923deca
 		"username": "",
 		"password": "",
 		"port": 8086,

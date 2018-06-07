@@ -79,7 +79,11 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"},"heat":{"version":"ssr_1.0"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"groups":{"Box 1":{"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+=======
+module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"changeSpeed":false,"groups":{"Box 1":{"resettable":false,"autoZero":"device","manualLightIntensity":true,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+>>>>>>> 483b477ba45a5c092e53a5a917f3a3668923deca
 
 /***/ }),
 /* 3 */
@@ -332,9 +336,9 @@ const saveChannelStatus = (urlProps, newStatus) => {
 
 
 const saveChannelStatuses = (urlProps, newStatuses) => {
-	return fetchPOST(`${buildURL(urlProps)}setStatuses`, newStatus);
+	return fetchPOST(`${buildURL(urlProps)}setStatuses`, newStatuses);
 };
-/* unused harmony export saveChannelStatuses */
+/* harmony export (immutable) */ __webpack_exports__["h"] = saveChannelStatuses;
 
 
 const resetChannelStatus = (urlProps, instrumentId, chanId) => {
@@ -781,7 +785,12 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
   }
 
   async ping(props = this.props) {
-    return Object(__WEBPACK_IMPORTED_MODULE_6__influx__["a" /* ping */])(this.props.configDB).catch(error => {
+    return Object(__WEBPACK_IMPORTED_MODULE_6__influx__["a" /* ping */])(this.props.configDB).then(() => {
+
+      this.setState({
+        error_influxdb: false
+      });
+    }).catch(error => {
 
       console.warn("Cannot reach influx DB. Error was: ", error);
 
@@ -789,7 +798,7 @@ class TrackerInstrument extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
         error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
       });
 
-      return Promise.reject();
+      return Promise.resolve();
     });
   }
 
@@ -964,8 +973,7 @@ var _initialiseProps = function () {
         groups: groups.groups,
         serverState: status,
         paused: status.paused,
-        error_influxdb: false,
-        error_tracker: false,
+
         error: false
       });
     }).catch(e => {});
@@ -1079,8 +1087,8 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
         data.chanStatuses[chanIds[i]] = Object.assign({}, response, { cellName: response["__cellName_" + chanIds[i]] });
         //delete response["__cellName_" + chanIds[ i ] ];
       }
-
-      return Object(__WEBPACK_IMPORTED_MODULE_6__queries__["setChannelStatuses"])(this.props.config, data);
+      console.log(data);
+      return Object(__WEBPACK_IMPORTED_MODULE_6__queries__["h" /* saveChannelStatuses */])(this.props.config, data);
     });
 
     __WEBPACK_IMPORTED_MODULE_2_electron__["ipcRenderer"].send("configChannels", {
@@ -1728,6 +1736,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				return;
 			}
 
+			if (data.lightSource !== "manual") {
+				data.lightRefValue = 0;
+			}
+
 			this.saveStatus(data);
 		});
 
@@ -1814,7 +1826,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 		this.parameter = parameter;
 
-		let queries = [`SELECT time, efficiency FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
+		let queries = [`SELECT time, efficiency, power FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
 		//console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
@@ -5174,6 +5186,7 @@ class InstrumentStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 
 	render() {
 
+		console.log(this.props);
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			"div",
 			{ className: "col-lg-2 group-status group-status-instrument" },

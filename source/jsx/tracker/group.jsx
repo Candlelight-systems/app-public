@@ -6,7 +6,7 @@ import HeatStatus from './status/heat/main.jsx';
 import InstrumentStatus from './status/instrument/main.jsx'
 
 
-import { setChannelStatuses } from '../../queries'
+import { saveChannelStatuses } from '../../queries'
 
 class TrackerGroupDevices extends React.Component {
 
@@ -96,8 +96,8 @@ class TrackerGroupDevices extends React.Component {
         data.chanStatuses[ chanIds[ i ] ] = Object.assign( {}, response, { cellName: response["__cellName_" + chanIds[ i ] ] } );
         //delete response["__cellName_" + chanIds[ i ] ];
       }
-
-      return setChannelStatuses( this.props.config, data )
+console.log( data );
+      return saveChannelStatuses( this.props.config, data )
     });
 
   
