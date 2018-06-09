@@ -422,10 +422,12 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
     let cfg;
 
     try {
-
+      console.log(__dirname, __WEBPACK_IMPORTED_MODULE_2_fs___default.a.readFileSync(__dirname + '/../config.json'));
       cfg = JSON.parse(__WEBPACK_IMPORTED_MODULE_2_fs___default.a.readFileSync(__dirname + '/../config.json'));
+      console.log(cfg);
       cfg.instruments = cfg.instruments || [];
     } catch (e) {
+      console.error(e);
       return null;
     }
 

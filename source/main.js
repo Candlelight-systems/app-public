@@ -168,15 +168,21 @@ function doMenu() {
 
 function saveConfig( ) {
   
-  fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
+  return new Promise( ( resolver, rejecter ) => {
 
-    if( error ) {
-      reportError( error );
-    } else {
-      config = JSON.parse( fs.readFileSync( configPath ) );    
-    }
-    
-  }); 
+    fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
+
+      if( error ) {
+        reportError( error );
+        rejecter( error );
+      } else {
+        config = JSON.parse( fs.readFileSync( configPath ) );    
+        resolver( );
+      }
+      
+    });  
+  })  
+   
 }
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -258,10 +264,10 @@ async function downloadData( event, tracker, measurementName, chanId ) {
         height: 800,
         resizable: false
 
-      } ).then( ( result ) => {
+      } ).then( async ( result ) => {
       
         config.instruments.push( result );
-        saveConfig();
+        await saveConfig();
         reloadInstruments();
 
       } ).catch( () => {} );
@@ -469,7 +475,7 @@ function removeInstrument( event, trackerHost ) {
     defaultId: 0,
     title: "Remove the instrument",
     buttons: [ "Cancel", "Yes" ]    
-  }, ( index ) => {
+  }, async ( index ) => {
 
     if( index == 1 ) {
 
@@ -481,7 +487,7 @@ function removeInstrument( event, trackerHost ) {
 
       } );
 
-      saveConfig();
+      await saveConfig();
       reloadInstruments();
     }
 
@@ -515,11 +521,11 @@ function addInstrument() {
     height: 800,
     resizable: false
 
-  } ).then( ( result ) => {
+  } ).then( async ( result ) => {
     
     try {
       config.instruments.push( result );
-      saveConfig();
+      await saveConfig();
       reloadInstruments();
     } catch( e ) {
       reportError( e );
@@ -624,10 +630,10 @@ function editInstrument( event, trackerHost ) {
     height: 800,
     resizable: false
 
-  }  ).then( ( results ) => {
+  }  ).then( async ( results ) => {
 
     Object.assign( data, results );
-    saveConfig();
+    await saveConfig();
 
     if( windows[ 'instrumentMain' ] ) {
       windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: data, db: config.database } ); 
