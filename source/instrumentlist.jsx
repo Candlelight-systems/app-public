@@ -7,6 +7,7 @@ import environment from "../app/environment.json"
 import { ping, checkAuth, checkDB } from "./influx"
 
 let influx_error = undefined;
+let influx_warning = undefined;
 
 ipcRenderer.on("reloadInstruments", () => {
   render();
@@ -23,13 +24,18 @@ ipcRenderer.on("dbInformation", async ( event, db ) => {
       await checkDB( db, db.username, db.password, db.db );
       await checkAuth( db, db.username, db.password, db.db );
 
+      influx_warning = false;
+      influx_error = false;
+
     } catch( e ) {
-      console.error( e );
+      
       // No privileges doesn't mean no write access...
-      if( e === "No user defined" || e === "User not found" || e === "No privileges found" ) {
+      if( e === "No user defined" || e === "User not found" || e === "No privileges found" || e === "Bad credentials" ) {
         // Ok that's fine
+        influx_warning = true;
+        influx_error = false;
       } else {
-      console.log('sdf');
+        influx_warning = false;
         influx_error = true;
       }
     }
@@ -52,17 +58,15 @@ function render( ) {
 
   let status = null;
 
-  if( influx_error !== undefined ) {
-    switch( influx_error ) {
-
-      case true:
-        status =<span className="text-warning"><span className="glyphicon glyphicon-warning-sign"></span> Cannot connect</span>;
-      break;
-
-      case false:
-        status =<span className="text-success"><span className="glyphicon glyphicon-check"></span> Connection ok</span>;
-      break;
-    }
+  if( influx_error !== undefined && influx_warning !== undefined ) {
+    
+      if( influx_error ) {
+        status = <span className="text-danger"><span className="glyphicon glyphicon-remove"></span> Cannot connect</span>;
+      } else if ( influx_warning ) {
+        status = <span className="text-warning"><span className="glyphicon glyphicon-warning-sign"></span> Partial DB access</span>;
+      } else {
+        status = <span className="text-success"><span className="glyphicon glyphicon-check"></span> Connection ok</span>;
+      }
   }
 
   ReactDOM.render(

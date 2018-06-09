@@ -33,7 +33,7 @@ function pad( number ) {
 
 function downloadData( measurementName ) {
 
-	ipcRenderer.send( "downloadData", data.config, this.state.serverState.measurementName );
+	ipcRenderer.send( "downloadData", data.config, measurementName );
 }
 
 
@@ -107,7 +107,7 @@ async function render( ) {
 			return a.startDate - b.startDate;
 		} );
 
-
+		let tracking;
 
 		ReactDOM.render(
 			<div className="container-fluid">
@@ -118,10 +118,7 @@ async function render( ) {
 				{ jsonArray.map( ( val ) => { 
 
 					switch( val.cellInfo.trackingMode ) {
-						case 'MPP':
-							tracking = 'Maximum power point'
-						break;
-
+						
 						case 'CONSTV':
 							tracking = `Constant voltage`;
 						break;
@@ -132,6 +129,14 @@ async function render( ) {
 
 						case 'VOC':
 							tracking = `Open circuit voltage`;
+						break;
+
+						case 'MPP':
+							tracking = 'Maximum power point'
+						break;
+
+						default:
+							tracking = 'N/A';
 						break;
 					}
 
@@ -165,9 +170,10 @@ async function render( ) {
 
 
 	} catch( error ) {
-
+console.log( error );
 		ReactDOM.render(
 			<div>
+
 	          <Error message={ error.props } errorMethods={ [ [ "Try again", render ] ] } />
 	        </div> ,
 			document.getElementById('root')

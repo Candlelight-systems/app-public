@@ -743,7 +743,7 @@ function pad(number) {
 
 function downloadData(measurementName) {
 
-	__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].send("downloadData", data.config, this.state.serverState.measurementName);
+	__WEBPACK_IMPORTED_MODULE_5_electron__["ipcRenderer"].send("downloadData", data.config, measurementName);
 }
 
 function removeData(measurementName) {
@@ -812,6 +812,8 @@ async function render() {
 			return a.startDate - b.startDate;
 		});
 
+		let tracking;
+
 		__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
 			{ className: 'container-fluid' },
@@ -826,9 +828,6 @@ async function render() {
 				jsonArray.map(val => {
 
 					switch (val.cellInfo.trackingMode) {
-						case 'MPP':
-							tracking = 'Maximum power point';
-							break;
 
 						case 'CONSTV':
 							tracking = `Constant voltage`;
@@ -840,6 +839,14 @@ async function render() {
 
 						case 'VOC':
 							tracking = `Open circuit voltage`;
+							break;
+
+						case 'MPP':
+							tracking = 'Maximum power point';
+							break;
+
+						default:
+							tracking = 'N/A';
 							break;
 					}
 
@@ -889,7 +896,7 @@ async function render() {
 			)
 		), document.getElementById('root'));
 	} catch (error) {
-
+		console.log(error);
 		__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
 			null,

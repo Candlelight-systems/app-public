@@ -120,6 +120,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 let influx_error = undefined;
+let influx_warning = undefined;
 
 __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("reloadInstruments", () => {
   render();
@@ -135,13 +136,18 @@ __WEBPACK_IMPORTED_MODULE_4_electron__["ipcRenderer"].on("dbInformation", async 
     await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["c" /* ping */])(db);
     await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["b" /* checkDB */])(db, db.username, db.password, db.db);
     await Object(__WEBPACK_IMPORTED_MODULE_6__influx__["a" /* checkAuth */])(db, db.username, db.password, db.db);
+
+    influx_warning = false;
+    influx_error = false;
   } catch (e) {
-    console.error(e);
+
     // No privileges doesn't mean no write access...
-    if (e === "No user defined" || e === "User not found" || e === "No privileges found") {
+    if (e === "No user defined" || e === "User not found" || e === "No privileges found" || e === "Bad credentials") {
       // Ok that's fine
+      influx_warning = true;
+      influx_error = false;
     } else {
-      console.log('sdf');
+      influx_warning = false;
       influx_error = true;
     }
   }
@@ -161,26 +167,29 @@ function render() {
 
   let status = null;
 
-  if (influx_error !== undefined) {
-    switch (influx_error) {
+  if (influx_error !== undefined && influx_warning !== undefined) {
 
-      case true:
-        status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'span',
-          { className: 'text-warning' },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-warning-sign' }),
-          ' Cannot connect'
-        );
-        break;
-
-      case false:
-        status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'span',
-          { className: 'text-success' },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-check' }),
-          ' Connection ok'
-        );
-        break;
+    if (influx_error) {
+      status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'span',
+        { className: 'text-danger' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-remove' }),
+        ' Cannot connect'
+      );
+    } else if (influx_warning) {
+      status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'span',
+        { className: 'text-warning' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-warning-sign' }),
+        ' Partial DB access'
+      );
+    } else {
+      status = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'span',
+        { className: 'text-success' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'glyphicon glyphicon-check' }),
+        ' Connection ok'
+      );
     }
   }
 
@@ -487,7 +496,7 @@ class InstrumentList extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compo
 /* 11 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true,"type":"pyranometer"}},"instrument":{"Outdoor modules":{"ADC":{"model":"ADS1259"},"fsr":30,"voltageRange":2.5,"changeSpeed":false,"groups":{"Box 1":{"resettable":false,"autoZero":"device","manualLightIntensity":true,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":true,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":false,"humidity":false,"kwh_yr":true}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 12 */

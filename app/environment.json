@@ -2,37 +2,67 @@
 	"ageing": true,
 	"statuses": {
 		"light": {
-			"version": "readonly",
-			"readonly": true,
-			"type": "pyranometer"
+			"version": "2.0",
+			"readonly": false
 		}
 	},
 	"instrument": {
-		"Outdoor modules": {
+		"Top port": {
 			"ADC": {
 				"model": "ADS1259"
 			},
-			"fsr": 30,
-			"voltageRange": 2.5,
 			"changeSpeed": false,
+			"fsr": 30,
+			"LSB": 1.22,
+			"LSBValue": 1,
+			"voltageRange": 2.5,
+			"autoZero": "instrument",
 			"groups": {
-				"Box 1": {
+				"Sample holder": {
 					"resettable": false,
-					"autoZero": "device",
-					"manualLightIntensity": true,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
 						"pce": true,
-						"power": true,
+						"power": false,
 						"sun": true,
 						"voc": true,
 						"jsc": true,
 						"ff": true,
 						"vnow": true,
 						"jnow": true,
-						"temperature": false,
-						"humidity": false,
-						"kwh_yr": true
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				}
+			}
+		},
+		"Bottom port": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"changeSpeed": false,
+			"fsr": 30,
+			"LSB": 1.22,
+			"LSBValue": 1,
+			"voltageRange": 2.5,
+			"autoZero": "instrument",
+			"groups": {
+				"Sample holder": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
 					}
 				}
 			}
