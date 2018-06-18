@@ -1521,16 +1521,22 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		if (!isNaN(data.timer.iv)) {
 			// Timer for the next IV curve
 			newState.timer_nextIV = { time: data.timer.iv, updated: Date.now() };
+		} else if (data.timer.iv === null) {
+			newState.timer_nextIV = { time: null, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.jsc)) {
 			// Timer for the next JSC measurement
 			newState.timer_nextJsc = { time: data.timer.jsc, updated: Date.now() };
+		} else if (data.timer.jsc === null) {
+			newState.timer_nextJsc = { time: null, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.voc)) {
 			// Timer for the next Voc curve
 			newState.timer_nextVoc = { time: data.timer.voc, updated: Date.now() };
+		} else if (data.timer.voc === null) {
+			newState.timer_nextVoc = { time: null, updated: Date.now() };
 		}
 
 		if (!isNaN(data.timer.aquisition)) {
@@ -1586,8 +1592,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			//if( ! this.state.data ) {
 			newState.data = statedata;
 			//}
-
-			console.log(newState);
 		}
 
 		if (data.action.ivCurve) {
@@ -3280,6 +3284,11 @@ class Timer extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
     this.interval = setInterval(() => {
 
       if (this.props.timerValue === undefined || isNaN(this.props.timerValue.time)) {
+        return;
+      }
+
+      if (this.props.timerValue.time === null) {
+        this.setState({ timerValue: NaN });
         return;
       }
 

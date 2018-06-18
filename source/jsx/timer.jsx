@@ -18,6 +18,11 @@ class Timer extends React.Component {
         return;
       }
 
+      if( this.props.timerValue.time === null ) {
+        this.setState( { timerValue: NaN });
+        return;
+      }
+
       if( this.props.direction == 'ascending' ) {
 
         this.setState( { 

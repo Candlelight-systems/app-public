@@ -205,14 +205,20 @@ class TrackerDevice extends React.Component {
 
 		if(  ! isNaN( data.timer.iv ) ) {	// Timer for the next IV curve
 			newState.timer_nextIV = { time: data.timer.iv, updated: Date.now() };
+		} else if( data.timer.iv === null ) {
+			newState.timer_nextIV = { time: null, updated: Date.now() };
 		}
 
 		if(  ! isNaN( data.timer.jsc ) ) {	// Timer for the next JSC measurement
 			newState.timer_nextJsc = { time: data.timer.jsc, updated: Date.now() };
+		} else if( data.timer.jsc === null ) {
+			newState.timer_nextJsc = { time: null, updated: Date.now() };
 		}
 
 		if(  ! isNaN( data.timer.voc ) ) {	// Timer for the next Voc curve
-			newState.timer_nextVoc ={ time: data.timer.voc, updated: Date.now() };
+			newState.timer_nextVoc = { time: data.timer.voc, updated: Date.now() };
+		} else if( data.timer.voc === null ) {
+			newState.timer_nextVoc = { time: null, updated: Date.now() };
 		}
 
 		if( ! isNaN( data.timer.aquisition ) ) {	// Timer for the last aquisition
@@ -268,7 +274,6 @@ class TrackerDevice extends React.Component {
 				newState.data = statedata;			
 			//}
 
-			console.log( newState );
 		}
 
 		if( data.action.ivCurve ) {
