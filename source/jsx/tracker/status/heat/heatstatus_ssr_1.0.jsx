@@ -1,6 +1,8 @@
 import React from 'react';
 import { ipcRenderer } from "electron";
 import urllib from 'url-lib';
+import environment from "../../../../../app/environment.json"
+
 
 class HeatStatus extends React.Component {
 
@@ -163,7 +165,7 @@ class HeatStatus extends React.Component {
 
   componentDidUpdate( prevProps ) {
 
-    if( this.buttonHeatCool && this.buttonMode && ! this.transformed ) {
+    if( this.buttonHeatCool && ! this.transformed ) {
 
       $( this.buttonHeatCool ).bootstrapToggle({
         on: 'Cooling',
@@ -186,6 +188,9 @@ class HeatStatus extends React.Component {
 
         } );
       } );      
+    }
+
+    if( this.buttonMode && ! this.transformed ) {
 
       $( this.buttonMode ).bootstrapToggle({
         on: 'PID',
@@ -211,9 +216,12 @@ class HeatStatus extends React.Component {
       } );      
 
 
-      this.transformed = true;
     }
 
+
+    if( ! this.transformed ) {
+      this.transformed = true;
+    }
     if( this.buttonHeatCool ) {
      $( this.buttonHeatCool ).data('bs.toggle')[( this.state.heater_cooling ? 'on' : 'off' ) ]( true );
     }
@@ -241,6 +249,7 @@ class HeatStatus extends React.Component {
 
               <h4>Control</h4>
 
+              { environment.statuses.heat.switch !== false && 
               <div className="row">
                 <div className="col-lg-5">
                   Polarity
@@ -252,7 +261,7 @@ class HeatStatus extends React.Component {
                   </label>
                 </div>
               </div>
-
+            }
 
                <div className="row">
                 <div className="col-lg-5">

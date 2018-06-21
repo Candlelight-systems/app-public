@@ -79,7 +79,7 @@ module.exports = require("electron");
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0","switch":false}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"device","groups":{"Slot Left":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}},"Slot Right":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Modules A":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":400,"LSB":4.88,"LSBValue":1,"voltageRange":10,"autoZero":"devices","groups":{"Module 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}},"Module 2":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Modules B":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":400,"LSB":4.88,"LSBValue":1,"voltageRange":10,"autoZero":"devices","groups":{"Module 3":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}},"Module 4":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 3 */
@@ -2158,7 +2158,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 		//console.log( this.props, instrumentEnvironment );
 		const displayElements = instrumentEnvironment[this.props.instrumentId].groups[this.props.groupName].displayDeviceInformation;
-		const button_autozero = instrumentEnvironment[this.props.instrumentId].groups[this.props.groupName].autoZero == "device" ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
+		const button_autozero = instrumentEnvironment[this.props.instrumentId].autoZero == "device" ? __WEBPACK_IMPORTED_MODULE_8_react___default.a.createElement(
 			"button",
 			{ className: "btn btn-cl", onClick: this.autoZero },
 			" Auto zero"
@@ -4521,6 +4521,9 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_url_lib___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_url_lib__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__app_environment_json__);
+
 
 
 
@@ -4681,7 +4684,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 
   componentDidUpdate(prevProps) {
 
-    if (this.buttonHeatCool && this.buttonMode && !this.transformed) {
+    if (this.buttonHeatCool && !this.transformed) {
 
       $(this.buttonHeatCool).bootstrapToggle({
         on: 'Cooling',
@@ -4702,6 +4705,9 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
           __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to switch the heater polarity");
         });
       });
+    }
+
+    if (this.buttonMode && !this.transformed) {
 
       $(this.buttonMode).bootstrapToggle({
         on: 'PID',
@@ -4722,10 +4728,11 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
           __WEBPACK_IMPORTED_MODULE_1_electron__["ipcRenderer"].send("reportError", "Unable to change the heating mode");
         });
       });
-
-      this.transformed = true;
     }
 
+    if (!this.transformed) {
+      this.transformed = true;
+    }
     if (this.buttonHeatCool) {
       $(this.buttonHeatCool).data('bs.toggle')[this.state.heater_cooling ? 'on' : 'off'](true);
     }
@@ -4762,7 +4769,7 @@ class HeatStatus extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
           null,
           'Control'
         ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.statuses.heat.switch !== false && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { className: 'row' },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

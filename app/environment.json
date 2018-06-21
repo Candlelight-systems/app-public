@@ -4,10 +4,14 @@
 		"light": {
 			"version": "2.0",
 			"readonly": false
+		},
+		"heat": {
+			"version": "ssr_1.0",
+			"switch": false
 		}
 	},
 	"instrument": {
-		"Top port": {
+		"Small cells": {
 			"ADC": {
 				"model": "ADS1259"
 			},
@@ -16,9 +20,26 @@
 			"LSB": 1.22,
 			"LSBValue": 1,
 			"voltageRange": 2.5,
-			"autoZero": "instrument",
+			"autoZero": "device",
 			"groups": {
-				"Sample holder": {
+				"Slot Left": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				},
+				"Slot Right": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
@@ -37,18 +58,82 @@
 				}
 			}
 		},
-		"Bottom port": {
+		"Modules A": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
-			"fsr": 30,
-			"LSB": 1.22,
+			"fsr": 400,
+			"LSB": 4.88,
 			"LSBValue": 1,
-			"voltageRange": 2.5,
-			"autoZero": "instrument",
+			"voltageRange": 10,
+			"autoZero": "devices",
 			"groups": {
-				"Sample holder": {
+				"Module 1": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				},
+				"Module 2": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				}
+			}
+		},
+		"Modules B": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"changeSpeed": false,
+			"fsr": 400,
+			"LSB": 4.88,
+			"LSBValue": 1,
+			"voltageRange": 10,
+			"autoZero": "devices",
+			"groups": {
+				"Module 3": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				},
+				"Module 4": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,

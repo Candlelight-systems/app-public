@@ -866,7 +866,7 @@ console.log('update influx');
 
 		//console.log( this.props, instrumentEnvironment );
 		const displayElements = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].displayDeviceInformation;
-		const button_autozero = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].autoZero == "device" ? <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button> : null;
+		const button_autozero = instrumentEnvironment[ this.props.instrumentId ].autoZero == "device" ? <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button> : null;
 
 		if( active ) {
 

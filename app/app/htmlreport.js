@@ -659,7 +659,12 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		}, (index, color) => {
 
 			const table = document.getElementById('ivTable');
-			table.children[index + 1].style.color = color;
+
+			if (this.jvDom[index]) {
+				this.jvDom[index].style.color = color;
+			}
+
+			//	table.children[ index + 1 ].style.color = color;
 		});
 
 		//graph.makeLegend( { isSerieHideable: false, frame: false, paddingTop: 5, paddingBottom: 0 } ).setAutoPosition( "bottom" );
@@ -859,10 +864,10 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						time = (date.getTime() - this.offset) / 1000 / 3600;
 					}
 
-					if (value[1] > 35 || value[1] < 0) {// Higher than 35% => fail. Lower than 0% => fail.
-						//	value[ 1 ] = NaN;
-						//value[ 2 ] = NaN;
-					}
+					//	if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
+					//	value[ 1 ] = NaN;
+					//value[ 2 ] = NaN;
+					//	}
 
 					waveEfficiency.append(time, value[1]);
 					wavePower.append(time, value[2] * value[3]);
@@ -956,6 +961,23 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 	}
 
 	render() {
+
+		this.jvDom = [];
+
+		let indexSpacing,
+		    lastIndex = 0;
+
+		try {
+			indexSpacing = this.state.data.jv.length / 9;
+		} catch (e) {
+			indexSpacing = 1;
+		}
+
+		if (indexSpacing < 1) {
+			indexSpacing = 0;
+		}
+
+		console.log(indexSpacing);
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
@@ -1308,46 +1330,52 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						),
 						!!this.state.data && !!this.state.data.jv && this.state.data.jv.map((jv, index) => {
 
-							return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								'div',
-								{ className: 'row ivData' },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							if (!lastIndex || index - lastIndex >= indexSpacing) {
+
+								lastIndex = lastIndex + indexSpacing;
+								return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 									'div',
-									{ className: 'col-xs-3' },
-									jv.ellapsed,
-									' h'
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.voc) ? 'N/A' : jv.waveInfo.voc.toPrecision(3)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.jsc) ? 'N/A' : jv.waveInfo.jsc.toPrecision(3)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.ff) ? 'N/A' : jv.waveInfo.ff.toPrecision(2)
-								),
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-									'div',
-									{ className: 'col-xs-1' },
-									isNaN(jv.waveInfo.pce) ? 'N/A' : jv.waveInfo.pce.toPrecision(3)
-								)
-							);
+									{ className: 'row ivData', ref: el => this.jvDom[index] = el },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-3' },
+										jv.ellapsed,
+										' h'
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.voc) ? 'N/A' : jv.waveInfo.voc.toPrecision(3)
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.jsc) ? 'N/A' : jv.waveInfo.jsc.toPrecision(3)
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.power) ? 'N/A' : jv.waveInfo.power.toPrecision(3)
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.powerin) ? 'N/A' : (jv.waveInfo.powerin / 10).toPrecision(3)
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.ff) ? 'N/A' : jv.waveInfo.ff.toPrecision(2)
+									),
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										'div',
+										{ className: 'col-xs-1' },
+										isNaN(jv.waveInfo.pce) ? 'N/A' : jv.waveInfo.pce.toPrecision(3)
+									)
+								);
+							} else {
+								return null;
+							}
 						})
 					),
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', { ref: el => this.domJV = el })

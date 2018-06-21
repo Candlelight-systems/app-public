@@ -891,7 +891,12 @@ class HTMLReport extends React.Component {
 		}, ( index, color ) => {
 
 			const table = document.getElementById('ivTable');
-			table.children[ index + 1 ].style.color = color;
+
+			if( this.jvDom[ index ] ) {
+				this.jvDom[ index ].style.color = color;
+			}
+
+		//	table.children[ index + 1 ].style.color = color;
 		} );
 
 		//graph.makeLegend( { isSerieHideable: false, frame: false, paddingTop: 5, paddingBottom: 0 } ).setAutoPosition( "bottom" );
@@ -1092,10 +1097,10 @@ class HTMLReport extends React.Component {
 						time = ( date.getTime() - this.offset ) / 1000 / 3600;
 					}
 
-					if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
+				//	if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
 					//	value[ 1 ] = NaN;
 						//value[ 2 ] = NaN;
-					}
+				//	}
 
 					waveEfficiency.append( time, value[ 1 ] );					
 					wavePower.append( time, value[ 2 ] * value[ 3 ] );					
@@ -1196,6 +1201,22 @@ class HTMLReport extends React.Component {
 	render() {	 
 
 
+		this.jvDom = [];
+
+		let indexSpacing, lastIndex = 0;
+
+		try {
+			indexSpacing = this.state.data.jv.length / 9;
+		} catch( e ) {
+			indexSpacing = 1;
+		}
+
+		if( indexSpacing < 1 ) {
+			indexSpacing = 0;
+		}
+
+		console.log( indexSpacing );
+
 		return (
 				
 			<div ref={ el => this.dom = el } className="container-fluid">
@@ -1268,22 +1289,25 @@ class HTMLReport extends React.Component {
 							{
 								!! this.state.data && !! this.state.data.jv && this.state.data.jv.map( ( jv, index ) => {
 									
-								
-									return ( 
+									if( ! lastIndex || ( index - lastIndex ) >= indexSpacing ) {
+										
+										lastIndex = lastIndex + indexSpacing;
+										return ( 
 
-									<div className="row ivData">
-										<div className="col-xs-3">{ jv.ellapsed } h</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
-										<div className="col-xs-1">{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
-									</div> 
-									);
+										<div className="row ivData" ref={ el => this.jvDom[ index ] = el }>
+											<div className="col-xs-3">{ jv.ellapsed } h</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.voc ) ? 'N/A' :  jv.waveInfo.voc.toPrecision( 3 ) }</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.jsc ) ? 'N/A' : jv.waveInfo.jsc.toPrecision( 3 ) }</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.power ) ? 'N/A' :  jv.waveInfo.power.toPrecision( 3 ) }</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
+											<div className="col-xs-1">{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
+										</div> 
+										);
+									} else {
+										return null;
+									}
 								} )
-
-
 							}
 						</div>
 
