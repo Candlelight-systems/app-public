@@ -1,6 +1,7 @@
 {
   "name": "candlelight-ageing-interface",
-  "author": "Candlelight systems",
+  "author": "Candlelight systems <contact@candlelight-systems.com>",
+  "email": "contact@candlelight-systems.com",
   "license": "MIT",
   "description": "Front-end interface for the Candlelight ageing systems",
   "version": "0.0.1",
@@ -67,7 +68,12 @@
       "output": "release",
       "buildResources": "build"
     },
-    
+    "linux": {
+      "target": "deb",
+      "icon": "build/candlelight.iconset",
+      "maintainer": "Candlelight-Systems <contact@candlelight-systems.com>"
+    },
+
     "nsis": {
 
     },
