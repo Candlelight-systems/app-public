@@ -288,40 +288,40 @@ let db;
 
 __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("reloadDB", (event, cfg) => {
 
-	db = cfg.db;
-	render();
+		db = cfg.db;
+		render();
 });
 
 __WEBPACK_IMPORTED_MODULE_3_electron__["ipcRenderer"].on("loadInstrument", (event, cfg) => {
 
-	tracker = cfg.tracker;
-	db = cfg.db;
-	render();
+		tracker = cfg.tracker;
+		db = cfg.db;
+		render();
 });
 
 function render(cfg) {
 
-	fetch("http://" + tracker.trackerHost + ":" + tracker.trackerPort + "/getInstruments", {
-		method: 'GET'
-	}).then(response => response.json()).then(json => {
+		fetch("http://" + tracker.trackerHost + ":" + tracker.trackerPort + "/getInstruments", {
+				method: 'GET'
+		}).then(response => response.json()).then(json => {
 
-		let trackers = [];
+				let trackers = [];
 
-		for (var i in json) {
+				for (var i in json) {
 
-			trackers.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				'div',
-				{ key: i, className: 'container-fluid' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__["a" /* default */], { instrumentId: i, trackerConfig: json, fullScaleCurrent: json.fullScaleCurrent, config: tracker, configDB: db })
-			));
-		}
+						trackers.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								'div',
+								{ key: i, className: 'container-fluid' },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_tracker_instrument_jsx__["a" /* default */], { instrumentId: i, trackerConfig: json, fullScaleCurrent: json.fullScaleCurrent, config: tracker, configDB: db })
+						));
+				}
 
-		__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-			'div',
-			null,
-			trackers
-		), document.getElementById('root'));
-	});
+				__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						null,
+						trackers
+				), document.getElementById('root'));
+		});
 }
 
 /***/ }),

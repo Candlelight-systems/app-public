@@ -380,11 +380,11 @@ class CalibratePD extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Componen
 
 		/*if( this.state.photodiodes && Array.isArray( this.state.photodiodes ) ) {
   	this.state.photodiodes.map( ( pd ) => {
-  			if( nextState[ "mon_" + pd.ref ] && ! this.state[ "mon_" + pd.ref ] ) {
+  				if( nextState[ "mon_" + pd.ref ] && ! this.state[ "mon_" + pd.ref ] ) {
   			
   			this.enablePD( pd.ref );
-  			} else if( ! nextState[ "mon_" + pd.ref ] && this.state[ "mon_" + pd.ref ] ) {
-  				this.disablePD( pf.ref );
+  				} else if( ! nextState[ "mon_" + pd.ref ] && this.state[ "mon_" + pd.ref ] ) {
+  					this.disablePD( pf.ref );
   		}
   	});
   }*/
