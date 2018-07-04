@@ -77,7 +77,7 @@ class CellForm extends React.Component {
 				relayController = groups[ i ].dualOutput || groups[ i ].relayController;
 			}
 		}
-console.log( this.state );
+
 		return (
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
