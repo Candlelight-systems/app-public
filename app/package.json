@@ -1,8 +1,11 @@
 {
   "name": "candlelight-frontend",
-  "version": "1.0.1",
+  "version": "1.0.6",
+  "author": "Candlelight systems <contact@candlelight-systems.com>",
   "license": "MIT",
-  "description": "The front-end interface for the candle light cell tracking system",
+  "description": "The front-end interface for the candlelight ageing and maximum power point tracking system",
+  "email": "contact@candlelight-systems.com",
+  "url": "http://candlelight-systems.com",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
