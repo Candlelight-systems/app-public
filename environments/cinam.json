@@ -25,7 +25,7 @@
 				"LSB": 0.33,
 				"LSBValue": 1,
 				"voltageRange": 2.5,
-				"autoZero": "devices",
+				"autoZero": "device",
 				"groups": {
 
 					"Slot A": {
@@ -60,10 +60,10 @@
 				"LSB": 4.88,
 				"LSBValue": 1,
 				"voltageRange": 10,
-				"autoZero": "devices",
+				"autoZero": "device",
 				"groups": {
 
-					"Slot A": {
+					"Module slot": {
 
 						"resettable": false,
 						"displayDeviceInformation": {
@@ -92,7 +92,7 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.1.100",
+				"trackerHost": "192.168.1.105",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081

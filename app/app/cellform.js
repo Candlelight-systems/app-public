@@ -73,7 +73,7 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"autoZero":"device","groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false},"heat":{"version":"ssr_1.0","switch":false}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":0.33,"LSBValue":1,"voltageRange":2.5,"autoZero":"device","groups":{"Slot A":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Module":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":4.88,"LSBValue":1,"voltageRange":10,"autoZero":"device","groups":{"Module slot":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 2 */
