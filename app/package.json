@@ -1,6 +1,6 @@
 {
   "name": "candlelight-frontend",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": "Norman Pellet",
   "license": "MIT",
   "description": "The front-end interface for the candlelight ageing and maximum power point tracking system",
