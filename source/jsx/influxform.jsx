@@ -125,7 +125,7 @@ class AppForm extends React.Component {
 	    const value = target.type === 'checkbox' ? target.checked : target.value;
 	    const name = target.name;
 	    this.setState( { [name]: value } );
-	    console.log( this.state );
+	    
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -218,6 +218,7 @@ class AppForm extends React.Component {
 
 		if( this.props.uploading ) {
 
+
 			switch( this.props.uploading.status ) {
 
 				case 'progress':
@@ -229,7 +230,7 @@ class AppForm extends React.Component {
 
 				case 'done':
 
-					status_progress = <div className="alert alert-success">Uploaded to { this.props.uploading.host } in progress</div>
+					status_progress = <div className="alert alert-success">Uploaded to the instruments</div>
 
 				break;
 

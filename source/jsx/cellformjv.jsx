@@ -32,6 +32,7 @@ class CellFormTracking extends React.Component {
 							<input type="number" min="-2.5" max="2.5" step="0.001" name="iv_start" id="iv_start" disabled={!!this.props.iv_autostart} className="form-control" placeholder="1" value={this.props.iv_start} onChange={this.handleInputChange} />
 							<span className="input-group-addon">V</span>
 						</div>
+						<div className="help-block">Click on "Voc" for an auto-start voltage value of the j-V curve. The Voc will be determined and the j-V curve will start at (Voc + 20mV).</div>
 					</div>
 				</div>
 
@@ -42,6 +43,7 @@ class CellFormTracking extends React.Component {
 							<input type="number" min="-2.5" max="2.5" step="0.001" name="iv_stop" id="iv_stop" className="form-control" placeholder="1" value={this.props.iv_stop} onChange={this.handleInputChange} />
 							<span className="input-group-addon">V</span>
 						</div>
+						<div className="help-block">We recommend stopping the sweep slightly below 0V (e.g. -0.1V) to allow a Jsc determination.</div>
 					</div>
 				</div>
 
@@ -55,10 +57,10 @@ class CellFormTracking extends React.Component {
 					</div>
 				</div>
 
-				<div className="form-group">
-					<label className="col-sm-3">Measure in both directions</label>
-					<div className="col-sm-9">
-						<input type="checkbox" name="iv_hysteresis" checked={ !! this.props.iv_hysteresis } onChange={ this.handleInputChange } />
+
+				<div className="form-group row">
+					<div>
+						<label className="col-sm-9"><input type="checkbox" name="iv_hysteresis" checked={ !! this.props.iv_hysteresis } onChange={ this.handleInputChange } /> Scan in both directions</label>
 					</div>
 				</div>
 

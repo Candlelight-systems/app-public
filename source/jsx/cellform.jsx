@@ -15,7 +15,9 @@ class CellForm extends React.Component {
 			cellArea: 0,
 			cellName: "",
 			connection: "group",
-			lightSource: "pd_pyr"
+			lightSource: "pd_pyr",
+			correctionFactor_type: "factory",
+			correctionFactor_value: 1,
 		};
 		this.close = this.close.bind( this );
 	}
@@ -71,12 +73,21 @@ class CellForm extends React.Component {
 		let relayController = false;
 		
 		let lightSourceSelect = environment.instrument[ this.props.instrumentConfig.instrumentId ].groups[ this.props.groupName ].manualLightIntensity;
+		let correctionFactor = 'N/A';
 
 		for( var i = 0; i < groups.length; i ++ ) {
 			if( groups[ i ].groupName == this.props.groupName ) {
 				relayController = groups[ i ].dualOutput || groups[ i ].relayController;
+
+				for( var j = 0; j < groups[ i ].channels.length; j ++ ) {
+
+					if( groups[ i ].channels[ j ].chanId == this.props.formState.chanId ) {
+						correctionFactor = groups[ i ].channels[ j ].correctionFactor;
+					}
+				}
 			}
 		}
+
 
 		return (
 			<div className="container-fluid">
@@ -96,8 +107,9 @@ class CellForm extends React.Component {
 						<label className="col-sm-3">Device name</label>
 						<div className="col-sm-9">
 							<input type="text" name="cellName" id="cellName" className="form-control" placeholder="Device name" disabled={ active } value={this.state.cellName} onChange={this.handleInputChange} />
+							{ active ? <div className="help-block">The device name cannot be changed once the device is in active mode</div> : null }
 						</div>
-						{ active ? <div className="help-block">The device name cannot be changed once the device is in active mode</div> : null }
+						
 					</div>
 
 					<div className="form-group">
@@ -149,7 +161,7 @@ class CellForm extends React.Component {
 						</div>
 					}
 
-					{ ( this.state.connection ==  "external" || this.state.lightSource == "manual" ) &&
+					{ ( this.state.connection ==  "external" || this.state.lightSource == "manual" ) ?
 						<div className="form-group">
 							<label htmlFor="cellarea" className="col-sm-3">Light intensity</label>
 							<div className="col-sm-9">
@@ -160,6 +172,27 @@ class CellForm extends React.Component {
 									</span>
 								</div>
 							</div>
+						</div> :
+
+						<div className="form-group">
+							<label htmlFor="cellarea" className="col-sm-3">Correction factor</label>
+							<div className="col-sm-9">
+
+								<div className="radio">
+									<label>
+										<input type="radio" name="correctionFactor_type" value="factory" onClick={ this.handleInputChange } checked={ this.state.correctionFactor_type == 'factory' } /> Factory settings ({ correctionFactor })
+									</label>
+								</div>
+
+								<div className="radio">
+									<label>
+										<input type="radio" name="correctionFactor_type" value="manual" onClick={ this.handleInputChange } checked={ this.state.correctionFactor_type == 'manual' } /> Manual value <input type="text" className="form-control" disabled={ this.state.correctionFactor_type == 'factory' } name="correctionFactor_value" onChange={ this.handleInputChange } value={ this.state.correctionFactor_value } />
+									</label>
+								</div>
+								
+								<div className="help-block">Correction factor to the sun intensity. Use it to account for the geometrical uniformity of the light source, such as the edge effects. The correction goes as effective_sun = measured_sun / correction_factor.</div>
+							</div>
+							
 						</div>
 					}
 

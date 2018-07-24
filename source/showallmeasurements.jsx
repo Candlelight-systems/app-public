@@ -112,9 +112,10 @@ async function render( ) {
 		ReactDOM.render(
 			<div className="container-fluid">
 				<ul className="list-group">
-				<li className="list-group-item list-group-item-success list-group-item-heading">
-					All existing measurements
-				</li>
+				<h2>
+					Showing all existing measurements
+				</h2>
+
 				{ jsonArray.map( ( val ) => { 
 
 					switch( val.cellInfo.trackingMode ) {

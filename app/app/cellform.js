@@ -73,7 +73,7 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = {"ageing":true,"statuses":{"light":{"version":"readonly","readonly":true},"heat":{"version":"ssr_1.0"}},"instrument":{"Small cells":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"voltageRange":2.5,"autoZero":"device","groups":{"Box 1":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ }),
 /* 2 */
@@ -160,7 +160,9 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			cellArea: 0,
 			cellName: "",
 			connection: "group",
-			lightSource: "pd_pyr"
+			lightSource: "pd_pyr",
+			correctionFactor_type: "factory",
+			correctionFactor_value: 1
 		};
 		this.close = this.close.bind(this);
 	}
@@ -209,10 +211,18 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		let relayController = false;
 
 		let lightSourceSelect = __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentConfig.instrumentId].groups[this.props.groupName].manualLightIntensity;
+		let correctionFactor = 'N/A';
 
 		for (var i = 0; i < groups.length; i++) {
 			if (groups[i].groupName == this.props.groupName) {
 				relayController = groups[i].dualOutput || groups[i].relayController;
+
+				for (var j = 0; j < groups[i].channels.length; j++) {
+
+					if (groups[i].channels[j].chanId == this.props.formState.chanId) {
+						correctionFactor = groups[i].channels[j].correctionFactor;
+					}
+				}
 			}
 		}
 
@@ -270,13 +280,13 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 								"div",
 								{ className: "col-sm-9" },
-								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", name: "cellName", id: "cellName", className: "form-control", placeholder: "Device name", disabled: active, value: this.state.cellName, onChange: this.handleInputChange })
-							),
-							active ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-								"div",
-								{ className: "help-block" },
-								"The device name cannot be changed once the device is in active mode"
-							) : null
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", name: "cellName", id: "cellName", className: "form-control", placeholder: "Device name", disabled: active, value: this.state.cellName, onChange: this.handleInputChange }),
+								active ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "help-block" },
+									"The device name cannot be changed once the device is in active mode"
+								) : null
+							)
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
@@ -377,7 +387,7 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 								)
 							)
 						),
-						(this.state.connection == "external" || this.state.lightSource == "manual") && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						this.state.connection == "external" || this.state.lightSource == "manual" ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							"div",
 							{ className: "form-group" },
 							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -402,6 +412,46 @@ class CellForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 											"-2"
 										)
 									)
+								)
+							)
+						) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							"div",
+							{ className: "form-group" },
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"label",
+								{ htmlFor: "cellarea", className: "col-sm-3" },
+								"Correction factor"
+							),
+							__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+								"div",
+								{ className: "col-sm-9" },
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "correctionFactor_type", value: "factory", onClick: this.handleInputChange, checked: this.state.correctionFactor_type == 'factory' }),
+										" Factory settings (",
+										correctionFactor,
+										")"
+									)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "radio" },
+									__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+										"label",
+										null,
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "radio", name: "correctionFactor_type", value: "manual", onClick: this.handleInputChange, checked: this.state.correctionFactor_type == 'manual' }),
+										" Manual value ",
+										__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "text", className: "form-control", disabled: this.state.correctionFactor_type == 'factory', name: "correctionFactor_value", onChange: this.handleInputChange, value: this.state.correctionFactor_value })
+									)
+								),
+								__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+									"div",
+									{ className: "help-block" },
+									"Correction factor to the sun intensity. Use it to account for the geometrical uniformity of the light source, such as the edge effects. The correction goes as effective_sun = measured_sun / correction_factor."
 								)
 							)
 						)
@@ -973,33 +1023,28 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 						{ name: 'tracking_record_interval', id: 'tracking_record_interval', className: 'form-control', value: this.props.tracking_record_interval, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
-							{ key: 'never_record', value: 'null' },
-							'Never'
-						),
-						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-							'option',
 							{ key: '1000sps_record', value: '1000' },
-							'1 sample per second'
+							'1 point per second'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ key: '10000sps_record', value: '10000' },
-							'6 samples per minute'
+							'6 points per minute'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ key: '60000sps_record', value: '60000' },
-							'1 sample per minute'
+							'1 point per minute'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ key: '600000sps_record', value: '600000' },
-							'6 samples per hour'
+							'6 points per hour'
 						),
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ key: '3600000sps_record', value: '3600000' },
-							'1 sample per hour'
+							'1 point per hour'
 						)
 					)
 				),
@@ -1081,6 +1126,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							{ className: 'input-group-addon' },
 							'V'
 						)
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'help-block' },
+						'Click on "Voc" for an auto-start voltage value of the j-V curve. The Voc will be determined and the j-V curve will start at (Voc + 20mV).'
 					)
 				)
 			),
@@ -1104,6 +1154,11 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							{ className: 'input-group-addon' },
 							'V'
 						)
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'help-block' },
+						'We recommend stopping the sweep slightly below 0V (e.g. -0.1V) to allow a Jsc determination.'
 					)
 				)
 			),
@@ -1132,16 +1187,16 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
-				{ className: 'form-group' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'label',
-					{ className: 'col-sm-3' },
-					'Measure in both directions'
-				),
+				{ className: 'form-group row' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
-					{ className: 'col-sm-9' },
-					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'iv_hysteresis', checked: !!this.props.iv_hysteresis, onChange: this.handleInputChange })
+					null,
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'label',
+						{ className: 'col-sm-9' },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'checkbox', name: 'iv_hysteresis', checked: !!this.props.iv_hysteresis, onChange: this.handleInputChange }),
+						' Scan in both directions'
+					)
 				)
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(

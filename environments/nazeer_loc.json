@@ -93,18 +93,18 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "128.178.118.50",
+				"trackerHost": "192.168.1.36",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "isicgesrv10.epfl.ch",
-			"username": "GMF",
-			"password": "Jd8h38dh_1.",
+			"host": "192.168.1.37",
+			"username": "",
+			"password": "",
 			"port": 8086,
-			"db": "GMF"
+			"db": "matahari"
 		},
 
 		"githubtokens": {

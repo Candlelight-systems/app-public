@@ -24,7 +24,7 @@
 				"autoZero": "instrument",
 				"groups": {
 
-					"Sample holder": {
+					"Box 1": {
 
 						"resettable": false,
 						"displayDeviceInformation": {
@@ -55,14 +55,14 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.1.101",
+				"trackerHost": "localhost",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "192.168.1.101",
+			"host": "localhost",
 			"username": "",
 			"password": "",
 			"port": 8086,

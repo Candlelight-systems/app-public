@@ -240,12 +240,11 @@ class CellFormTracking extends React.Component {
 					<label htmlFor="tracking_record_interval" className="col-sm-3">Recording rate</label>
 					<div className="col-sm-9">
 						<select name="tracking_record_interval" id="tracking_record_interval" className="form-control" value={this.props.tracking_record_interval} onChange={this.handleInputChange}>
-							<option key="never_record" value="null">Never</option>
-							<option key="1000sps_record" value="1000">1 sample per second</option>
-							<option key="10000sps_record" value="10000">6 samples per minute</option>
-							<option key="60000sps_record" value="60000">1 sample per minute</option>
-							<option key="600000sps_record" value="600000">6 samples per hour</option>
-							<option key="3600000sps_record" value="3600000">1 sample per hour</option>
+							<option key="1000sps_record" value="1000">1 point per second</option>
+							<option key="10000sps_record" value="10000">6 points per minute</option>
+							<option key="60000sps_record" value="60000">1 point per minute</option>
+							<option key="600000sps_record" value="600000">6 points per hour</option>
+							<option key="3600000sps_record" value="3600000">1 point per hour</option>
 						</select>
 					</div>
 

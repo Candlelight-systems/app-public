@@ -820,9 +820,9 @@ async function render() {
 				'ul',
 				{ className: 'list-group' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-					'li',
-					{ className: 'list-group-item list-group-item-success list-group-item-heading' },
-					'All existing measurements'
+					'h2',
+					null,
+					'Showing all existing measurements'
 				),
 				jsonArray.map(val => {
 
@@ -1038,7 +1038,6 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		const name = target.name;
 		this.setState({ [name]: value });
-		console.log(this.state);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -1184,9 +1183,7 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 					status_progress = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'alert alert-success' },
-						'Uploaded to ',
-						this.props.uploading.host,
-						' in progress'
+						'Uploaded to the instruments'
 					);
 
 					break;
