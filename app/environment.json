@@ -7,7 +7,7 @@
 		}
 	},
 	"instrument": {
-		"Small cells": {
+		"Top port": {
 			"ADC": {
 				"model": "ADS1259"
 			},
@@ -18,7 +18,37 @@
 			"voltageRange": 2.5,
 			"autoZero": "instrument",
 			"groups": {
-				"Box 1": {
+				"Sample holder": {
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				}
+			}
+		},
+		"Bottom port": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"changeSpeed": false,
+			"fsr": 30,
+			"LSB": 1.22,
+			"LSBValue": 1,
+			"voltageRange": 2.5,
+			"autoZero": "instrument",
+			"groups": {
+				"Sample holder": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,

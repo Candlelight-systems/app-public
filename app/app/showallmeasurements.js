@@ -1165,8 +1165,6 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 		if (this.props.uploading) {
 
-			console.log(this.props.uploading);
-
 			switch (this.props.uploading.status) {
 
 				case 'progress':
@@ -1186,8 +1184,7 @@ class AppForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 					status_progress = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'div',
 						{ className: 'alert alert-success' },
-						'Uploaded to ',
-						this.props.uploading.host
+						'Uploaded to the instruments'
 					);
 
 					break;

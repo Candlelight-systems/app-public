@@ -131,7 +131,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-                  { Math.round( this.state.lightValue * 1000 ) / 1000 } sun
+                  { this.state.lightValue < 0 ? 0 : Math.round( this.state.lightValue * 1000 ) / 1000 } sun
                 </div>
               </div> : null 
             }
