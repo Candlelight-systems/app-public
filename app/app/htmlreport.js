@@ -573,42 +573,43 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 		graph.autoscaleAxes();
 		graph.draw();
 		/*var nbShown = 0;
-  	graphsCfg.forEach( ( g, index ) => {
-  		if( this.props.config[ g.graphRef ] ) {
+  		graphsCfg.forEach( ( g, index ) => {
+  			if( this.props.config[ g.graphRef ] ) {
   		nbShown++;
   	}
   	switch (g.type) {
-  			case 'pce':
+  				case 'pce':
   			this.updatePCEGraph( this.graphs[ g.graphRef ] );
   		break;
-  				case 'power':
+  
+  		case 'power':
   			this.updatePowerGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'jsc':
+  				case 'jsc':
   			this.updateJscGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'voc':
+  				case 'voc':
   			this.updateVocGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'voltage':
+  				case 'voltage':
   			this.updateVoltageGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'current':
+  				case 'current':
   			this.updateCurrentGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'light':
+  				case 'light':
   			this.updateLightGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'humidity':
+  				case 'humidity':
   			this.updateHumidityGraph( this.graphs[ g.graphRef ] );
   		break;
-  			case 'temperature':
+  				case 'temperature':
   			this.updateTemperatureGraph( this.graphs[ g.graphRef ] );
   		break;
   	}
   } );
-  	for( let ref in this.graphsRefs ) {
-  		if( this.props.config[ ref ] ) { // Ask for display
+  		for( let ref in this.graphsRefs ) {
+  			if( this.props.config[ ref ] ) { // Ask for display
   		this.graphs[ ref ].setHeight( pageHeight / nbShown );
   		this.graphs[ ref ].draw();
   	}

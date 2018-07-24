@@ -1971,7 +1971,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
      		|		|
      		|		|
      		x1      x2
-     	Area = ( ( x2 - x1 ) * ( y1 + y2 ) ) / 2
+     		Area = ( ( x2 - x1 ) * ( y1 + y2 ) ) / 2
      */
 
 					if (time > 0) {
