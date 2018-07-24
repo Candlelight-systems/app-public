@@ -664,9 +664,9 @@ function editInfluxDB( event ) {
     windows[ 'form' ].webContents.send("uploading", { status: 'progress', host: config.instruments.map( ( i ) => i.trackerHost ).join(', ') } );
 
     updateInfluxDB( ).then( () => {
-      windows[ 'form' ].webContents.send("uploading", { status: 'done', host: instrument.trackerHost } );
+      windows[ 'form' ].webContents.send("uploading", { status: 'done' } );
     } ).catch( err => {
-      windows[ 'form' ].webContents.send("uploading", { status: 'error', error: err, host: err.options.form.host } );
+      windows[ 'form' ].webContents.send("uploading", { status: 'error', error: err, host: err.options.host } );
     });
 
     if( windows[ 'instrumentMain' ] ) {
@@ -687,7 +687,7 @@ function showAllMeasurements( instrument ) {
 function updateInfluxDB( ) {
 
   return Promise.all( config.instruments.map( ( instrument ) => {
-       return request.post( { url: "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB", form: config.database, timeout: 1000 } );
+       return request.post( { url: "http://" + instrument.trackerHost + ":" + instrument.trackerPort + "/setInfluxDB", host: instrument.trackerHost, form: config.database, timeout: 1000 } );
   }  ) );
 }
 

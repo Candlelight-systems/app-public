@@ -6,29 +6,25 @@
 			"light": {
 				"version": "2.0",
 				"readonly": false
-			},
-			"heat": {
-				"version": "ssr_1.0",
-				"switch": false
 			}
 		},
 
 		"instrument": {
 
-			"Small cells": {
+			"Top port": {
 
 				"ADC": {
 					"model": "ADS1259"
 				},
 				"changeSpeed": false,
 				"fsr": 30,
-				"LSB": 0.33,
+				"LSB": 1.22,
 				"LSBValue": 1,
 				"voltageRange": 2.5,
-				"autoZero": "device",
+				"autoZero": "instrument",
 				"groups": {
 
-					"Slot A": {
+					"Sample holder": {
 
 						"resettable": false,
 						"displayDeviceInformation": {
@@ -45,25 +41,28 @@
 							"humidity": true,
 							"kwh_yr": false
 						}
+
+
 					}
 				}
 
 			},
 
-			"Module": {
+			"Bottom port": {
 
 				"ADC": {
 					"model": "ADS1259"
 				},
 				"changeSpeed": false,
 				"fsr": 30,
-				"LSB": 4.88,
+				
+				"LSB": 1.22,
 				"LSBValue": 1,
-				"voltageRange": 10,
-				"autoZero": "device",
+				"voltageRange": 2.5,
+				"autoZero": "instrument",
 				"groups": {
 
-					"Module slot": {
+					"Sample holder": {
 
 						"resettable": false,
 						"displayDeviceInformation": {
@@ -80,6 +79,8 @@
 							"humidity": true,
 							"kwh_yr": false
 						}
+
+
 					}
 				}
 
@@ -92,14 +93,14 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.0.100",
+				"trackerHost": "192.168.1.36",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "192.168.1.101",
+			"host": "192.168.1.37",
 			"username": "",
 			"password": "",
 			"port": 8086,
