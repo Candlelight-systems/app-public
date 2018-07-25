@@ -141,6 +141,16 @@ function generateWebpackConfig( theme ) {
                 filter: 'isFile'
               },
 
+              { 
+                expand: true, 
+                cwd: './environments/logos/',
+                src: [ './' + grunt.option('target') + ".png" ],
+                dest: 'app/app/images/',
+                rename: function( dest, src ) {
+                  return 'app/app/images/logo_client.png';
+                }
+              },
+
               // JV app
               {
                 expand: true, 
@@ -317,6 +327,8 @@ function generateWebpackConfig( theme ) {
       process.env.buildEnvironment = env;
       fs.writeFileSync( "./app/config.json", JSON.stringify( env.defaultConfig, undefined, "\t" ) );
       fs.writeFileSync( "./app/environment.json", JSON.stringify( env.environment, undefined, "\t" ) );
+
+
 
       grunt.task.run( 'copy' );
       grunt.task.run( 'babel' );
