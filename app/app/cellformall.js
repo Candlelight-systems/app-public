@@ -787,19 +787,38 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 				)
 			),
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'h3',
+				null,
+				'Measurement intervals'
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group row' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					null,
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'label',
+						{ className: 'col-sm-9' },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { value: 'fixed', type: 'radio', name: 'iv_measurement_interval_type', checked: this.props.iv_measurement_interval_type == 'fixed', onChange: this.handleInputChange }),
+						' Measure at fixed intervals'
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: 'form-group' },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'label',
 					{ htmlFor: 'iv_interval', className: 'col-sm-3' },
-					'Measure every'
+					'Measurement interval'
 				),
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 					'div',
 					{ className: 'col-sm-9' },
 					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 						'select',
-						{ name: 'iv_interval', id: 'iv_interval', className: 'form-control', value: this.props.iv_interval, onChange: this.handleInputChange },
+						{ disabled: this.props.iv_measurement_interval_type == 'auto', name: 'iv_interval', id: 'iv_interval', className: 'form-control', value: this.props.iv_interval, onChange: this.handleInputChange },
 						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 							'option',
 							{ value: '60000' },
@@ -836,6 +855,194 @@ class CellFormTracking extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 							'Every week'
 						)
 					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group row' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					null,
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'label',
+						{ className: 'col-sm-9' },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'radio', value: 'auto', name: 'iv_measurement_interval_type', checked: this.props.iv_measurement_interval_type == 'auto', onChange: this.handleInputChange }),
+						' Automatic intervals'
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'label',
+					{ htmlFor: 'iv_interval', className: 'col-sm-3' },
+					'Measure upon efficiency drop'
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'col-sm-9' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'select',
+						{ name: 'iv_measurement_interval_auto_pdrop', id: 'iv_measurement_interval_auto_pdrop', className: 'form-control', value: this.props.iv_measurement_interval_auto_pdrop, onChange: this.handleInputChange },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '0.25' },
+							'0.25%'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '0.5' },
+							'0.5%'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '1' },
+							'1%'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '2' },
+							'2%'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '3' },
+							'3%'
+						)
+					),
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'div',
+						{ className: 'help-block' },
+						'A j-V curve measurement will be triggered when the PCE of the device changes by X percentage point. Only works with MPP tracking.'
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'col-sm-9' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'small',
+						null,
+						'The following intervals are checked for each tracking point that is recorded (see the "record interval" in the "Tracking" tab.) For example, if the recording interval is set to 1 point every 10 minutes, setting the minimum interval to 1 minute will have the same effect as setting it to every 10 minutes.'
+					)
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'label',
+					{ htmlFor: 'iv_interval', className: 'col-sm-3' },
+					'With a minimum interval of'
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'col-sm-9' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'select',
+						{ disabled: this.props.iv_measurement_interval_type == 'fixed', name: 'iv_measurement_interval_auto_minTime', id: 'iv_measurement_interval_auto_minTime', className: 'form-control', value: this.props.iv_interval, onChange: this.handleInputChange },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '60000' },
+							'1 minute'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '600000' },
+							'10 minutes'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '3600000' },
+							'1 hour'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '10800000' },
+							'3 hours'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '43200000' },
+							'12 hours'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '86400000' },
+							'1 day'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '604800000' },
+							'1 week'
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block' },
+					'Sets a minimum interval under which the j-V curve will not be measured, even if the PCE has changed above the threshold.'
+				)
+			),
+			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				'div',
+				{ className: 'form-group' },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'label',
+					{ htmlFor: 'iv_interval', className: 'col-sm-3' },
+					'With a maximum interval of'
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'col-sm-9' },
+					__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+						'select',
+						{ disabled: this.props.iv_measurement_interval_type == 'fixed', name: 'iv_measurement_interval_auto_maxTime', id: 'iv_measurement_interval_auto_maxTime', className: 'form-control', value: this.props.iv_interval, onChange: this.handleInputChange },
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '600000' },
+							'10 minutes'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '3600000' },
+							'1 hour'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '10800000' },
+							'3 hours'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '43200000' },
+							'12 hours'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '86400000' },
+							'1 day'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '604800000' },
+							'1 week'
+						),
+						__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+							'option',
+							{ value: '-1' },
+							'Never'
+						)
+					)
+				),
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+					'div',
+					{ className: 'help-block' },
+					'Sets a maximum time interval. Even if the power hasn\'t changed above the threshold, the j-V curve will be measured at this interval.'
 				)
 			)
 		);

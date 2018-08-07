@@ -113,7 +113,9 @@ class TrackerDevice extends React.Component {
 		
   		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
   		if( this.props.serverState !== nextProps.serverState ) {
-  			this.getStatus();
+  			//this.getStatus();
+
+  			this.setState( { serverState: nextProps.serverState } );
   		}
 
       	if( 
@@ -471,7 +473,7 @@ class TrackerDevice extends React.Component {
 		let iv = value.replace("\"", "").split(",").map( ( el ) => parseFloat( el ) ),
 			wave = Graph.newWaveform();
 
-		for( var i = 2; i < iv.length - 1; i += 2 ) {
+		for( var i = 0; i < iv.length - 1; i += 2 ) {
 			wave.append( iv[ i ], iv[ i + 1 ] );
 		}
 		return wave;
@@ -485,7 +487,6 @@ class TrackerDevice extends React.Component {
 		*		2. Use grouping to get 100 points
 		*		3. Get latest vocs, jscs
 		*/
-console.log('update influx');
 		let parameter,
 			parameter_jv,
 			newState = {},
@@ -496,6 +497,7 @@ console.log('update influx');
 			query,
 			queue = [];
 
+		newState.influxTime = Date.now();
 
 		if( ! serverState.measurementName ) {
 			return;
@@ -1145,6 +1147,7 @@ console.log('update influx');
 							voltage={ this.state.voltage } 
 							current={ this.state.current } 
 							cellarea={ this.state.serverState.cellArea }
+							updatedTime={ this.state.influxTime }
 							/>
 					
 					</div>
