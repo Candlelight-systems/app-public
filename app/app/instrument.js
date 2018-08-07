@@ -1432,7 +1432,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
 		if (this.props.serverState !== nextProps.serverState) {
-			this.getStatus();
+			//this.getStatus();
+
+			this.setState({ serverState: nextProps.serverState });
 		}
 
 		if (nextProps.serverState.tracking_mode > 0 && nextProps.measurementName && nextProps.measurementName !== this.props.measurementName || !this.state.serverState) {
@@ -1777,7 +1779,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		let iv = value.replace("\"", "").split(",").map(el => parseFloat(el)),
 		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
-		for (var i = 2; i < iv.length - 1; i += 2) {
+		for (var i = 0; i < iv.length - 1; i += 2) {
 			wave.append(iv[i], iv[i + 1]);
 		}
 		return wave;
@@ -1791,7 +1793,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
   *		2. Use grouping to get 100 points
   *		3. Get latest vocs, jscs
   */
-		console.log('update influx');
 		let parameter,
 		    parameter_jv,
 		    newState = {},
@@ -1801,6 +1802,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		    timeQuery,
 		    query,
 		    queue = [];
+
+		newState.influxTime = Date.now();
 
 		if (!serverState.measurementName) {
 			return;
@@ -2672,7 +2675,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						dataIV: this.state.data_IV,
 						voltage: this.state.voltage,
 						current: this.state.current,
-						cellarea: this.state.serverState.cellArea
+						cellarea: this.state.serverState.cellArea,
+						updatedTime: this.state.influxTime
 					})
 				)
 			);
@@ -3080,13 +3084,33 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 		this.ellipse.draw();
 	}
 
+	shouldComponentUpdate(nextProps) {
+
+		let shouldUpdate = false;
+
+		if (nextProps.updatedTime !== this.props.updatedTime) {
+			shouldUpdate = true;
+		} else {
+			nextProps.data.map((el, index) => {
+
+				if (!this.props.data[index] || el.time != this.props.data[index].time) {
+					shouldUpdate = true;
+				}
+			});
+		}
+
+		console.log(shouldUpdate, nextProps.updatedTime, this.props.updatedTime);
+
+		return shouldUpdate;
+	}
+
 	componentDidUpdate() {
 
 		this.props.data.sort((a, b) => {
 			return a.time - b.time;
 		});
 
-		this.graph.resetSeries();
+		//	this.graph.resetSeries();
 
 		let maxY = 0;
 

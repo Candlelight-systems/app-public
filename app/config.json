@@ -1,7 +1,7 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "128.178.118.50",
+			"trackerHost": "128.178.118.250",
 			"trackerName": "Main Instrument",
 			"trackerPort": 8080,
 			"trackerPortWS": 8081
