@@ -1829,7 +1829,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 		this.parameter = parameter;
 
-		let queries = [`SELECT time, efficiency, power FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
+		let queries = [`SELECT time, efficiency, power FROM "${encodeURIComponent(serverState.measurementName)}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${encodeURIComponent(serverState.measurementName)}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${encodeURIComponent(serverState.measurementName)}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${encodeURIComponent(serverState.measurementName)}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${encodeURIComponent(serverState.measurementName)}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
 		//console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
@@ -1922,7 +1922,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			}
 
 			this.parameter = parameter;
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + serverState.measurementName + "\" ORDER BY time ASC LIMIT 1;";
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + encodeURIComponent(serverState.measurementName) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + encodeURIComponent(serverState.measurementName) + "\" ORDER BY time ASC LIMIT 1;";
 
 			queue.push(Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
 
@@ -2028,7 +2028,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
-
+				console.log(wave);
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -2935,7 +2935,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
     return shape;*/
 			});
 		}
-
+		console.log(this.props.data);
 		if (this.graph && this.props.data) {
 
 			this.serie.setWaveform(this.props.data);
