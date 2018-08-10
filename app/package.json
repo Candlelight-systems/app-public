@@ -1,7 +1,7 @@
 {
   "name": "candlelight-frontend",
-  "version": "1.0.6",
-  "author": "Candlelight systems <contact@candlelight-systems.com>",
+  "version": "1.0.7",
+  "author": "Norman Pellet",
   "license": "MIT",
   "description": "The front-end interface for the candlelight ageing and maximum power point tracking system",
   "email": "contact@candlelight-systems.com",
@@ -12,7 +12,6 @@
   },
   "repository": "https://github.com/cheminfo/candlelight",
   "keywords": [],
-  "author": "Norman Pellet",
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
     "electron": "^2.0.2"
