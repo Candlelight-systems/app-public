@@ -177,7 +177,7 @@ class statusGraph extends GraphComponent {
 			} );
 
 		}
-
+console.log( this.props.data );
 		if( this.graph && this.props.data ) {
 
 			this.serie.setWaveform( this.props.data );

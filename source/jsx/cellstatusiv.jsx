@@ -99,13 +99,33 @@ class statusIV extends GraphComponent {
 		this.ellipse.draw();
 	}
 
+	shouldComponentUpdate( nextProps ) {
+
+		let shouldUpdate = false;
+
+		if( nextProps.updatedTime !== this.props.updatedTime ) {
+			shouldUpdate = true;
+		} else {
+			nextProps.data.map( ( el, index ) => {
+
+				if( ! this.props.data[ index ] || el.time != this.props.data[ index ].time ) {
+					shouldUpdate = true;
+				}
+			});
+		}
+
+		console.log( shouldUpdate, nextProps.updatedTime, this.props.updatedTime );
+
+		return shouldUpdate;
+	}
+
 	componentDidUpdate() {
 
 		this.props.data.sort( ( a, b ) => {
 			return a.time - b.time;
 		} );
 
-		this.graph.resetSeries();
+	//	this.graph.resetSeries();
 		
 		let maxY = 0;
 
