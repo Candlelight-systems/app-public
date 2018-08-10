@@ -1432,7 +1432,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 		// If the state has changed, we trigger a new query to the server to fetch the latest. This might be redundant though.
 		if (this.props.serverState !== nextProps.serverState) {
-			this.getStatus();
+			//this.getStatus();
+
+			this.setState({ serverState: nextProps.serverState });
 		}
 
 		if (nextProps.serverState.tracking_mode > 0 && nextProps.measurementName && nextProps.measurementName !== this.props.measurementName || !this.state.serverState) {
@@ -1777,7 +1779,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		let iv = value.replace("\"", "").split(",").map(el => parseFloat(el)),
 		    wave = __WEBPACK_IMPORTED_MODULE_3_node_jsgraph_dist_jsgraph_es6___default.a.newWaveform();
 
-		for (var i = 2; i < iv.length - 1; i += 2) {
+		for (var i = 0; i < iv.length - 1; i += 2) {
 			wave.append(iv[i], iv[i + 1]);
 		}
 		return wave;
@@ -1791,7 +1793,6 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
   *		2. Use grouping to get 100 points
   *		3. Get latest vocs, jscs
   */
-		console.log('update influx');
 		let parameter,
 		    parameter_jv,
 		    newState = {},
@@ -1801,6 +1802,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		    timeQuery,
 		    query,
 		    queue = [];
+
+		newState.influxTime = Date.now();
 
 		if (!serverState.measurementName) {
 			return;
@@ -1826,7 +1829,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 		}
 		this.parameter = parameter;
 
-		let queries = [`SELECT time, efficiency, power FROM "${serverState.measurementName}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${serverState.measurementName}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${serverState.measurementName}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${serverState.measurementName}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${serverState.measurementName}_jsc" ORDER BY time DESC LIMIT 1`];
+		let queries = [`SELECT time, efficiency, power FROM "${encodeURIComponent(serverState.measurementName)}" ORDER BY time ASC limit 1`, `SELECT time, efficiency, power_mean, current_mean, voltage_mean, sun, pga, temperature_base, temperature_vsensor, temperature_junction, humidity FROM "${encodeURIComponent(serverState.measurementName)}" ORDER BY time DESC limit 1`, `SELECT time, iv, sun FROM "${encodeURIComponent(serverState.measurementName)}_iv" ${this.state._last_iv_time ? `WHERE time > '${this.state._last_iv_time}'` : ''} ORDER BY time ASC`, `SELECT voc FROM "${encodeURIComponent(serverState.measurementName)}_voc" ORDER BY time DESC LIMIT 1`, `SELECT jsc FROM "${encodeURIComponent(serverState.measurementName)}_jsc" ORDER BY time DESC LIMIT 1`];
 
 		let newIvCurves = false;
 		//console.log( `SELECT time, iv, sun FROM "${ serverState.measurementName }_iv" ${ this.state._last_iv_time ? `WHERE time > ${ this.state._last_iv_time.getTime() * 1000 }` : '' } ORDER BY time ASC`);
@@ -1919,7 +1922,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 			}
 
 			this.parameter = parameter;
-			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + serverState.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + serverState.measurementName + "\" ORDER BY time ASC LIMIT 1;";
+			query = "SELECT MEAN(" + parameter + ") as param, MAX(" + parameter + ") as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean  FROM \"" + encodeURIComponent(serverState.measurementName) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC; SELECT " + parameter + " FROM \"" + encodeURIComponent(serverState.measurementName) + "\" ORDER BY time ASC LIMIT 1;";
 
 			queue.push(Object(__WEBPACK_IMPORTED_MODULE_7__influx__["b" /* query */])(query, db_ds, this.props.configDB).then(results => {
 
@@ -2025,7 +2028,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
-
+				console.log(wave);
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -2672,7 +2675,8 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						dataIV: this.state.data_IV,
 						voltage: this.state.voltage,
 						current: this.state.current,
-						cellarea: this.state.serverState.cellArea
+						cellarea: this.state.serverState.cellArea,
+						updatedTime: this.state.influxTime
 					})
 				)
 			);
@@ -2931,7 +2935,7 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
     return shape;*/
 			});
 		}
-
+		console.log(this.props.data);
 		if (this.graph && this.props.data) {
 
 			this.serie.setWaveform(this.props.data);
@@ -3080,13 +3084,33 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 		this.ellipse.draw();
 	}
 
+	shouldComponentUpdate(nextProps) {
+
+		let shouldUpdate = false;
+
+		if (nextProps.updatedTime !== this.props.updatedTime) {
+			shouldUpdate = true;
+		} else {
+			nextProps.data.map((el, index) => {
+
+				if (!this.props.data[index] || el.time != this.props.data[index].time) {
+					shouldUpdate = true;
+				}
+			});
+		}
+
+		console.log(shouldUpdate, nextProps.updatedTime, this.props.updatedTime);
+
+		return shouldUpdate;
+	}
+
 	componentDidUpdate() {
 
 		this.props.data.sort((a, b) => {
 			return a.time - b.time;
 		});
 
-		this.graph.resetSeries();
+		//	this.graph.resetSeries();
 
 		let maxY = 0;
 

@@ -64,10 +64,18 @@ class CellFormTracking extends React.Component {
 					</div>
 				</div>
 
+				<h3>Measurement intervals</h3>
+
+				<div className="form-group row">
+					<div>
+						<label className="col-sm-9"><input value="fixed" type="radio" name="iv_measurement_interval_type" checked={ this.props.iv_measurement_interval_type == 'fixed' } onChange={ this.handleInputChange } /> Measure at fixed intervals</label>
+					</div>
+				</div>				
+
 				<div className="form-group">
-					<label htmlFor="iv_interval" className="col-sm-3">Measure every</label>
+					<label htmlFor="iv_interval" className="col-sm-3">Measurement interval</label>
 					<div className="col-sm-9">
-						<select name="iv_interval" id="iv_interval" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+						<select disabled={ this.props.iv_measurement_interval_type == 'auto' } name="iv_interval" id="iv_interval" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
 							<option value="60000">Every minute</option>
 							<option value="600000">Every 10 minutes</option>
 							<option value="3600000">Every hour</option>
@@ -78,6 +86,70 @@ class CellFormTracking extends React.Component {
 						</select>
 					</div>
 				</div>
+
+
+
+				<div className="form-group row">
+					<div>
+						<label className="col-sm-9"><input type="radio" value="auto" name="iv_measurement_interval_type" checked={ this.props.iv_measurement_interval_type == 'auto' } onChange={ this.handleInputChange } /> Automatic intervals</label>
+					</div>
+				</div>				
+
+				<div className="form-group">
+					<label htmlFor="iv_interval" className="col-sm-3">Measure upon efficiency drop</label>
+					<div className="col-sm-9">
+						<select name="iv_measurement_interval_auto_pdrop" id="iv_measurement_interval_auto_pdrop" className="form-control" value={ this.props.iv_measurement_interval_auto_pdrop } onChange={ this.handleInputChange }>
+							<option value="0.25">0.25%</option>
+							<option value="0.5">0.5%</option>
+							<option value="1">1%</option>
+							<option value="2">2%</option>
+							<option value="3">3%</option>
+						</select>
+						<div className="help-block">A j-V curve measurement will be triggered when the PCE of the device changes by X percentage point. Only works with MPP tracking.</div>
+					</div>
+				</div>
+
+				<div className="col-sm-9">
+
+					<div className="help-block"><small>The following intervals are checked for each tracking point that is recorded (see the "record interval" in the "Tracking" tab.) For example, if the recording interval is set to 1 point every 10 minutes, setting the minimum interval to 1 minute will have the same effect as setting it to every 10 minutes.</small></div>
+
+				</div>
+
+				<div className="form-group">
+					<label htmlFor="iv_interval" className="col-sm-3">With a minimum interval of</label>
+					<div className="col-sm-9">
+						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_minTime" id="iv_measurement_interval_auto_minTime" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+							<option value="60000">1 minute</option>
+							<option value="600000">10 minutes</option>
+							<option value="3600000">1 hour</option>
+							<option value="10800000">3 hours</option>
+							<option value="43200000">12 hours</option>
+							<option value="86400000">1 day</option>
+							<option value="604800000">1 week</option>
+						</select>
+					</div>
+					<div className="help-block">Sets a minimum interval under which the j-V curve will not be measured, even if the PCE has changed above the threshold.</div>
+				</div>
+
+
+
+				<div className="form-group">
+					<label htmlFor="iv_interval" className="col-sm-3">With a maximum interval of</label>
+					<div className="col-sm-9">
+						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_maxTime" id="iv_measurement_interval_auto_maxTime" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+							<option value="600000">10 minutes</option>
+							<option value="3600000">1 hour</option>
+							<option value="10800000">3 hours</option>
+							<option value="43200000">12 hours</option>
+							<option value="86400000">1 day</option>
+							<option value="604800000">1 week</option>
+							<option value="-1">Never</option>
+						</select>
+					</div>
+					<div className="help-block">Sets a maximum time interval. Even if the power hasn't changed above the threshold, the j-V curve will be measured at this interval.</div>
+				</div>
+
+
 			</div> );
 	}
 }
