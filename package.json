@@ -16,11 +16,7 @@
     "babel-preset-minify": "^0.4.3",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
-<<<<<<< HEAD
-    "bootstrap": "^3.3.7",
-=======
     "babili": "^0.1.4",
->>>>>>> 3aa7e25454406e4f0b757cf6122339ae5e4f60f9
     "electron-builder": "^19.19.1",
     "grunt-babel": "^7.0.0",
     "grunt-contrib-copy": "^1.0.0",
