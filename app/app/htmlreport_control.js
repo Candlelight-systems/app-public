@@ -208,10 +208,10 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 
 		var db = this.props.db.db;
 
-		return Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])("SELECT time,efficiency FROM \"" + this.props.measurementName + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + this.props.measurementName + "\" ORDER BY time DESC limit 1;", db, this.props.db).then(async results => {
+		return Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])("SELECT time,efficiency FROM \"" + encodeURIComponent(this.props.measurementName) + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + encodeURIComponent(this.props.measurementName) + "\" ORDER BY time DESC limit 1;", db, this.props.db).then(async results => {
 
 			if (!results[0].series) {
-				throw "No measurement with the name " + this.props.measurementName + " or no associated data";
+				throw "No measurement with the name " + encodeURIComponent(this.props.measurementName) + " or no associated data";
 			}
 
 			let timefrom = results[0].series[0].values[0][0],
@@ -219,7 +219,7 @@ class HTMLReportControl extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 			    timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
 			    grouping = Math.max(1, Math.round(timeDifference / 1000));
 
-			Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,iv from "${this.props.measurementName}_iv" ORDER BY time ASC;`, db, this.props.db).then(results => {
+			Object(__WEBPACK_IMPORTED_MODULE_1__influx__["a" /* query */])(`SELECT time,iv from "${encodeURIComponent(this.props.measurementName)}_iv" ORDER BY time ASC;`, db, this.props.db).then(results => {
 
 				if (!results[0].series) {
 					console.warn("No IV curves for this serie");

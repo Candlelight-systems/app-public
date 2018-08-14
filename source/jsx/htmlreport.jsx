@@ -977,7 +977,7 @@ class HTMLReport extends React.Component {
 		var db = props.db.db;		
 		let time, wave = Graph.newWaveform();
 
-		return influxquery( `SELECT time,voc FROM "${ props.measurementName }_voc" ORDER BY time`, db, props.db ).then( async ( results ) => {
+		return influxquery( `SELECT time,voc FROM "${ encodeURIComponent( props.measurementName ) }_voc" ORDER BY time`, db, props.db ).then( async ( results ) => {
 
 			if( ! results[ 0 ].series ) {
 				this.data.voc = Graph.newWaveform();
@@ -1009,7 +1009,7 @@ class HTMLReport extends React.Component {
 		var db = props.db.db;		
 		let time, wave = Graph.newWaveform();
 
-		return influxquery( `SELECT time,jsc FROM "${ props.measurementName }_jsc" ORDER BY time`, db, props.db ).then( async ( results ) => {
+		return influxquery( `SELECT time,jsc FROM "${ encodeURIComponent( props.measurementName ) }_jsc" ORDER BY time`, db, props.db ).then( async ( results ) => {
 
 			if( ! results[ 0 ].series ) {
 				this.data.jsc = Graph.newWaveform();
@@ -1039,7 +1039,7 @@ class HTMLReport extends React.Component {
 		var db = props.db.db;
 		let jvCfg = props.config.jv || [];
 
-		await influxquery(`SELECT time,efficiency FROM "${ props.measurementName }" ORDER BY time ASC limit 1; SELECT time,efficiency FROM "${ props.measurementName }" ORDER BY time DESC limit 1;`, db, props.db ).then( async ( results ) => {
+		await influxquery(`SELECT time,efficiency FROM "${ encodeURIComponent( props.measurementName ) }" ORDER BY time ASC limit 1; SELECT time,efficiency FROM "${ encodeURIComponent( props.measurementName ) }" ORDER BY time DESC limit 1;`, db, props.db ).then( async ( results ) => {
 			
 			if( ! results[ 0 ].series ) {
 				throw "No measurement with the name " + props.measurementName + " or no associated data";
@@ -1051,7 +1051,7 @@ class HTMLReport extends React.Component {
 				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
 				grouping = Math.max( 1, Math.round( timeDifference / 2000 ) );
 
-			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
+			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + encodeURIComponent( props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
 			let toReturn = await influxquery(qString, db, props.db ).then( ( results ) => {
 				
@@ -1102,14 +1102,24 @@ class HTMLReport extends React.Component {
 						//value[ 2 ] = NaN;
 				//	}
 
-					waveEfficiency.append( time, value[ 1 ] );					
+					if( value[ 1 ] < 100 && value[ 1 ] > 0 ) {
+						waveEfficiency.append( time, value[ 1 ] );					
+					}
+
 					wavePower.append( time, value[ 2 ] * value[ 3 ] );					
-					waveVoltage.append( time, value[ 2 ] );					
+					
+					if( value[ 2 ] < 200 && value[ 2 ] > -200 ) {
+						waveVoltage.append( time, value[ 2 ] );					
+					}
+					
 					waveCurrent.append( time, value[ 3 ] );
 
 					waveSun.append( time, value[ 5 ] );
 					waveHumidity.append( time, value[ 4 ] );
-					waveTemperature.append( time, value[ 6 ] );		
+
+					if( value[ 6 ] !== 0 ) {
+						waveTemperature.append( time, value[ 6 ] );
+					}
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
 				} );
@@ -1144,11 +1154,11 @@ class HTMLReport extends React.Component {
 			let time_1000h = tfrom + 1000000000 * 3600 * 1000;
 			
 			this.data.timeEfficiencies = await influxquery(`
-				SELECT efficiency FROM "${ props.measurementName }" WHERE time > ${ time_1h } ORDER BY time ASC LIMIT 1;
-				SELECT efficiency FROM "${ props.measurementName }" WHERE time > ${ time_24h } ORDER BY time ASC LIMIT 1;
-				SELECT efficiency FROM "${ props.measurementName }" WHERE time > ${ time_100h } ORDER BY time ASC LIMIT 1;
-				SELECT efficiency FROM "${ props.measurementName }" WHERE time > ${ time_500h } ORDER BY time ASC LIMIT 1;
-				SELECT efficiency FROM "${ props.measurementName }" WHERE time > ${ time_1000h } ORDER BY time ASC LIMIT 1;
+				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_1h } ORDER BY time ASC LIMIT 1;
+				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_24h } ORDER BY time ASC LIMIT 1;
+				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_100h } ORDER BY time ASC LIMIT 1;
+				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_500h } ORDER BY time ASC LIMIT 1;
+				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_1000h } ORDER BY time ASC LIMIT 1;
 			`, db, props.db ).then( ( results ) => {
 			
 				return results.map( ( result ) => {
@@ -1162,7 +1172,7 @@ class HTMLReport extends React.Component {
 
 			});
 
-			let jvQuery = jvCfg.map( time => `SELECT * FROM "${ props.measurementName }_iv" WHERE time='${ time }'` ).join( ";" );
+			let jvQuery = jvCfg.map( time => `SELECT * FROM "${ encodeURIComponent( props.measurementName ) }_iv" WHERE time='${ time }'` ).join( ";" );
 
 			if( jvQuery.length > 0 ) {
 
