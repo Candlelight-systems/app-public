@@ -93,7 +93,7 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "128.178.118.250",
+				"trackerHost": "128.178.117.93",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081

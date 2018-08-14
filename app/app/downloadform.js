@@ -403,10 +403,10 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 
 		var db = this.props.db.db;
 
-		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT time,efficiency FROM \"" + this.props.measurementName + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + this.props.measurementName + "\" ORDER BY time DESC limit 1;", db, this.props.db).then(async results => {
+		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT time,efficiency FROM \"" + encodeURIComponent(this.props.measurementName) + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + encodeURIComponent(this.props.measurementName) + "\" ORDER BY time DESC limit 1;", db, this.props.db).then(async results => {
 
 			if (!results[0].series) {
-				throw "No measurement with the name " + this.props.measurementName + " or no associated data";
+				throw "No measurement with the name " + encodeURIComponent(this.props.measurementName) + " or no associated data";
 			}
 
 			let timefrom = results[0].series[0].values[0][0],
@@ -414,7 +414,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 			    timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
 			    grouping = Math.max(1, Math.round(timeDifference / 1000));
 
-			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + this.props.measurementName + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db).then(results => {
+			let toReturn = await Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + encodeURIComponent(this.props.measurementName) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db).then(results => {
 
 				let values = results[0].series[0].values,
 				    offset,
@@ -495,11 +495,11 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 				let time_1000h = tfrom + 1000000000 * 3600 * 1000;
 
 				toReturn.timeEfficiencies = await Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])(`
-					SELECT efficiency FROM "${this.props.measurementName}" WHERE time > ${time_1h} ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${this.props.measurementName}" WHERE time > ${time_24h} ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${this.props.measurementName}" WHERE time > ${time_100h} ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${this.props.measurementName}" WHERE time > ${time_500h} ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${this.props.measurementName}" WHERE time > ${time_1000h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(this.props.measurementName)}" WHERE time > ${time_1h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(this.props.measurementName)}" WHERE time > ${time_24h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(this.props.measurementName)}" WHERE time > ${time_100h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(this.props.measurementName)}" WHERE time > ${time_500h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(this.props.measurementName)}" WHERE time > ${time_1000h} ORDER BY time ASC LIMIT 1;
 				`, db, this.props.db).then(results => {
 
 					return results.map(result => {
@@ -526,9 +526,9 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 		    timefrom;
 
 		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])(`
-			SELECT time,efficiency FROM "${this.props.measurementName}" ORDER BY time ASC limit 1;
-			SELECT time,voc FROM "${this.props.measurementName}_voc" ORDER BY time ASC;
-			SELECT time,jsc FROM "${this.props.measurementName}_jsc" ORDER BY time ASC;`, db, this.props.db).then(async results => {
+			SELECT time,efficiency FROM "${encodeURIComponent(this.props.measurementName)}" ORDER BY time ASC limit 1;
+			SELECT time,voc FROM "${encodeURIComponent(this.props.measurementName)}_voc" ORDER BY time ASC;
+			SELECT time,jsc FROM "${encodeURIComponent(this.props.measurementName)}_jsc" ORDER BY time ASC;`, db, this.props.db).then(async results => {
 
 			results.map((results, index) => {
 
@@ -569,7 +569,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 		let timefrom;
 
 		return Object(__WEBPACK_IMPORTED_MODULE_3__influx__["a" /* query */])(`
-			SELECT time,iv FROM "${this.props.measurementName}_iv" ORDER BY time ASC;`, db, this.props.db).then(async results => {
+			SELECT time,iv FROM "${encodeURIComponent(this.props.measurementName)}_iv" ORDER BY time ASC;`, db, this.props.db).then(async results => {
 
 			return results.map((results, index) => {
 
