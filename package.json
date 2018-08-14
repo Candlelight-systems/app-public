@@ -4,7 +4,7 @@
   "email": "contact@candlelight-systems.com",
   "license": "MIT",
   "description": "Front-end interface for the Candlelight ageing systems",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "http://candlelight-systems.com",
   "devDependencies": {
     "babel-cli": "^6.24.1",
