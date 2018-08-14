@@ -24,11 +24,12 @@
     "grunt-contrib-sass": "^1.0.0",
     "grunt-webpack": "^2.0.1",
     "jquery": "^3.2.1",
-    "node-jsgraph": "^2.0.78",
+    "node-jsgraph": "^2.0.90",
     "react": "^15.5.4",
     "webpack": "^3.4.1"
   },
   "dependencies": {
+    "bootstrap": "3",
     "bootstrap-slider": "^9.9.0",
     "fix-path": "^2.1.0",
     "grunt": "^1.0.3",
