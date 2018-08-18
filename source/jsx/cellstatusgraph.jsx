@@ -166,22 +166,14 @@ class statusGraph extends GraphComponent {
 			shape.kill();
 		});
 */
-		if( this.props.data_IV ) {
+		
 
-			this.shapes_IV = this.props.data_IV.map( ( data_IV ) => {
-			//	console.log( data_IV );
-				/*let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
-				shape.draw();
-				shape.redraw();
-				return shape;*/
-			} );
-
-		}
-console.log( this.props.data );
 		if( this.graph && this.props.data ) {
 
 			this.serie.setWaveform( this.props.data );
 			this.serieZone.setWaveform( this.props.data.duplicate( true ).prepend( 0, 0 ).append( ( wave ) => wave.getXRaw( wave.getLength() - 1 ), 0 ) );
+			
+
 			this.graph.autoscaleAxes();
 			
 			//this.graph.updateLegend();
@@ -228,6 +220,27 @@ console.log( this.props.data );
 				.setUnit( nextProps.axisUnit );
 
 			this.serie.setLabel( this.props.serieLabelLegend );
+		}
+
+
+		if( nextProps.data_IV && nextProps.data_IV !== this.props.data_IV ) {
+
+			this.shapes_IV.map( shape => shape.kill() );
+
+			this.shapes_IV = nextProps.data_IV.map( ( data_IV ) => {
+				
+				if( data_IV[ 0 ] === null ) {
+					return;
+				}
+
+				let shape = this.graph.newShape( 'ellipse', { position: [ { x: data_IV[ 0 ], y: data_IV[ 1 ] } ] } );
+
+				shape.setFillColor( 'black' );
+				shape.setR( '2px' );
+				shape.draw();
+				shape.redraw();
+				return shape;
+			} );
 		}
 	}
 

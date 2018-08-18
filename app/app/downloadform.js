@@ -602,7 +602,7 @@ class DownloadForm extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compone
 
 	async downloadPDF() {
 
-		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName);
+		__WEBPACK_IMPORTED_MODULE_7_electron__["ipcRenderer"].send("htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName, this.props.instrumentId);
 	}
 
 	render() {
