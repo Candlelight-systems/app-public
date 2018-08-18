@@ -241,7 +241,7 @@ app.on('activate', function () {
   }
 })
 
-async function downloadData( event, tracker, measurementName, chanId ) {
+async function downloadData( event, tracker, measurementName, chanId, instrumentId ) {
 
     let json = await fetch( `http://${ tracker.trackerHost }:${ tracker.trackerPort }/getMeasurement?measurementName=${ measurementName }`, {
       method: 'GET'
@@ -257,7 +257,8 @@ async function downloadData( event, tracker, measurementName, chanId ) {
       measurementName: measurementName, 
       db: config.database, 
       cellInfo: json.cellInfo, 
-      chanId: chanId 
+      chanId: chanId,
+      instrumentId: instrumentId
     
     }, {
         width: 850,
@@ -275,7 +276,7 @@ async function downloadData( event, tracker, measurementName, chanId ) {
 
 
 
-function htmlReport( event, cellInfo, chanId, measurementName ) {
+function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
 
     let listenerConfig, listenerSavePDF/*, listenerPrintPDF*/;
 
@@ -372,7 +373,7 @@ function htmlReport( event, cellInfo, chanId, measurementName ) {
   
 
     windows[ 'htmlReport' ].webContents.once("dom-ready", () => {
-      windows[ 'htmlReport' ].webContents.send("loadData", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId } );
+      windows[ 'htmlReport' ].webContents.send("loadData", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId, instrumentId: instrumentId } );
     });     
       // and load the index.html of the app.
     windows[ 'htmlReport' ].loadURL( url.format({

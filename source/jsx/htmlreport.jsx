@@ -3,6 +3,7 @@ import { query as influxquery } from "../influx";
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import { getIVParameters } from '../../app/util/iv'
 import { ipcRenderer } from 'electron';
+import environment from "../../app/environment.json"
 
 
 const colors = {
@@ -1106,13 +1107,18 @@ class HTMLReport extends React.Component {
 						waveEfficiency.append( time, value[ 1 ] );					
 					}
 
-					wavePower.append( time, value[ 2 ] * value[ 3 ] );					
+					if( Math.abs( value[ 2 ] * value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].voltageRange * environment.instrument[ this.props.instrumentId ].fsr  ) {
+						wavePower.append( time, value[ 2 ] * value[ 3 ] );
+					}
 					
-					if( value[ 2 ] < 200 && value[ 2 ] > -200 ) {
+					
+					if( Math.abs( value[ 2 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
 						waveVoltage.append( time, value[ 2 ] );					
 					}
 					
-					waveCurrent.append( time, value[ 3 ] );
+					if( Math.abs( value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr ) {
+						waveCurrent.append( time, value[ 3 ] );
+					}
 
 					waveSun.append( time, value[ 5 ] );
 					waveHumidity.append( time, value[ 4 ] );

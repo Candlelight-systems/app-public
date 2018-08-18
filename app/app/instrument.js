@@ -421,7 +421,6 @@ class GraphComponent extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.PureC
 	}
 
 	resize(props) {
-		console.log(props);
 		this.graph.resize(props.width || 300, props.height || 130);
 	}
 
@@ -1083,7 +1082,7 @@ class TrackerGroupDevices extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.
         data.chanStatuses[chanIds[i]] = Object.assign({}, response, { cellName: response["__cellName_" + chanIds[i]] });
         //delete response["__cellName_" + chanIds[ i ] ];
       }
-      console.log(data);
+
       return Object(__WEBPACK_IMPORTED_MODULE_6__queries__["h" /* saveChannelStatuses */])(this.props.config, data);
     });
 
@@ -1488,8 +1487,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 		if (data.state.voltage && data.state.current && this.state.data_IV) {
 
-			this.state.data_IV.append(data.state.voltage, data.state.current);
-			newState.data_IV = this.state.data_IV;
+			if (Math.abs(data.state.current) < __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default.a.instrument[this.props.instrumentId].fsr && Math.abs(data.state.voltage) < __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange) {
+				this.state.data_IV.append(data.state.voltage, data.state.current);
+				newState.data_IV = this.state.data_IV;
+			}
 		}
 
 		if (data.state.power) {
@@ -1696,7 +1697,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 
 	downloadData() {
 
-		__WEBPACK_IMPORTED_MODULE_9_electron__["ipcRenderer"].send("downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId);
+		__WEBPACK_IMPORTED_MODULE_9_electron__["ipcRenderer"].send("downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId, this.props.instrumentId);
 	}
 
 	autoZero() {
@@ -1844,10 +1845,21 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						newState._last_iv_time = value[0];
 					}
 
+					let t1;
+					let t2 = new Date(value[0]);
+
+					if (results[0].series) {
+						t1 = new Date(results[0].series[0].values[0][0]);
+						t1 = t1.getTime();
+					} else {
+						t1 = null;
+					}
+
 					return {
-						time: new Date(value[0]),
+						time: t2,
 						iv: this.readIV(value[1]),
-						sun: value[2]
+						sun: value[2],
+						ellapsed: t1 !== null ? (t2.getTime() - t1) / 3600000 : null
 					};
 				}));
 
@@ -1856,8 +1868,9 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.iv_values = newState.ivCurves.map(ivCurve => {
 
 					const p = ivCurve.iv.duplicate().math((x, y) => x * y);
-					const parameters = Object(__WEBPACK_IMPORTED_MODULE_6__app_util_iv__["a" /* getIVParameters */])(ivCurve.iv, p, this.state.serverState.cellArea, ivCurve.sun * 1000, false);
-					return parameters[parameter_jv];
+					const parameters = Object(__WEBPACK_IMPORTED_MODULE_6__app_util_iv__["a" /* getIVParameters */])(ivCurve.iv, p, this.state.serverState.cellArea, ivCurve.sun * 1000, true);
+
+					return [ivCurve.ellapsed, parameters[parameter_jv]];
 				});
 			}
 
@@ -1997,7 +2010,10 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 					waveSun.append(time, value[5]);
 
 					if (index > values.length * 0.8) {
-						waveIV.append(value[3], value[4]);
+
+						if (Math.abs(value[4]) < __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default.a.instrument[this.props.instrumentId].fsr && Math.abs(value[3]) < __WEBPACK_IMPORTED_MODULE_10__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange) {
+							waveIV.append(value[3], value[4]);
+						}
 					}
 
 					waveTemperature.append(time, value[6]);
@@ -2028,7 +2044,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 				newState.highest_value = Math.round(highest_value * 100) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
-				console.log(wave);
+
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -2670,7 +2686,7 @@ class TrackerDevice extends __WEBPACK_IMPORTED_MODULE_8_react___default.a.Compon
 						width: "290",
 						height: "230",
 						shown: true,
-						key: this.props.instrumentId + this.props.chanId + "_iv",
+						instrumentId: this.props.instrumentId,
 						data: this.state.ivCurves,
 						dataIV: this.state.data_IV,
 						voltage: this.state.voltage,
@@ -2925,21 +2941,12 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
   			shape.kill();
   		});
   */
-		if (this.props.data_IV) {
 
-			this.shapes_IV = this.props.data_IV.map(data_IV => {
-				//	console.log( data_IV );
-				/*let shape = this.graph.newShape( 'ellipse', { rx: '3px', ry: '3px', position: { x: data_IV.x, y: data_IV.y } } );
-    shape.draw();
-    shape.redraw();
-    return shape;*/
-			});
-		}
-		console.log(this.props.data);
 		if (this.graph && this.props.data) {
 
 			this.serie.setWaveform(this.props.data);
 			this.serieZone.setWaveform(this.props.data.duplicate(true).prepend(0, 0).append(wave => wave.getXRaw(wave.getLength() - 1), 0));
+
 			this.graph.autoscaleAxes();
 
 			//this.graph.updateLegend();
@@ -2982,6 +2989,26 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 
 			this.serie.setLabel(this.props.serieLabelLegend);
 		}
+
+		if (nextProps.data_IV && nextProps.data_IV !== this.props.data_IV) {
+
+			this.shapes_IV.map(shape => shape.kill());
+
+			this.shapes_IV = nextProps.data_IV.map(data_IV => {
+
+				if (data_IV[0] === null) {
+					return;
+				}
+
+				let shape = this.graph.newShape('ellipse', { position: [{ x: data_IV[0], y: data_IV[1] }] });
+
+				shape.setFillColor('black');
+				shape.setR('2px');
+				shape.draw();
+				shape.redraw();
+				return shape;
+			});
+		}
 	}
 
 	shouldComponentUpdate(nextProps) {
@@ -3010,6 +3037,9 @@ class statusGraph extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" 
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__app_environment_json__);
+
 
 
 
@@ -3038,7 +3068,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		this.graph = new __WEBPACK_IMPORTED_MODULE_1_node_jsgraph_dist_jsgraph_es6___default.a(this.graphDOM, {
 
-			paddingTop: 10,
+			paddingTop: 5,
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 5,
@@ -3099,8 +3129,6 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			});
 		}
 
-		console.log(shouldUpdate, nextProps.updatedTime, this.props.updatedTime);
-
 		return shouldUpdate;
 	}
 
@@ -3112,7 +3140,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 
 		//	this.graph.resetSeries();
 
-		let maxY = 0;
+		//let maxY = 0;
 
 		let indices = [];
 
@@ -3162,7 +3190,7 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 			s.setWaveform(data.iv);
 			s2.setWaveform(data.iv.duplicate().math((y, x) => y * x));
 
-			maxY = Math.max(maxY, data.iv.getMaxY());
+			//			maxY = Math.max( maxY, data.iv.getMaxY() );
 			k++;
 		});
 
@@ -3177,7 +3205,11 @@ class statusIV extends __WEBPACK_IMPORTED_MODULE_0__graphcomponent_jsx__["a" /* 
 		this.graph.autoscaleAxes();
 		this.graph.show();
 
-		this.graph.getYAxis().forceMin(-maxY * 0.5);
+		this.graph.getYAxis().setLowestMin(-__WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentId].fsr * 1e-3);
+		this.graph.getYAxis().setHighestMax(__WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentId].fsr * 1e-3);
+		this.graph.getXAxis().setLowestMin(-__WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange);
+		this.graph.getXAxis().setHighestMax(__WEBPACK_IMPORTED_MODULE_3__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange);
+
 		this.ellipse.setPosition({ x: this.props.voltage, y: this.props.current / 1000 });
 		this.ellipse.redraw();
 

@@ -115,7 +115,7 @@ ipcRenderer.on("config", (event, cfg) => {
 
 function render() {
 
-	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__["a" /* default */], { config: config, db: data.db, measurementName: data.measurementName, cellInfo: data.cellInfo, chanId: data.chanId }), document.getElementById('root'));
+	__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__jsx_htmlreport_jsx__["a" /* default */], { instrumentId: data.instrumentId, config: config, db: data.db, measurementName: data.measurementName, cellInfo: data.cellInfo, chanId: data.chanId }), document.getElementById('root'));
 }
 
 /***/ }),
@@ -137,6 +137,9 @@ module.exports = require("react-dom");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_util_iv__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_electron__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__app_environment_json__);
+
 
 
 
@@ -873,13 +876,17 @@ class HTMLReport extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component
 						waveEfficiency.append(time, value[1]);
 					}
 
-					wavePower.append(time, value[2] * value[3]);
+					if (Math.abs(value[2] * value[3] * 1000) < __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange * __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.instrument[this.props.instrumentId].fsr) {
+						wavePower.append(time, value[2] * value[3]);
+					}
 
-					if (value[2] < 200 && value[2] > -200) {
+					if (Math.abs(value[2]) < __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.instrument[this.props.instrumentId].voltageRange) {
 						waveVoltage.append(time, value[2]);
 					}
 
-					waveCurrent.append(time, value[3]);
+					if (Math.abs(value[3] * 1000) < __WEBPACK_IMPORTED_MODULE_5__app_environment_json___default.a.instrument[this.props.instrumentId].fsr) {
+						waveCurrent.append(time, value[3]);
+					}
 
 					waveSun.append(time, value[5]);
 					waveHumidity.append(time, value[4]);
@@ -1592,6 +1599,12 @@ let getIVParameters = (waveform, powerwaveform, area, powin, inverted = false) =
     vmax: vmax
   };
 };
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+module.exports = {"ageing":true,"statuses":{"light":{"version":"2.0","readonly":false}},"instrument":{"Top port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}},"Bottom port":{"ADC":{"model":"ADS1259"},"changeSpeed":false,"fsr":30,"LSB":1.22,"LSBValue":1,"voltageRange":2.5,"autoZero":"instrument","groups":{"Sample holder":{"resettable":false,"displayDeviceInformation":{"time_ellapsed":true,"pce":true,"power":false,"sun":true,"voc":true,"jsc":true,"ff":true,"vnow":true,"jnow":true,"temperature":true,"humidity":true,"kwh_yr":false}}}}}}
 
 /***/ })
 /******/ ]);
