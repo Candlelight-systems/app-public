@@ -64,7 +64,7 @@ class statusGraph extends GraphComponent {
 
 
 		this.serie = this.graph.newSerie();
-		this.serie.setLineColor( __THEME_GRAPH_EFFICIENCY_LINECOLOR );
+		this.serie.setLineColor( "__THEME_GRAPH_EFFICIENCY_LINECOLOR" );
 		this.serie.autoAxis();
 		this.serie.setLineWidth( 2 );		
 
@@ -83,12 +83,12 @@ class statusGraph extends GraphComponent {
 						.setTickLabelOffset( -60 )
 						.setTickPosition( Graph.TICKS_INSIDE )
 						.secondaryGridOff()
-						.setPrimaryTicksColor( __THEME_GRAPH_EFFICIENCY_TICKCOLOR )
-						.setSecondaryTicksColor( __THEME_GRAPH_EFFICIENCY_TICKCOLOR )
-						.setTicksLabelColor( __THEME_GRAPH_EFFICIENCY_TICKLABELCOLOR )
+						.setPrimaryTicksColor( "__THEME_GRAPH_EFFICIENCY_TICKCOLOR" )
+						.setSecondaryTicksColor( "__THEME_GRAPH_EFFICIENCY_TICKCOLOR" )
+						.setTicksLabelColor( "__THEME_GRAPH_EFFICIENCY_TICKLABELCOLOR" )
 						.setNbTicksSecondary( 0 )
 						.setUnit( 'h' )
-						.setPrimaryGridColor( __THEME_GRAPH_EFFICIENCY_AXISCOLOR );
+						.setPrimaryGridColor( "__THEME_GRAPH_EFFICIENCY_AXISCOLOR" );
 						
 			this.graph.getYAxis().hide();
 

@@ -173,7 +173,7 @@ class TrackerDevice extends React.Component {
 
 		if( data.state.voltage && data.state.current && this.state.data_IV ) {
 
-			if( Math.abs( data.state.current ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( data.state.voltage ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
+			if( Math.abs( data.state.current * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( data.state.voltage ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
 				this.state.data_IV.append( data.state.voltage, data.state.current );
 				newState.data_IV = this.state.data_IV;
 			}
@@ -712,7 +712,7 @@ class TrackerDevice extends React.Component {
 
 					if( index > values.length * 0.8 ) {		
 
-						if( Math.abs( value[ 4 ] ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( value[ 3 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
+						if( Math.abs( value[ 4 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( value[ 3 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
 							waveIV.append( value[ 3 ], value[ 4 ] );
 						}
 					}
