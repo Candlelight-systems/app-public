@@ -3,9 +3,10 @@
 import GraphComponent from './graphcomponent.jsx';
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 import React from 'react';
+import environment from "../../app/environment.json"
 
 
-const color = __THEME_GRAPH_IV_MAINCOLOR;
+const color = "__THEME_GRAPH_IV_MAINCOLOR";
 
 class statusIV extends GraphComponent {
 
@@ -27,7 +28,7 @@ class statusIV extends GraphComponent {
 
 		this.graph = new Graph( this.graphDOM, {
 			
-			paddingTop: 10,
+			paddingTop: 5,
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 5,
@@ -114,8 +115,6 @@ class statusIV extends GraphComponent {
 			});
 		}
 
-		console.log( shouldUpdate, nextProps.updatedTime, this.props.updatedTime );
-
 		return shouldUpdate;
 	}
 
@@ -127,7 +126,7 @@ class statusIV extends GraphComponent {
 
 	//	this.graph.resetSeries();
 		
-		let maxY = 0;
+		//let maxY = 0;
 
 		let indices = [];
 			
@@ -177,7 +176,7 @@ class statusIV extends GraphComponent {
 			s.setWaveform( data.iv );
 			s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
 
-			maxY = Math.max( maxY, data.iv.getMaxY() );
+//			maxY = Math.max( maxY, data.iv.getMaxY() );
 			k++;
 		});
 
@@ -193,7 +192,11 @@ class statusIV extends GraphComponent {
 		this.graph.autoscaleAxes();
 		this.graph.show();
 		
-		this.graph.getYAxis().forceMin( - maxY * 0.5 );	
+		this.graph.getYAxis().setLowestMin( - environment.instrument[ this.props.instrumentId ].fsr * 1e-3 );	
+		this.graph.getYAxis().setHighestMax( environment.instrument[ this.props.instrumentId ].fsr * 1e-3 );
+		this.graph.getXAxis().setLowestMin( - environment.instrument[ this.props.instrumentId ].voltageRange );
+		this.graph.getXAxis().setHighestMax( environment.instrument[ this.props.instrumentId ].voltageRange );	
+
 		this.ellipse.setPosition( { x: this.props.voltage, y: this.props.current / 1000 } );
 		this.ellipse.redraw();
 

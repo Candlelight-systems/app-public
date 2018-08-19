@@ -1,74 +1,13 @@
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+'use strict';
 
-(function webpackMissingModule() { throw new Error("Cannot find module \"./source/calibratePD.jsx\""); }());
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var React = _interopDefault(require('react'));
+var ReactDOM = _interopDefault(require('react-dom'));
+require('electron');
 
-/***/ })
-/******/ ]);
+class CalibratePD extends React.Component{constructor(a){super(a), this.unit={voltage:React.createElement("span",null,"V"),currentdensity:React.createElement("span",null,"mA cm",React.createElement("sup",null,"-2")),current:React.createElement("span",null,"mA"),efficiency:React.createElement("span",null,"%"),fillfactor:React.createElement("span",null,"%"),sun:React.createElement("span",null,"sun"),area:React.createElement("span",null,"cm",React.createElement("sup",null,"2"))}, this.state={channelsJsc:{}}, this.handleInputChange=this.handleInputChange.bind(this), this.handleInputChangeLi=this.handleInputChangeLi.bind(this), this.scalePD=this.scalePD.bind(this), this.close=this.close.bind(this), this.setRequestTimeout();}close(){this.props.onClose();}async scalePD(a){let b;this.setState({rescaling_success:!1}), b=a?a/this.state.channelsJsc.pd:this.state.control.factory_scaling_ma_to_sun, b=Math.round(1e3*b)/1e3;let c=JSON.stringify({instrumentId:this.props.instrumentId,groupName:this.props.groupName,pdScale:b}),d=new Headers({"Content-Type":"application/json","Content-Length":c.length.toString()});await fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/light.setPDScaling",{method:"POST",headers:d,body:c}), this.setState({rescaling_success:!0}), await this.getPD();}setRequestTimeout(){setTimeout(()=>{for(var a=[],b=0;b<this.state.channels.length;b++)this.state["mon_"+this.state.channels[b].chanId]&&a.push(this.state.channels[b].chanId);fetch(`http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent(this.props.instrumentId)}&groupName=${this.props.groupName}&chanIds=${a.join(",")}`,{method:"GET"}).then(a=>a.json()).then(a=>{for(var b in a)"pd"==b?a.pd=a.pd:a[b]*=1e3;this.setState({channelsJsc:a});}).catch(()=>{}).then(()=>{this.setRequestTimeout();});},2e3);}async componentDidMount(){await fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/getChannels?instrumentId="+this.props.instrumentId+"&groupName="+this.props.groupName,{method:"GET"}).then(a=>a.json()).then(a=>{this.setState({channels:a}), a.forEach(a=>{this.setState({["size_"+a.chanId]:null});});}).catch(a=>{console.error(a), console.error("Error in getting channels JSON");}), await this.getPD();}getPD(){return fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/getPDOptions?instrumentId="+this.props.instrumentId+"&groupName="+this.props.groupName,{method:"GET"}).then(a=>a.json()).then(a=>{this.setState({control:a});}).catch(a=>{console.error(a), console.error("Error in getting light controller");})}handleInputChange(a){const b=a.target,c="checkbox"===b.type?b.checked:b.value,d=b.name;this.setState({[d]:c});}handleInputChangeLi(a){const b=a.target,c=!b.classList.contains("active"),d=b.getAttribute("data-name");this.setState({[d]:c});}async enableChannel(a){await fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/enableChannel?instrumentId="+this.props.instrumentId+"&chanId="+a+"&noIV=true",{method:"GET"}), await fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/setVoltage?instrumentId="+this.props.instrumentId+"&chanId="+a+"&voltage=0",{method:"GET"});}async disableChannel(a){await fetch("http://"+this.props.config.trackerHost+":"+this.props.config.trackerPort+"/disableChannel?instrumentId="+this.props.instrumentId+"&chanId="+a,{method:"GET"});}componentWillUpdate(a,b){if(this.state.channels&&Array.isArray(this.state.channels))for(var c in this.state.channels){let a=this.state.channels[c].chanId,d="mon_"+a;this.state[d]&&!b[d]?this.disableChannel(a):!this.state[d]&&b[d]&&this.enableChannel(a);}}jsc(a,b,c,d){if(this.state.channelsJsc[a]===void 0)return b?"":0;let e=this.state.channelsJsc[a];if(null===e||e===void 0)return b?"":0;c&&this.state.size&&0<this.state.size?e/=this.state.size:c=!1;let f=e.toPrecision(4);return b?React.createElement("span",{className:"badge"},f," mA ",c?React.createElement("span",null,"cm",React.createElement("sup",null,"-2")):""," ",d?" / "+Math.round(100*e*d)/100+" sun":""):e}render(){let a;const b=this.state.control;return React.createElement("div",{className:"container-fluid",id:"calib_light_list"},React.createElement("div",{className:"col-sm-9"},React.createElement("div",{className:"alert alert-info"}," ",React.createElement("span",{className:"glyphicon glyphicon-info-sign","aria-hidden":"true"})," Switch to manual mode in order to gain control of the light intensity")),!!this.state.rescaling_success&&React.createElement("div",{className:"col-sm-9"},React.createElement("div",{className:"alert alert-success"}," ",React.createElement("span",{className:"glyphicon glyphicon-check-sign","aria-hidden":"true"})," Successfully updated the photodiode scaling factor")),React.createElement("div",{className:"col-sm-5"},React.createElement("h4",null,"Monitor short circuit currents"),React.createElement("div",{className:"form-group"},React.createElement("div",{className:"input-group"},React.createElement("span",{className:"input-group-addon"},"Cell area :"),React.createElement("input",{type:"number",min:"0",max:"2",step:"0.01",className:"form-control",name:"size",value:this.state.size,onChange:this.handleInputChange}),React.createElement("span",{className:"input-group-addon"},"cm",React.createElement("sup",null,"-2")))),React.createElement("ul",{className:"list-group"},b?React.createElement("li",{key:"_photodiode","data-name":"pd",className:"list-group-item active"},this.jsc("pd",!0,!1,b.scaling),"Photodiode"):null,!!this.state.channels&&this.state.channels.map(a=>React.createElement("li",{key:a.chanId,"data-name":"mon_"+a.chanId,className:"list-group-item "+(this.state["mon_"+a.chanId]?"active":""),onClick:this.handleInputChangeLi},this.jsc(a.chanId,!0,!0),"Channel ",a.chanId)))),React.createElement("div",{className:"col-sm-4"},React.createElement("h4",null,"2-point calibration"),React.createElement("p",null,"To calibrate the light intensity with respect to the short circuit of your device, manually adjust the light intensity such that the short circuit current of the solar cells corresponds to the one measured on an AM1.5G source.",React.createElement("br",null),"You can also reset the default settings to the factory calibrated reference photodiode short circuit current."),React.createElement("div",null,React.createElement("div",{className:"form-group"},React.createElement("label",null,"Photodiode"),React.createElement("input",{className:"form-control",readOnly:"readonly",value:(a=this.jsc("pd",!1)).toPrecision(4)?a+" mA":""})),React.createElement("div",{className:"form-group"},React.createElement("div",{className:"btn-group"},React.createElement("button",{className:"btn btn-default",type:"button",onClick:()=>this.scalePD(1)},"Set as 1 sun"),!!this.state.control&&React.createElement("button",{className:"btn btn-default",type:"button",onClick:()=>this.scalePD()},"Factory reset (",Math.round(100*this.state.channelsJsc.pd*b.factory_scaling_ma_to_sun)/100," sun)")))),React.createElement("div",{className:"btn-group"},React.createElement("button",{type:"button",className:"btn btn-default",onClick:this.close},"Close"))))}}
+
+const {ipcRenderer: ipcRenderer$1}=require('electron');ipcRenderer$1.on('loadForm',(a,b)=>{render(b);});function onClose(){ipcRenderer$1.send('closeForm');}function render(a){ReactDOM.render(React.createElement(CalibratePD,{instrumentId:a.instrumentId,groupName:a.groupName,config:a.config,onClose:onClose}),document.getElementById('root'));}
+
+//# sourceMappingURL=calibratepd.js.map

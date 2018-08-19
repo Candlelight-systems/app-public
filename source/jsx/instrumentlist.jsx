@@ -1,6 +1,6 @@
   
 import React from 'react';
-import $ from "jquery";
+
 import fs from "fs";
 import { ipcRenderer } from "electron";
 

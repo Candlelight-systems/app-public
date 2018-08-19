@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-class Error extends React.Component {
+class ErrorMessage extends React.Component {
 
   constructor( props ) {
     super( props );
@@ -23,4 +23,4 @@ class Error extends React.Component {
   }
 }
 
-export default Error;
+export default ErrorMessage;
