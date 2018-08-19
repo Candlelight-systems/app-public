@@ -96,7 +96,7 @@ class TrackerGroupDevices extends React.Component {
         data.chanStatuses[ chanIds[ i ] ] = Object.assign( {}, response, { cellName: response["__cellName_" + chanIds[ i ] ] } );
         //delete response["__cellName_" + chanIds[ i ] ];
       }
-console.log( data );
+
       return saveChannelStatuses( this.props.config, data )
     });
 

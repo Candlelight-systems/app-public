@@ -21,7 +21,7 @@ ipcRenderer.on("config", ( event, cfg ) => {
 function render( ) {
 
 	ReactDOM.render(
-		<HtmlReport config={ config } db={ data.db } measurementName={ data.measurementName } cellInfo={ data.cellInfo } chanId={ data.chanId } />,
+		<HtmlReport instrumentId={ data.instrumentId } config={ config } db={ data.db } measurementName={ data.measurementName } cellInfo={ data.cellInfo } chanId={ data.chanId } />,
 		document.getElementById('root')
 	);
 }

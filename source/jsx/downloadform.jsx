@@ -475,7 +475,7 @@ class DownloadForm extends React.Component {
 	
 	async downloadPDF() {
 
-		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName );
+		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName, this.props.instrumentId );
 	
 	}
 

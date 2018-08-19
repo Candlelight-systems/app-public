@@ -173,8 +173,10 @@ class TrackerDevice extends React.Component {
 
 		if( data.state.voltage && data.state.current && this.state.data_IV ) {
 
-			this.state.data_IV.append( data.state.voltage, data.state.current );			
-			newState.data_IV = this.state.data_IV;
+			if( Math.abs( data.state.current * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( data.state.voltage ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
+				this.state.data_IV.append( data.state.voltage, data.state.current );
+				newState.data_IV = this.state.data_IV;
+			}
 		}
 
 		if( data.state.power ) {
@@ -381,7 +383,7 @@ class TrackerDevice extends React.Component {
 
 	downloadData() {
 
-		ipcRenderer.send( "downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId );
+		ipcRenderer.send( "downloadData", this.props.config, this.state.serverState.measurementName, this.props.chanId, this.props.instrumentId );
 	}
 
 
@@ -544,11 +546,23 @@ class TrackerDevice extends React.Component {
 						newState._last_iv_time = value[ 0 ];
 					}	
 
-					return {
-						time: new Date( value[ 0 ] ),
-						iv: this.readIV( value[ 1 ] ),
-						sun: value[ 2 ]
+					let t1;
+					let t2 = new Date( value[ 0 ] );
+
+					if( results[ 0 ].series ) {
+						t1 = new Date( results[ 0 ].series[ 0 ].values[ 0 ][ 0 ] );
+						t1 = t1.getTime(); 
+					} else {
+						t1 = null;
 					}
+
+					return {
+						time: t2,
+						iv: this.readIV( value[ 1 ] ),
+						sun: value[ 2 ],
+						ellapsed: t1 !== null ? ( t2.getTime() - t1 ) / 3600000 : null
+					}
+
 				} ) );
 				
 				//console.log( newState.ivCurves );
@@ -556,8 +570,9 @@ class TrackerDevice extends React.Component {
 				newState.iv_values = newState.ivCurves.map( ( ivCurve ) => {
 
 					const p = ivCurve.iv.duplicate().math( ( x, y ) => x * y );
-					const parameters = getIVParameters( ivCurve.iv, p, this.state.serverState.cellArea, ivCurve.sun * 1000, false );
-					return parameters[ parameter_jv ];
+					const parameters = getIVParameters( ivCurve.iv, p, this.state.serverState.cellArea, ivCurve.sun * 1000, true );
+
+					return [ ivCurve.ellapsed, parameters[ parameter_jv ] ];
 				} );
 			}
 
@@ -695,8 +710,11 @@ class TrackerDevice extends React.Component {
 					wave.append( time, value[ valueIndex ] );
 					waveSun.append( time, value[ 5 ] );		
 
-					if( index > values.length * 0.8 ) {			
-						waveIV.append( value[ 3 ], value[ 4 ] );
+					if( index > values.length * 0.8 ) {		
+
+						if( Math.abs( value[ 4 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr && Math.abs( value[ 3 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
+							waveIV.append( value[ 3 ], value[ 4 ] );
+						}
 					}
 
 					waveTemperature.append( time, value[ 6 ] );
@@ -730,7 +748,7 @@ class TrackerDevice extends React.Component {
 				newState.highest_value = Math.round( highest_value * 100 ) / 100;
 				newState.highest_value_time = highest_value_time;
 				newState.data = wave;
-				console.log( wave );
+				
 				newState.data_sun = waveSun;
 				newState.data_temperature = waveTemperature;
 				newState.data_humidity = waveHumidity;
@@ -1141,7 +1159,7 @@ class TrackerDevice extends React.Component {
 							width="290"
 							height="230"
 							shown={ true } 
-							key={ this.props.instrumentId + this.props.chanId + "_iv" } 
+							instrumentId={ this.props.instrumentId }
 							data={ this.state.ivCurves } 
 							dataIV={ this.state.data_IV } 
 							voltage={ this.state.voltage } 

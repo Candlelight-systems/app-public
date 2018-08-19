@@ -1,63 +1,14 @@
 'use strict';
 
 var fs = require('fs');
+const rollup_babel =    require( 'rollup-plugin-babel' );
+const rollup_json =     require( 'rollup-plugin-json' );
+const rollup_replace =  require( 'rollup-plugin-replace' );
 
 let webpackConfig;
+let themeJSON;
 
 module.exports = function(grunt) {
-
-
-function generateWebpackConfig( theme ) {
-
-  webpackConfig = {
-
-     externals: {
-      "jquery": "jQuery",
-      "node-jsgraph/dist/jsgraph-es6": "commonjs node-jsgraph/dist/jsgraph-es6",
-      "fs": "commonjs fs",
-      "child_process": "commonjs child_process",
-      "python-shell": "commonjs python-shell",
-      "path": "commonjs path",
-      "electron": "commonjs electron",
-      "react": "commonjs react",
-      "react-dom": "commonjs react-dom",
-      "pdfkit": "commonjs pdfkit",
-      "html-pdf": "commonjs html-pdf",
-      "debounce": "commonjs lodash.debounce"
-     },
-
-     target: 'electron',
-
-      node: {
-        __dirname: false
-      }
-      ,
-
-     module: {
-         loaders: [{
-             test: /\.js$/,
-             exclude: /node_modules/,
-             loader: 'babel-loader'
-         },
-         {
-             test: /\.jsx$/,
-             exclude: /node_modules/,
-             loader: 'babel-loader',
-              query: {
-                presets: [
-                  'react'
-                  ],
-                plugins: [
-                  'transform-class-properties',
-                  [
-                    'inline-replace-variables', theme ]
-                ]
-              }
-         }]
-     }
- }
-
-
 
     grunt.initConfig({
 
@@ -162,145 +113,83 @@ function generateWebpackConfig( theme ) {
           }
         },
 
+        rollup: {
+            main: {
+                options: {
+                    format: 'cjs',
+                    sourceMap: true,
+                    
+                   plugins: function() {
+                          return [
+                            rollup_babel({
+                              exclude: './node_modules/**',
+                              babelrc: false,
+                              presets: [ 'babel-preset-minify', 'react' ],
+                              plugins: [
+                                  'transform-class-properties',
+                                  'transform-exponentiation-operator',
+                                  [ 'inline-replace-variables', {
+                                      '__VERSION__': 'v<%= pkg.version %>'
+                                  } ],
+                                  'transform-node-env-inline'
+                              ]
+                            }),
 
-        babel: {
-          main: {
-            options: {
-              sourceMap: true,
-              comments: false,
-              presets: ['babel-preset-minify', 'react'],
-              plugins: ["transform-node-env-inline"]
+                            rollup_json({})
+                          ];
+                        }
+                },
+                files: {
+                    'app/main.js': 'source/main.js'
+                }
             },
-            files: {
-              'app/main.js': 'source/main.js'
+
+            interface: {
+                    options: {
+                        format: 'cjs',
+                        sourceMap: true,
+                        external: [ 'react', 'react-dom' ],
+                        plugins: function() {
+                              return [
+                                rollup_json({
+                                    exclude: [ '*.json' ]
+                                }),
+                                rollup_babel({
+                                  exclude: [ './node_modules/**',  '*.json' ],
+                                  babelrc: false,
+                                  presets: [ 'react', 'babel-preset-minify' ],
+                                  plugins: [
+                                      'transform-class-properties',
+                                      'transform-exponentiation-operator',
+                                      [ 'inline-replace-variables', {
+                                          '__VERSION__': 'v<%= pkg.version %>'
+                                      } ]
+                                  ]
+                                }),
+                                rollup_replace( themeJSON )
+                              ];
+                        }
+                    },
+                    files: {
+                        'app/app/instrument.js': 'source/instrument.jsx',
+                        'app/app/instrumentform.js': 'source/instrumentform.jsx',
+                        'app/app/cellform.js': 'source/cellform.jsx',
+                        'app/app/cellformall.js': 'source/cellformall.jsx',
+                        'app/app/instrumentlist.js': 'source/instrumentlist.jsx',
+                        'app/app/influxdbform.js': 'source/influxdbform.jsx',
+                        'app/app/downloadform.js': 'source/downloadform.jsx',
+                        'app/app/bugreport.js': 'source/bugreport.jsx',
+                        'app/app/calibratepd.js': 'source/calibratepd.jsx',
+                        'app/app/scheduleLight.js': 'source/scheduleLight.jsx',
+                        'app/app/htmlreport.js': 'source/htmlreport.jsx',
+                        'app/app/calibratepyranometer.js': 'source/calibratepyranometer.jsx',
+                        'app/app/htmlreport_control.js': 'source/htmlreport_control.jsx',
+                        'app/app/showallmeasurements.js': 'source/showallmeasurements.jsx',
+                        'app/app/mppt.js': 'source/mppt.jsx'
+                    }
+                }
             }
-          }
-        },
-
-        webpack: {
-
-           instrument: Object.assign( {
-               entry: [ './source/instrument.jsx' ],
-               output: {
-                   filename: 'app/app/instrument.js'
-               } }, webpackConfig ),
-
-            formInstrument:
-              Object.assign( {
-               entry: [ './source/instrumentform.jsx' ],
-               output: {
-                   filename: 'app/app/instrumentform.js'
-               } }, webpackConfig ),
-
-
-            cellForm:
-              Object.assign( {
-               entry: [ './source/cellform.jsx' ],
-               output: {
-                   filename: 'app/app/cellform.js'
-               } }, webpackConfig ),
-
-
-            cellFormall:
-              Object.assign( {
-               entry: [ './source/cellformall.jsx' ],
-               output: {
-                   filename: 'app/app/cellformall.js'
-               } }, webpackConfig ),
-
-            listInstrument:
-              Object.assign( {
-               entry: [ './source/instrumentlist.jsx' ],
-               output: {
-                   filename: 'app/app/instrumentlist.js'
-               } }, webpackConfig ),
-
-
-            formInflux:
-              Object.assign( {
-               entry: [ './source/influxdbform.jsx' ],
-               output: {
-                   filename: 'app/app/influxdbform.js'
-               } }, webpackConfig ),
-
-            footer:
-              Object.assign( {
-               entry: [ './source/footer.jsx' ],
-               output: {
-                   filename: 'app/app/footer.js'
-               } }, webpackConfig ),
-
-
-            downloadform:
-              Object.assign( {
-               entry: [ './source/downloadform.jsx' ],
-               output: {
-                   filename: 'app/app/downloadform.js'
-               } }, webpackConfig ),
-
-            mppt:
-              Object.assign( {
-               entry: [ './source/mppt.jsx' ],
-               output: {
-                   filename: 'app/app/mppt.js'
-               } }, webpackConfig ),
-
-
-            bugreport:
-              Object.assign( {
-               entry: [ './source/bugreport.jsx' ],
-               output: {
-                   filename: 'app/app/bugreport.js'
-               } }, webpackConfig ),
-
-            calibratePD:
-              Object.assign( {
-               entry: [ './source/calibratepd.jsx' ],
-               output: {
-                   filename: 'app/app/calibratepd.js'
-               } }, webpackConfig ),
-
-
-            scheduleLight:
-              Object.assign( {
-               entry: [ './source/scheduleLight.jsx' ],
-               output: {
-                   filename: 'app/app/scheduleLight.js'
-               } }, webpackConfig ),
-
-            htmlReport:
-              Object.assign( {
-               entry: [ './source/htmlreport.jsx' ],
-               output: {
-                   filename: 'app/app/htmlreport.js'
-               } }, webpackConfig ),
-
-            htmlReport_config:
-              Object.assign( {
-               entry: [ './source/htmlreport_control.jsx' ],
-               output: {
-                   filename: 'app/app/htmlreport_control.js'
-               } }, webpackConfig ),
-
-
-            showallmeasurements:
-              Object.assign( {
-               entry: [ './source/showallmeasurements.jsx' ],
-               output: {
-                   filename: 'app/app/showallmeasurements.js'
-               } }, webpackConfig ),
-
-            calibratepyranometer:
-              Object.assign( {
-               entry: [ './source/calibratepyranometer.jsx' ],
-               output: {
-                   filename: 'app/app/calibratepyranometer.js'
-               } }, webpackConfig )
-        }
-    });
-
-}
-
+        }); 
 
     grunt.registerTask( 'deploy', "Deploying app", () => {
 
@@ -312,9 +201,10 @@ function generateWebpackConfig( theme ) {
       }
 
       fs.writeFileSync( "./css/_theme.scss", fs.readFileSync( "./css/themes/" + theme + ".scss" ) );
-      let themeJSON = JSON.parse( fs.readFileSync( "./css/themes/" + theme + ".json" ) );
-
-      generateWebpackConfig( themeJSON );
+      themeJSON = JSON.parse( fs.readFileSync( "./css/themes/" + theme + ".json" ) );
+console.log( themeJSON );
+   //   generateWebpackConfig( themeJSON );
+    //'inline-replace-variables', theme
 
       var env = JSON.parse( fs.readFileSync( "./environments/" + target + ".json" ) );
 
@@ -330,14 +220,13 @@ function generateWebpackConfig( theme ) {
 
 
 
-      grunt.task.run( 'copy' );
-      grunt.task.run( 'babel' );
+      grunt.task.run( 'copy' ); 
       grunt.task.run( 'less' );
-      grunt.task.run( 'webpack' );
+      grunt.task.run( 'rollup' );
 
     } );
 
-    grunt.loadNpmTasks('grunt-webpack');
+    grunt.loadNpmTasks('grunt-rollup');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-babel');
