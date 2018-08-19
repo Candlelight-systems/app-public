@@ -1,6 +1,6 @@
 import React from "react"
-import ReactDOM from 'react-dom';	
-import config from "../app/config";
+import ReactDOM from 'react-dom'
+import config from "../app/config.json"
 
 
 class BugReportForm extends React.Component {

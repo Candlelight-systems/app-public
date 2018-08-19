@@ -3,7 +3,7 @@ import React from 'react';
 
 import Group from "./group.jsx"
 import ActivityStatus from './status/activity/main.jsx'
-import Error from "../error.jsx"
+import ErrorMessage from "../error.jsx"
 import { ipcRenderer } from "electron";
 
 import debounce from "lodash.debounce"
@@ -213,7 +213,7 @@ class TrackerInstrument extends React.Component {
       
       content = (
         <div>
-          <Error message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } methods={ this.state.errorMethods } />
+          <ErrorMessage message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } methods={ this.state.errorMethods } />
         </div> 
       );
 

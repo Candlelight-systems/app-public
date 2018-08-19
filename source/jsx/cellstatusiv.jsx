@@ -6,7 +6,7 @@ import React from 'react';
 import environment from "../../app/environment.json"
 
 
-const color = __THEME_GRAPH_IV_MAINCOLOR;
+const color = "__THEME_GRAPH_IV_MAINCOLOR";
 
 class statusIV extends GraphComponent {
 
