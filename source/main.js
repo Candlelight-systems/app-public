@@ -99,7 +99,7 @@ function openSocket( instrumentConfig ) {
       }
 
       ws.isAlive = false;
-      ws.ping( '', false, true );
+      ws.ping( () => {} );
 
     }, 30000 );
   }
