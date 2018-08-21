@@ -92,8 +92,8 @@ module.exports = function(grunt) {
                 filter: 'isFile'
               },
 
-              { 
-                expand: true, 
+              {
+                expand: true,
                 cwd: './environments/logos/',
                 src: [ './' + grunt.option('target') + ".png" ],
                 dest: 'app/app/images/',
