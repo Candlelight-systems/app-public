@@ -721,8 +721,8 @@ class TrackerDevice extends React.Component {
 					waveHumidity.append( time, value[ 7 ] );
 						
 					if( this.state.serverState.tracking_mode == 1 ) {
-						if( value[ 2 ] > highest_value && !isNaN( value[ 2 ] ) ) {
-							highest_value = value[ 2 ];
+						if( value[ 1 ] > highest_value && !isNaN( value[ 1 ] ) ) {
+							highest_value = value[ 1 ];
 							highest_value_time = time;
 						}
 					}

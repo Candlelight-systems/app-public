@@ -160,13 +160,13 @@ class statusIV extends GraphComponent {
 				return;
 			}
 
-			let s = this.graph.newSerie( "iv_" + index );
+			let s = this.graph.newSerie( "iv_" + k );
 			s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
 			s.setLineColor( colors[ k ] );
 			s.autoAxis();
 			s.setLineWidth( 2 );
 
-			let s2 = this.graph.newSerie( "power_" + index );
+			let s2 = this.graph.newSerie( "power_" + k );
 			s2.setLineColor( colors[ k ] );
 			s2.setLineStyle( 2 );
 			s2.excludedFromLegend = true;
