@@ -1121,7 +1121,10 @@ class HTMLReport extends React.Component {
 					}
 
 					waveSun.append( time, value[ 5 ] );
-					waveHumidity.append( time, value[ 4 ] );
+
+					if( value[ 4 ] < 100 && value[ 4 ] > 0 ) {
+						waveHumidity.append( time, value[ 4 ] );
+					}
 
 					if( value[ 6 ] !== 0 ) {
 						waveTemperature.append( time, value[ 6 ] );
