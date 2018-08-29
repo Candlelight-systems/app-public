@@ -225,12 +225,12 @@ class statusGraph extends GraphComponent {
 
 		if( nextProps.data_IV && nextProps.data_IV !== this.props.data_IV ) {
 
-			this.shapes_IV.map( shape => shape.kill() );
+			this.shapes_IV.map( shape => { shape && shape.kill() } );
 
 			this.shapes_IV = nextProps.data_IV.map( ( data_IV ) => {
 				
 				if( data_IV[ 0 ] === null ) {
-					return;
+					return false;
 				}
 
 				let shape = this.graph.newShape( 'ellipse', { position: [ { x: data_IV[ 0 ], y: data_IV[ 1 ] } ] } );

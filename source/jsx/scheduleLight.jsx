@@ -48,8 +48,13 @@ class ScheduleLight extends React.Component {
 					enable: ! this.state.fixed_intensity,
 					basis: this.state.schedule_basis,
 					intensities: this.state.schedule_values.split("\n").map( ( val ) => parseFloat( val ) )
+				},
+
+				uv: {
+					setPoint: parseFloat( this.state.fixed_uv_intensity_val )
 				}
-			}
+			},
+
 		};
 
 		let body = JSON.stringify( saveJSON );
@@ -134,7 +139,9 @@ class ScheduleLight extends React.Component {
 		   		fixed_intensity: ! controller.scheduling.enable,
 		   		fixed_intensity_val: parseFloat( controller.setPoint ),
 		   		schedule_basis: controller.scheduling.basis,
-		   		schedule_values: controller.scheduling.intensities.join("\n")
+		   		schedule_values: controller.scheduling.intensities.join("\n"),
+		   		uv: controller.uv,
+		   		fixed_uv_intensity_val: controller.uv.setPoint
 	    	} ) );
 	   	} )
 		.catch( ( error ) => {
@@ -285,6 +292,18 @@ class ScheduleLight extends React.Component {
 								</div>
 							</div>
 
+							}
+
+							{ this.state.uv ? 
+								<div className={ "form-group " + ( fixed_intensity_error ? 'has-error' : '' ) }>
+									<label>UV Intensity</label>
+									<div className="input-group">
+										<input className="form-control" type="number" min="0" max="1.5" step="0.01" name="fixed_uv_intensity_val" value={ this.state.fixed_uv_intensity_val } onChange={ this.handleInputChange } />
+										<span class="input-group-addon">mW cm<sup>-2</sup></span>
+									</div>
+									<div className="help-block">Minimum value: 0 mW cm<sup>-2</sup>. Maximum value: 30 mW cm<sup>-2</sup></div>
+								</div>
+								: null
 							}
 						</div>
 					}
