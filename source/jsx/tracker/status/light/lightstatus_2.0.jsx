@@ -135,6 +135,44 @@ class LightStatus extends React.Component {
                 </div>
               </div> : null 
             }
+
+
+            { 
+              this.state.lightMode == 'auto' && this.state.lightUVSetpoint !== undefined ? // In case the light is in automatic mode
+
+              <div className="row">
+                <div className="col-lg-5">
+                  <span className="grey">
+                    UV(A) Set point:
+                  </span> 
+                    
+                </div> 
+                <div className="col-lg-4">
+                  { this.state.lightUVSetpoint } mW cm<sup>-2</sup>
+                </div>
+              </div>
+              : 
+              null 
+            }
+
+
+            { this.state.lightUVValue !== undefined ?
+              <div className="row">
+                <div className="col-lg-5">
+                  <span className="grey">
+                    UV(A) intensity:
+                  </span> 
+                </div> 
+                <div className="col-lg-4">
+                  { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ? 
+                    this.state.lightUVValue 
+                    : 
+                    ( this.state.lightUVValue < 0 ? 0 : <span>{ Math.round( this.state.lightUValue * 1000 ) / 1000 } mW cm<sup>-2</sup></span> )
+                  }
+                </div>
+              </div> : null 
+            }
+
             </div> : null }
           </div>
           
