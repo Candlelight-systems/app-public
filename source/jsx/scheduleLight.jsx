@@ -48,14 +48,15 @@ class ScheduleLight extends React.Component {
 					enable: ! this.state.fixed_intensity,
 					basis: this.state.schedule_basis,
 					intensities: this.state.schedule_values.split("\n").map( ( val ) => parseFloat( val ) )
-				},
-
-				uv: {
-					setPoint: parseFloat( this.state.fixed_uv_intensity_val )
 				}
-			},
-
+			}
 		};
+
+		if( this.state.uv ) {
+			saveJSON.control.uv = {
+				setPoint: parseFloat( this.state.fixed_uv_intensity_val )
+			};
+		}
 
 		let body = JSON.stringify( saveJSON );
 
@@ -141,7 +142,7 @@ class ScheduleLight extends React.Component {
 		   		schedule_basis: controller.scheduling.basis,
 		   		schedule_values: controller.scheduling.intensities.join("\n"),
 		   		uv: controller.uv,
-		   		fixed_uv_intensity_val: controller.uv.setPoint
+		   		fixed_uv_intensity_val: controller.uv ? controller.uv.setPoint : null
 	    	} ) );
 	   	} )
 		.catch( ( error ) => {

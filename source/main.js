@@ -81,6 +81,7 @@ function openSocket( instrumentConfig ) {
     console.log("Socket is in error state: " + error.code );
   });
 
+  ws.removeAllListeners( 'message' );
   ws.on('message', wsIncoming );
 
   ws.isAlive = true;
