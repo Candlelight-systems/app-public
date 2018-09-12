@@ -4,21 +4,25 @@
 		"light": {
 			"version": "2.0",
 			"readonly": false
+		},
+		"heat": {
+			"version": "ssr_1.0",
+			"switch": false
 		}
 	},
 	"instrument": {
-		"Top port": {
+		"Small cells": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
 			"fsr": 30,
-			"LSB": 1.22,
+			"LSB": 0.33,
 			"LSBValue": 1,
 			"voltageRange": 2.5,
-			"autoZero": "instrument",
+			"autoZero": "device",
 			"groups": {
-				"Sample holder": {
+				"Slot A": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
@@ -37,18 +41,18 @@
 				}
 			}
 		},
-		"Bottom port": {
+		"Module": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
 			"fsr": 30,
-			"LSB": 1.22,
+			"LSB": 4.88,
 			"LSBValue": 1,
-			"voltageRange": 2.5,
-			"autoZero": "instrument",
+			"voltageRange": 10,
+			"autoZero": "device",
 			"groups": {
-				"Sample holder": {
+				"Module slot": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
