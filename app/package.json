@@ -1,6 +1,6 @@
 {
   "name": "candlelight-frontend",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "Norman Pellet",
   "license": "MIT",
   "description": "The front-end interface for the candlelight ageing and maximum power point tracking system",
@@ -20,9 +20,11 @@
   "dependencies": {
     "fix-path": "^2.1.0",
     "grunt-rollup": "^9.0.0",
+    "jquery": "^3.3.1",
+    "lodash.debounce": "^4.0.8",
     "mathjax": "^2.7.5",
     "node-fetch": "^2.2.0",
-    "node-jsgraph": "^2.0.90",
+    "node-jsgraph": "^2.0.91",
     "pdfkit": "^0.8.3",
     "python-shell": "^0.5.0",
     "react": "^16.4.2",
@@ -30,6 +32,7 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "rollup": "^0.64.1",
+    "url-lib": "^2.0.2",
     "ws": "^6.0.0"
   }
 }
