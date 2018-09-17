@@ -631,7 +631,7 @@ class TrackerDevice extends React.Component {
 				newState.jsc = results[ 4 ].series[ 0 ].values[ 0 ][ 1 ] / serverState.cellArea * 1000;
 			}
 //console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] );
-			if( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] == -1 || results[ 1 ].series[ 0 ].values[ 0 ][ 5 ] < 0.001 ) {
+			if( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] == -1 || results[ 1 ].series[ 0 ].values[ 0 ][ 5 ] < 0.015 ) {
 				parameter = 'power_mean';
 			}
 
@@ -1096,7 +1096,7 @@ class TrackerDevice extends React.Component {
 											<span className="glyphicon glyphicon-tint"></span>
 										</div>
 										<div className="value">
-											{ this.state.humidity && this.state.humidity > 0 ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
+											{ !isNaN( this.state.humidity ) && this.state.humidity >= 0 ? <span>{ this.state.humidity } { this.unit.humidity }</span> : 'N/A' }
 										</div>
 									</div>
 								</div>
