@@ -106,6 +106,8 @@ class statusIV extends GraphComponent {
 
 		if( nextProps.updatedTime !== this.props.updatedTime ) {
 			shouldUpdate = true;
+		} else if( this.props.data.length !== nextProps.data.length ) {
+			shouldUpdate = true;
 		} else {
 			nextProps.data.map( ( el, index ) => {
 
@@ -129,10 +131,11 @@ class statusIV extends GraphComponent {
 		//let maxY = 0;
 
 		let indices = [];
-			
+		
 		if( ! this.props.data[ 0 ] ) {
 			return;
 		}
+		
 		const firstTime = this.props.data[ 0 ].time;
 		const lastTime = this.props.data[ this.props.data.length - 1 ].time;
 		const idealInterval = ( lastTime - firstTime ) / 4; // 5 iv curves
@@ -149,7 +152,7 @@ class statusIV extends GraphComponent {
 
 		const colors = [ '#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18' ];
 		let k = 0;
-
+console.log( indices );
 		this.props.data.forEach( ( data, index ) => {
 
 			if( indices.indexOf( index ) == -1 ) {
@@ -159,7 +162,7 @@ class statusIV extends GraphComponent {
 			if( data.iv.getLength() == 0 ) {
 				return;
 			}
-
+console.log( data );
 			let s = this.graph.newSerie( "iv_" + k );
 			s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
 			s.setLineColor( colors[ k ] );
