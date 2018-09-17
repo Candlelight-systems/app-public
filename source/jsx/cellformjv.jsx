@@ -96,7 +96,7 @@ class CellFormTracking extends React.Component {
 				</div>				
 
 				<div className="form-group">
-					<label htmlFor="iv_interval" className="col-sm-3">Measure upon efficiency drop</label>
+					<label htmlFor="iv_measurement_interval_auto_pdrop" className="col-sm-3">Measure upon efficiency drop</label>
 					<div className="col-sm-9">
 						<select name="iv_measurement_interval_auto_pdrop" id="iv_measurement_interval_auto_pdrop" className="form-control" value={ this.props.iv_measurement_interval_auto_pdrop } onChange={ this.handleInputChange }>
 							<option value="0.25">0.25%</option>
@@ -118,7 +118,7 @@ class CellFormTracking extends React.Component {
 				<div className="form-group">
 					<label htmlFor="iv_interval" className="col-sm-3">With a minimum interval of</label>
 					<div className="col-sm-9">
-						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_minTime" id="iv_measurement_interval_auto_minTime" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_minTime" id="iv_measurement_interval_auto_minTime" className="form-control" value={ this.props.iv_measurement_interval_auto_minTime } onChange={ this.handleInputChange }>
 							<option value="60000">1 minute</option>
 							<option value="600000">10 minutes</option>
 							<option value="3600000">1 hour</option>
@@ -136,7 +136,7 @@ class CellFormTracking extends React.Component {
 				<div className="form-group">
 					<label htmlFor="iv_interval" className="col-sm-3">With a maximum interval of</label>
 					<div className="col-sm-9">
-						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_maxTime" id="iv_measurement_interval_auto_maxTime" className="form-control" value={ this.props.iv_interval } onChange={ this.handleInputChange }>
+						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_maxTime" id="iv_measurement_interval_auto_maxTime" className="form-control" value={ this.props.iv_measurement_interval_auto_minTime } onChange={ this.handleInputChange }>
 							<option value="600000">10 minutes</option>
 							<option value="3600000">1 hour</option>
 							<option value="10800000">3 hours</option>

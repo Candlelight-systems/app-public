@@ -17,29 +17,12 @@
 			},
 			"changeSpeed": false,
 			"fsr": 30,
-			"LSB": 1.22,
+			"LSB": 0.33,
 			"LSBValue": 1,
 			"voltageRange": 2.5,
 			"autoZero": "device",
 			"groups": {
-				"Slot Left": {
-					"resettable": false,
-					"displayDeviceInformation": {
-						"time_ellapsed": true,
-						"pce": true,
-						"power": false,
-						"sun": true,
-						"voc": true,
-						"jsc": true,
-						"ff": true,
-						"vnow": true,
-						"jnow": true,
-						"temperature": true,
-						"humidity": true,
-						"kwh_yr": false
-					}
-				},
-				"Slot Right": {
+				"Slot A": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
@@ -58,87 +41,19 @@
 				}
 			}
 		},
-		"Modules A": {
+		"Module": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
-			"fsr": 400,
+			"fsr": 30,
 			"LSB": 4.88,
 			"LSBValue": 1,
 			"voltageRange": 10,
 			"autoZero": "device",
 			"groups": {
-				"Module 1": {
-					"manualLightIntensity": true,
+				"Module slot": {
 					"resettable": false,
-					"displayDeviceInformation": {
-						"time_ellapsed": true,
-						"pce": true,
-						"power": false,
-						"sun": true,
-						"voc": true,
-						"jsc": true,
-						"ff": true,
-						"vnow": true,
-						"jnow": true,
-						"temperature": true,
-						"humidity": true,
-						"kwh_yr": false
-					}
-				},
-				"Module 2": {
-					"resettable": false,
-					"manualLightIntensity": true,
-					"displayDeviceInformation": {
-						"time_ellapsed": true,
-						"pce": true,
-						"power": false,
-						"sun": true,
-						"voc": true,
-						"jsc": true,
-						"ff": true,
-						"vnow": true,
-						"jnow": true,
-						"temperature": true,
-						"humidity": true,
-						"kwh_yr": false
-					}
-				}
-			}
-		},
-		"Modules B": {
-			"ADC": {
-				"model": "ADS1259"
-			},
-			"changeSpeed": false,
-			"fsr": 400,
-			"LSB": 4.88,
-			"LSBValue": 1,
-			"voltageRange": 10,
-			"autoZero": "device",
-			"groups": {
-				"Module 3": {
-					"resettable": false,
-					"manualLightIntensity": true,
-					"displayDeviceInformation": {
-						"time_ellapsed": true,
-						"pce": true,
-						"power": false,
-						"sun": true,
-						"voc": true,
-						"jsc": true,
-						"ff": true,
-						"vnow": true,
-						"jnow": true,
-						"temperature": true,
-						"humidity": true,
-						"kwh_yr": false
-					}
-				},
-				"Module 4": {
-					"resettable": false,
-					"manualLightIntensity": true,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
 						"pce": true,

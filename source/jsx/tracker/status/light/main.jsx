@@ -12,8 +12,29 @@ class LightStatus extends React.Component {
 
     this.light_calibrate = this.light_calibrate.bind( this );
     this.light_controller_config = this.light_controller_config.bind( this );    
-
+    this.light_controller_setuv = this.light_controller_setuv.bind( this );
+    this.wsUpdate = this.wsUpdate.bind( this );
+    this.state = {};
   }
+  
+
+  componentDidMount() {
+
+    ipcRenderer.on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
+  }
+
+  componentWillUnmount() {
+
+    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
+  }
+
+
+  wsUpdate( event, data ) {
+    // Update directly the state
+    this.setState( data.data );
+  }
+
+
 
   light_calibrate( calibrateMethod ) {
 
@@ -31,6 +52,13 @@ class LightStatus extends React.Component {
       groupName: this.props.name,
       config: this.props.config
     } );
+  }
+
+  light_controller_setuv() {
+
+    fetch( `http://${ this.props.config.trackerHost }:${ this.props.config.trackerPort }/light.applyUV?instrumentId=${ this.props.instrumentId }&groupName=${ this.props.name }`, {
+      method: 'GET'
+    })
   }
 
   render() {
@@ -76,6 +104,11 @@ class LightStatus extends React.Component {
       break;
     }
 
+    let button_uv_set = null;
+    if( this.state.lightUVSetpoint ) {
+      button_uv_set = <button className="btn btn-cl btn-default btn-small" onClick= { this.light_controller_setuv } >Apply UV intensity</button>
+    }
+
     return ( 
       <div className="group-status group-status-light col-lg-2">
         <h4>Light bias</h4>
@@ -95,7 +128,7 @@ class LightStatus extends React.Component {
               </button>
             }
 
-            { button_calibrate }
+            { button_calibrate } { button_uv_set }
             </div>
           </div>
       </div> 

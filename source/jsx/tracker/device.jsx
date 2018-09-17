@@ -163,12 +163,12 @@ class TrackerDevice extends React.Component {
 
 		if( data.state.current ) {
 			// Convert to mA
-			newState.current = round( data.state.current * 1000, 2 );
+			newState.current = round( data.state.current * 1000, 3 );
 			newState.currentdensity = data.state.current * 1000 / this.state.serverState.cellArea;
 		}
 
 		if( data.state.voltage ) {
-			newState.voltage = round( data.state.voltage, 2 );
+			newState.voltage = round( data.state.voltage, 3 );
 		}
 
 		if( data.state.voltage && data.state.current && this.state.data_IV ) {
@@ -793,8 +793,8 @@ class TrackerDevice extends React.Component {
 			return;
 		}
 
-		if( Math.abs( value ) < 0.8 ) {
-			return ( <span>{ ( Math.round( value * 10000 ) / 10 ).toPrecision( 3 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
+		if( Math.abs( value ) < 1 ) {
+			return ( <span>{ ( Math.round( value * 100000 ) / 100 ) }&nbsp;&mu;A&nbsp;cm<sup>-2</sup></span> );
 		} else {
 			return ( <span>{ ( Math.round( value * 100 ) / 100 ).toPrecision( 3 ) }&nbsp;mA&nbsp;cm<sup>-2</sup></span> );
 		}
