@@ -119,8 +119,6 @@ class DownloadForm extends React.Component {
 
 	}
 
-
-
 	async downloadVocJsc( outputfile ) {
 
 		let data = await this.getVocJscData();
@@ -134,10 +132,7 @@ class DownloadForm extends React.Component {
 			waveName: "Jsx",
 			waveNameX: "Time_jsc_h"
 		} );
-
 	}
-
-
 
 	async downloadIV( outputfile ) {
 
@@ -155,7 +150,6 @@ class DownloadForm extends React.Component {
 		} );
 		
 	}
-
 /*
 	plotMPPT( data ) {
 
@@ -227,7 +221,7 @@ class DownloadForm extends React.Component {
 				.forceMax( 90 )
 				.setLineAt( [ 0 ] );
 
-		graph.newSerie("temeprature").autoAxis().setLabel("Temp.").setYAxis( graph.getLeftAxis( 5 ) ).setLineColor("#ae441f").setLineWidth(2).setWaveform( data.temperature );
+		graph.newSerie("temperature").autoAxis().setLabel("Temp.").setYAxis( graph.getLeftAxis( 5 ) ).setLineColor("#ae441f").setLineWidth(2).setWaveform( data.temperature );
 		
 		graph.makeLegend().setAutoPosition( "bottom" );
 		graph.updateLegend();
@@ -517,8 +511,8 @@ class DownloadForm extends React.Component {
 						</div>
 						<div className="col-sm-6">
 							<div className="btn-group">
-								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
-								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
 								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, true, false ) } }>Download JV</button>
 								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, true, true ) } }>Download All</button>
 							</div>

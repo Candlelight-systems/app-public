@@ -22,8 +22,7 @@ class ScheduleLight extends React.Component {
 		this.apply = this.apply.bind( this );
 		this.close = this.close.bind( this );
 		this.save = this.save.bind( this );
-		this.handleInputChange = this.handleInputChange.bind( this );
-		
+		this.handleInputChange = this.handleInputChange.bind( this );	
 	}
 
 	handleFocus( event ) {
@@ -31,10 +30,7 @@ class ScheduleLight extends React.Component {
 	}
 
 	async save() {
-
 		let state = await this.apply();
-		
-		//this.close();
 	}
 
 	async apply() {
@@ -319,10 +315,8 @@ class ScheduleLight extends React.Component {
 					</div>
 					
 					<div className="col-sm-5">
-
 						<label>Light profile vs time</label>
 						<div ref={ ( el ) => { this.graphDom = el } }></div>
-
 					</div>
 				</div>
 					

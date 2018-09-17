@@ -244,10 +244,6 @@ class statusGraph extends GraphComponent {
 		}
 	}
 
-	shouldComponentUpdate( nextProps ) {
-		return super.shouldComponentUpdate( nextProps );
-	}
-
 	render() {
 
 

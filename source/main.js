@@ -266,13 +266,13 @@ async function downloadData( event, tracker, measurementName, chanId, instrument
         height: 800,
         resizable: false
 
-      } ).then( async ( result ) => {
+    } ).then( async ( result ) => {
       
         config.instruments.push( result );
         await saveConfig();
         reloadInstruments();
 
-      } ).catch( () => {} );
+    } ).catch( () => {} );
 }
 
 

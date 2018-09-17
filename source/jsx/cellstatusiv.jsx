@@ -100,112 +100,120 @@ class statusIV extends GraphComponent {
 		this.ellipse.draw();
 	}
 
-	shouldComponentUpdate( nextProps ) {
 
-		let shouldUpdate = false;
+	componentWillUpdate( nextProps ) {
+
+		let shouldUpdateIV = false;
 
 		if( nextProps.updatedTime !== this.props.updatedTime ) {
-			shouldUpdate = true;
+			shouldUpdateIV = true;
 		} else if( this.props.data.length !== nextProps.data.length ) {
-			shouldUpdate = true;
+			shouldUpdateIV = true;
 		} else {
 			nextProps.data.map( ( el, index ) => {
 
 				if( ! this.props.data[ index ] || el.time != this.props.data[ index ].time ) {
-					shouldUpdate = true;
+					shouldUpdateIV = true;
 				}
 			});
 		}
 
-		return shouldUpdate;
+		console.log( shouldUpdateIV );
+
+		if( shouldUpdateIV ) {
+
+			nextProps.data.sort( ( a, b ) => {
+				return a.time - b.time;
+			} );
+
+		//	this.graph.resetSeries();
+			
+			//let maxY = 0;
+
+			let indices = [];
+			
+			if( ! nextProps.data[ 0 ] ) {
+				return;
+			}
+			
+			const firstTime = nextProps.data[ 0 ].time;
+			const lastTime = nextProps.data[ nextProps.data.length - 1 ].time;
+			const idealInterval = ( lastTime - firstTime ) / 4; // 5 iv curves
+
+			let lastInterval = 0;
+
+			nextProps.data.forEach( ( data, index ) => {
+
+				if( data.time - lastInterval > idealInterval || nextProps.data.length <= 5 || index == nextProps.data.length - 1 ) {
+					lastInterval = data.time;
+					indices.push( index ); 
+				}
+			});
+
+			const colors = [ '#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18' ];
+			let k = 0;
+
+			nextProps.data.forEach( ( data, index ) => {
+
+				if( indices.indexOf( index ) == -1 ) {
+					return;
+				}
+
+				if( data.iv.getLength() == 0 ) {
+					return;
+				}
+
+				let s = this.graph.newSerie( "iv_" + k );
+				s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
+				s.setLineColor( colors[ k ] );
+				s.autoAxis();
+				s.setLineWidth( 2 );
+
+				let s2 = this.graph.newSerie( "power_" + k );
+				s2.setLineColor( colors[ k ] );
+				s2.setLineStyle( 2 );
+				s2.excludedFromLegend = true;
+				s2.autoAxis();
+				s2.setLineWidth( 2 );
+
+				s.setWaveform( data.iv );
+				s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
+
+	//			maxY = Math.max( maxY, data.iv.getMaxY() );
+				k++;
+			});
+
+			this.serieIV = this.graph.newSerie( "iv_time" ).setLabel("MPPT");
+			this.serieIV.autoAxes();
+			this.serieIV.setLineColor( color ).setLineWidth( 2 );
+
+				
+			if( nextProps.dataIV ) {
+				this.serieIV.setWaveform( nextProps.dataIV );
+			}
+
+			this.graph.autoscaleAxes();
+			this.graph.show();
+			
+			this.graph.getYAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );	
+			this.graph.getYAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );
+			this.graph.getXAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].voltageRange );
+			this.graph.getXAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].voltageRange );	
+
+			
+			this.graph.autoscaleAxes();
+			this.graph.draw();
+			this.graph.updateLegend();
+
+		}
+
 	}
 
 	componentDidUpdate() {
 
-		this.props.data.sort( ( a, b ) => {
-			return a.time - b.time;
-		} );
-
-	//	this.graph.resetSeries();
-		
-		//let maxY = 0;
-
-		let indices = [];
-		
-		if( ! this.props.data[ 0 ] ) {
-			return;
-		}
-		
-		const firstTime = this.props.data[ 0 ].time;
-		const lastTime = this.props.data[ this.props.data.length - 1 ].time;
-		const idealInterval = ( lastTime - firstTime ) / 4; // 5 iv curves
-
-		let lastInterval = 0;
-
-		this.props.data.forEach( ( data, index ) => {
-
-			if( data.time - lastInterval > idealInterval || this.props.data.length <= 5 || index == this.props.data.length - 1 ) {
-				lastInterval = data.time;
-				indices.push( index ); 
-			}
-		});
-
-		const colors = [ '#ae182d', '#6d18ae', '#1834ae', '#1897ae', '#18ae22', '#acae18' ];
-		let k = 0;
-console.log( indices );
-		this.props.data.forEach( ( data, index ) => {
-
-			if( indices.indexOf( index ) == -1 ) {
-				return;
-			}
-
-			if( data.iv.getLength() == 0 ) {
-				return;
-			}
-console.log( data );
-			let s = this.graph.newSerie( "iv_" + k );
-			s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
-			s.setLineColor( colors[ k ] );
-			s.autoAxis();
-			s.setLineWidth( 2 );
-
-			let s2 = this.graph.newSerie( "power_" + k );
-			s2.setLineColor( colors[ k ] );
-			s2.setLineStyle( 2 );
-			s2.excludedFromLegend = true;
-			s2.autoAxis();
-			s2.setLineWidth( 2 );
-
-			s.setWaveform( data.iv );
-			s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
-
-//			maxY = Math.max( maxY, data.iv.getMaxY() );
-			k++;
-		});
-
-		this.serieIV = this.graph.newSerie( "iv_time" ).setLabel("MPPT");
-		this.serieIV.autoAxes();
-		this.serieIV.setLineColor( color ).setLineWidth( 2 );
-
-			
-		if( this.props.dataIV ) {
-			this.serieIV.setWaveform( this.props.dataIV );
-		}
-
-		this.graph.autoscaleAxes();
-		this.graph.show();
-		
-		this.graph.getYAxis().setLowestMin( - environment.instrument[ this.props.instrumentId ].fsr * 1e-3 );	
-		this.graph.getYAxis().setHighestMax( environment.instrument[ this.props.instrumentId ].fsr * 1e-3 );
-		this.graph.getXAxis().setLowestMin( - environment.instrument[ this.props.instrumentId ].voltageRange );
-		this.graph.getXAxis().setHighestMax( environment.instrument[ this.props.instrumentId ].voltageRange );	
-
 		this.ellipse.setPosition( { x: this.props.voltage, y: this.props.current / 1000 } );
 		this.ellipse.redraw();
 
-		this.graph.autoscaleAxes();
-		this.graph.draw();
-		this.graph.updateLegend();
 	}
 	
 	render() {

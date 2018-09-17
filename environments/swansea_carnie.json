@@ -4,8 +4,8 @@
 
 		"statuses": {
 			"light": {
-				"version": "2.0",
-				"readonly": false
+				"version": "readonly",
+				"readonly": true
 			}
 		},
 
@@ -18,15 +18,13 @@
 				},
 				"changeSpeed": false,
 				"fsr": 30,
-				"LSB": 1.22,
+				"LSB": 0.3,
 				"LSBValue": 1,
-				"voltageRange": 2.5,
+				"voltageRange": 5,
 				"autoZero": "instrument",
-				
-
 				"groups": {
 
-					"Slot A": {
+					"Sample holder": {
 
 						"resettable": false,
 						"displayDeviceInformation": {
@@ -57,14 +55,14 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "localhost",
+				"trackerHost": "192.168.1.101",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "localhost",
+			"host": "192.168.1.102",
 			"username": "",
 			"password": "",
 			"port": 8086,

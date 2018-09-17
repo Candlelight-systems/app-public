@@ -131,7 +131,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-                  { this.state.lightValue < 0 ? 0 : Math.round( this.state.lightValue * 1000 ) / 1000 } sun
+                  { this.state.lightValue < 0 ? 0 : ( this.state.lightValue  ).toPrecision( 3 ) } sun
                 </div>
               </div> : null 
             }
@@ -143,7 +143,7 @@ class LightStatus extends React.Component {
               <div className="row">
                 <div className="col-lg-5">
                   <span className="grey">
-                    UV(A) Set point:
+                    UV(A) set point:
                   </span> 
                     
                 </div> 
@@ -163,13 +163,16 @@ class LightStatus extends React.Component {
                     UV(A) intensity:
                   </span> 
                 </div> 
+                {}
                 <div className="col-lg-4">
                   { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ? 
                     this.state.lightUVValue 
                     : 
-                    ( this.state.lightUVValue < 0 ? 0 : <span>{ Math.round( this.state.lightUValue * 1000 ) / 1000 } mW cm<sup>-2</sup></span> )
+                    ( this.state.lightUVValue < 0 ? 0 : <span>{ Math.round( this.state.lightUVValue * 1000 ) / 1000 } mW cm<sup>-2</sup></span> )
                   }
                 </div>
+                <div class="text-warning"><strong><span className="glyphicon glyphicon-danger"></span> Caution !</strong> UV sensor readout can be influenced by the white light intensity</div>
+                
               </div> : null 
             }
 
