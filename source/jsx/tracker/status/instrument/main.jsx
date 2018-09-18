@@ -42,6 +42,7 @@ class InstrumentStatus extends React.Component {
 		super( ...arguments );
 		this.state = {};
 		this.togglePause = this.togglePause.bind( this );
+		this.restartSoftware = this.restartSoftware.bind( this );
 		this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind( this );
 		this.autoZero = this.autoZero.bind( this );
 	}
@@ -88,6 +89,9 @@ class InstrumentStatus extends React.Component {
 	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/" + url + "?instrumentId=" + encodeURIComponent( this.props.instrumentId ), { method: 'GET'  } );
 	}
 
+    restartSoftware() {
+	    return fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/restart", { method: 'GET' } );
+	}
 
 	render() {
 
@@ -145,6 +149,16 @@ class InstrumentStatus extends React.Component {
             </div>
           </div>
       		}
+
+	   		<div className="row">
+            <div className="col-lg-5">
+                <button type="button" className="btn btn-cl btn-default btn-sm" onClick={ this.restartSoftware }><span>Restart instrument firmware</span></button>              
+            </div>
+            <div className="col-lg-4">
+
+            </div>
+          </div>
+
           { speedOptions.length > 0 && environment.instrument[ this.props.instrumentId ].changeSpeed !== false && 
 			<div className="form-group">
 				<label htmlFor="tracking_speed" className="col-sm-9">Acquisition speed <sup title="This option directly affects the acquisition speed of the instrument, and therefore has a significant impact on the tracking efficiency when the light bias is noisy. The slower the better for the convergence, but it will limit the overall tracking speed.">?</sup></label>

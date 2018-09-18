@@ -9,7 +9,7 @@ import PDFDocument from 'pdfkit'
 import { ipcRenderer } from "electron";
 
 class DownloadForm extends React.Component {
-	
+
 
 	constructor( props ) {
 		super( props );
@@ -46,26 +46,26 @@ class DownloadForm extends React.Component {
 		let outputfile;
 
 		if( this.state.dl_format == "itx" ) {
-			outputfile = new ITXBuilder();	
+			outputfile = new ITXBuilder();
 		} else {
-			outputfile = new CSVBuilder();	
+			outputfile = new CSVBuilder();
 		}
-			
+
 		let fileappend = [];
 		if( track ) {
 			await this.downloadTrack( outputfile );
 			fileappend.push( "track" );
-		}	
+		}
 
 		if( jv ) {
 			await this.downloadIV( outputfile );
 			fileappend.push( "jv" );
-		}	
+		}
 
 		if( vocjsc ) {
 			await this.downloadVocJsc( outputfile );
 			fileappend.push( "vocjsc" );
-		}	
+		}
 
 		dialog.showSaveDialog( {
 
@@ -75,69 +75,64 @@ class DownloadForm extends React.Component {
 		}, ( fileName ) => {
 
 			fs.writeFileSync(fileName, outputfile.build() );
-		} );	
+		} );
 	}
 
 
 	async downloadTrack( outputfile ) {
 
 		let data = await this.getTrackData();
-		outputfile.addWaveform( data.efficiency, { 
+		outputfile.addWaveform( data.efficiency, {
 			waveName: "Efficiency",
 			waveNameX: "Time_MPP_h"
 		} );
 
-		outputfile.addWaveform( data.power, { 
+		outputfile.addWaveform( data.power, {
 			waveName: "Power",
 			noXWave: true
 		} );
 
-		outputfile.addWaveform( data.voltage, { 
+		outputfile.addWaveform( data.voltage, {
 			waveName: "Voltage",
 			noXWave: true
 		} );
 
-		outputfile.addWaveform( data.current, { 
+		outputfile.addWaveform( data.current, {
 			waveName: "Current",
 			noXWave: true
 		} );
 
-		outputfile.addWaveform( data.temperature, { 
+		outputfile.addWaveform( data.temperature, {
 			waveName: "Temperature",
 			noXWave: true
 		} );
 
-		outputfile.addWaveform( data.sun, { 
+		outputfile.addWaveform( data.sun, {
 			waveName: "Sun",
 			noXWave: true
 		} );
 
-		outputfile.addWaveform( data.humidity, { 
+		outputfile.addWaveform( data.humidity, {
 			waveName: "Humidity",
 			noXWave: true
 		} );
 
 	}
 
-
-
 	async downloadVocJsc( outputfile ) {
 
 		let data = await this.getVocJscData();
-		
-		outputfile.addWaveform( data.waveVoc, { 
+
+		outputfile.addWaveform( data.waveVoc, {
 			waveName: "Voc",
 			waveNameX: "Time_voc_h"
 		} );
 
-		outputfile.addWaveform( data.waveJsc, { 
+		outputfile.addWaveform( data.waveJsc, {
 			waveName: "Jsx",
 			waveNameX: "Time_jsc_h"
 		} );
-
 	}
-
-
 
 	async downloadIV( outputfile ) {
 
@@ -148,14 +143,13 @@ class DownloadForm extends React.Component {
 				return;
 			}
 
-			outputfile.addWaveform( data.wave, { 
+			outputfile.addWaveform( data.wave, {
 				waveName: "Current_" + data.time_h + "h",
 				waveNameX: "Voltage_" + data.time_h + "h"
 			} );
 		} );
-		
-	}
 
+	}
 /*
 	plotMPPT( data ) {
 
@@ -170,7 +164,7 @@ class DownloadForm extends React.Component {
 				.setLineAt( [ 0 ] );
 
 		graph.newSerie("efficiency").setLabel("PCE").autoAxis().setYAxis( graph.getLeftAxis( 0 ) ).setLineColor("#1f1fae").setLineWidth(2).setWaveform( data.efficiency );
-		
+
 		graph.getLeftAxis( 1 )
 				.setLabel("Vmpp")
 				.setUnit("V")
@@ -180,7 +174,7 @@ class DownloadForm extends React.Component {
 				.setLineAt( [ 0 ] );
 
 		graph.newSerie("Voltage").autoAxis().setYAxis( graph.getLeftAxis( 1 ) ).setLineColor("#1f8eae").setLineWidth(2).setWaveform( data.voltage );
-		
+
 		graph.getLeftAxis( 2 )
 				.setLabel("Jmpp")
 				.setUnit("A")
@@ -193,7 +187,7 @@ class DownloadForm extends React.Component {
 
 
 		graph.newSerie("Current").autoAxis().setYAxis( graph.getLeftAxis( 2 ) ).setLineColor("#1fae76").setLineWidth(2).setWaveform( data.current );
-		
+
 		graph.getLeftAxis( 3 )
 				.setLabel("Sun")
 				.setUnit("-")
@@ -204,7 +198,7 @@ class DownloadForm extends React.Component {
 				.setLineAt( [ 0 ] );
 
 		graph.newSerie("sun").autoAxis().setLabel("Sun").setYAxis( graph.getLeftAxis( 3 ) ).setLineColor("#7aae1f").setLineWidth(2).setWaveform( data.sun );
-		
+
 		graph.getLeftAxis( 4 )
 				.setLabel("Humidity")
 				.setUnit("%")
@@ -216,7 +210,7 @@ class DownloadForm extends React.Component {
 				.setLineAt( [ 0 ] );
 
 		graph.newSerie("humidity").autoAxis().setLabel("Hum.").setYAxis( graph.getLeftAxis( 4 ) ).setLineColor("#ae9b1f").setLineWidth(2).setWaveform( data.humidity );
-		
+
 		graph.getLeftAxis( 5 )
 				.setLabel("Temperature")
 				.setUnit("°C")
@@ -227,8 +221,8 @@ class DownloadForm extends React.Component {
 				.forceMax( 90 )
 				.setLineAt( [ 0 ] );
 
-		graph.newSerie("temeprature").autoAxis().setLabel("Temp.").setYAxis( graph.getLeftAxis( 5 ) ).setLineColor("#ae441f").setLineWidth(2).setWaveform( data.temperature );
-		
+		graph.newSerie("temperature").autoAxis().setLabel("Temp.").setYAxis( graph.getLeftAxis( 5 ) ).setLineColor("#ae441f").setLineWidth(2).setWaveform( data.temperature );
+
 		graph.makeLegend().setAutoPosition( "bottom" );
 		graph.updateLegend();
 		graph.draw();
@@ -251,7 +245,7 @@ class DownloadForm extends React.Component {
 				.setUnit("h")
 				.setUnitWrapper("(", ")")
 				.gridsOff();
-				
+
 
 		return graph;
 	}
@@ -267,7 +261,7 @@ class DownloadForm extends React.Component {
 		var db = this.props.db.db;
 
 		return influxquery("SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time DESC limit 1;", db, this.props.db ).then( async ( results ) => {
-			
+
 			if( ! results[ 0 ].series ) {
 				throw "No measurement with the name " + encodeURIComponent( this.props.measurementName ) + " or no associated data";
 			}
@@ -278,7 +272,7 @@ class DownloadForm extends React.Component {
 				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
 
 			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
-	
+
 				let values = results[ 0 ].series[ 0 ].values,
 					offset,
 					waveEfficiency = Graph.newWaveform(),
@@ -303,7 +297,7 @@ class DownloadForm extends React.Component {
 				let finalEfficiency = 0;
 
 				values.forEach( ( value, index ) => {
-					
+
 					let date = new Date( value[ 0 ] ),
 						time;
 
@@ -319,13 +313,13 @@ class DownloadForm extends React.Component {
 						value[ 2 ] = NaN;
 					}*/
 
-					waveEfficiency.append( time, value[ 1 ] );					
-					waveVoltage.append( time, value[ 2 ] );					
+					waveEfficiency.append( time, value[ 1 ] );
+					waveVoltage.append( time, value[ 2 ] );
 					waveCurrent.append( time, value[ 3 ] );
 					wavePower.append( time, value[ 8 ] );
 					waveHumidity.append( time, value[ 4 ] );
 					waveSun.append( time, value[ 5 ] );
-					waveTemperature.append( time, value[ 6 ] );		
+					waveTemperature.append( time, value[ 6 ] );
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
 				} );
@@ -337,7 +331,7 @@ class DownloadForm extends React.Component {
 					voltage: waveVoltage,
 					current: waveCurrent,
 					sun: waveSun,
-					temperature: waveTemperature, 
+					temperature: waveTemperature,
 					humidity: waveHumidity,
 					power: wavePower,
 
@@ -358,7 +352,7 @@ class DownloadForm extends React.Component {
 				let time_100h = tfrom + 1000000000 * 3600 * 100;
 				let time_500h = tfrom + 1000000000 * 3600 * 500;
 				let time_1000h = tfrom + 1000000000 * 3600 * 1000;
-				
+
 				toReturn.timeEfficiencies = await influxquery(`
 					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_1h } ORDER BY time ASC LIMIT 1;
 					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_24h } ORDER BY time ASC LIMIT 1;
@@ -366,7 +360,7 @@ class DownloadForm extends React.Component {
 					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_500h } ORDER BY time ASC LIMIT 1;
 					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_1000h } ORDER BY time ASC LIMIT 1;
 				`, db, this.props.db ).then( ( results ) => {
-				
+
 					return results.map( ( result ) => {
 
 						if( ! result.series ) {
@@ -397,7 +391,7 @@ class DownloadForm extends React.Component {
 			SELECT time,efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" ORDER BY time ASC limit 1;
 			SELECT time,voc FROM "${ encodeURIComponent( this.props.measurementName ) }_voc" ORDER BY time ASC;
 			SELECT time,jsc FROM "${ encodeURIComponent( this.props.measurementName ) }_jsc" ORDER BY time ASC;`, db, this.props.db ).then( async ( results ) => {
-			
+
 
 			results.map( ( results, index ) => {
 
@@ -413,7 +407,7 @@ class DownloadForm extends React.Component {
 				return results.series[ 0 ].values.map( ( value ) => {
 
 					let date = new Date( value[ 0 ] ),
-						time = Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10, 
+						time = Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10,
 						val = value[ 1 ]
 
 					if( index == 1 ) {
@@ -459,30 +453,30 @@ class DownloadForm extends React.Component {
 						data = value[ 1 ].split(","),
 						wave = Graph.newWaveform();
 
-					for( let i = 0; i < data.length; i += 2 ) {
+					for( let i = 0; i < data.length - 1; i += 2 ) {
 						wave.append( parseFloat( data[ i ].replace('"', '') ), parseFloat( data[ i + 1 ].replace('"', '') ) );
 					}
 
-					return { 
-						wave: wave, 
-						time_h: Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10 
+					return {
+						wave: wave,
+						time_h: Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10
 					};
 
 				} );
 			} );
 		} );
 	}
-	
+
 	async downloadPDF() {
 
 		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName, this.props.instrumentId );
-	
+
 	}
 
-	render() {	 
+	render() {
 
 		return (
-	
+
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
 
@@ -517,8 +511,8 @@ class DownloadForm extends React.Component {
 						</div>
 						<div className="col-sm-6">
 							<div className="btn-group">
-								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
-								<button  className="btn btn-primary"  type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
+								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
 								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, true, false ) } }>Download JV</button>
 								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, true, true ) } }>Download All</button>
 							</div>
@@ -543,7 +537,7 @@ class DownloadForm extends React.Component {
 				</form>
 
 				<div className="btn-group pull-right">
-		          
+
 		      	</div>
 			</div>
 		);

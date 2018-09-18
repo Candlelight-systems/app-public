@@ -67,7 +67,7 @@ function makeInstrumentMenu() {
 function openSocket( instrumentConfig ) {
 
   const ws = new WebSocket('ws://' + instrumentConfig.trackerHost + ':' + instrumentConfig.trackerPortWS );
-  
+
   ws.on('open', function open() {
     console.log("Socket is open");
   });
@@ -117,16 +117,16 @@ function wsIncoming( data ) {
   if( data.instrumentId && windows[ 'instrumentMain' ]) {
 
     if( data.chanId ) {
-      windows[ 'instrumentMain' ].webContents.send( `channel.update.${ data.instrumentId }.${ data.chanId}`, data ); 
+      windows[ 'instrumentMain' ].webContents.send( `channel.update.${ data.instrumentId }.${ data.chanId}`, data );
     }
 
     if( data.groupName ) {
-      windows[ 'instrumentMain' ].webContents.send( `group.update.${ data.instrumentId }.${ data.groupName }`, data ); 
+      windows[ 'instrumentMain' ].webContents.send( `group.update.${ data.instrumentId }.${ data.groupName }`, data );
     }
 
     if( data.log ) {
       data.log.time = Date.now();
-      windows[ 'instrumentMain' ].webContents.send( `instrument.log.${ data.instrumentId }`, data.log );  
+      windows[ 'instrumentMain' ].webContents.send( `instrument.log.${ data.instrumentId }`, data.log );
     }
   }
 }
@@ -168,7 +168,7 @@ function doMenu() {
 }
 
 function saveConfig( ) {
-  
+
   return new Promise( ( resolver, rejecter ) => {
 
     fs.writeFile( configPath, JSON.stringify( config, undefined, "\t" ), ( error ) => {
@@ -177,13 +177,13 @@ function saveConfig( ) {
         reportError( error );
         rejecter( error );
       } else {
-        config = JSON.parse( fs.readFileSync( configPath ) );    
+        config = JSON.parse( fs.readFileSync( configPath ) );
         resolver( );
       }
-      
-    });  
-  })  
-   
+
+    });
+  })
+
 }
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -253,26 +253,26 @@ async function downloadData( event, tracker, measurementName, chanId, instrument
       throw new Error(`Error while connecting to the instrument. Check that you are online and that the instrument is available on your network.`);
     });
 
-    openForm( null, "downloadform", { 
-    
-      measurementName: measurementName, 
-      db: config.database, 
-      cellInfo: json.cellInfo, 
+    openForm( null, "downloadform", {
+
+      measurementName: measurementName,
+      db: config.database,
+      cellInfo: json.cellInfo,
       chanId: chanId,
       instrumentId: instrumentId
-    
+
     }, {
         width: 850,
         height: 800,
         resizable: false
 
-      } ).then( async ( result ) => {
-      
+    } ).then( async ( result ) => {
+
         config.instruments.push( result );
         await saveConfig();
         reloadInstruments();
 
-      } ).catch( () => {} );
+    } ).catch( () => {} );
 }
 
 
@@ -282,7 +282,7 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
     let listenerConfig, listenerSavePDF/*, listenerPrintPDF*/;
 
     ipcMain.on("htmlReport.config", ( listenerConfig = ( event, data ) => {
-      
+
       if( ! windows[ 'htmlReport' ] ) {
         return;
       }
@@ -291,7 +291,7 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
     } ) );
 
     ipcMain.on("htmlReport.savePDF", ( listenerSavePDF = ( event, data ) => {
-      
+
       if( ! windows[ 'htmlReport' ] ) {
         return;
       }
@@ -311,19 +311,19 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
         }, ( err, data ) => {
 
           fs.writeFile( fileName, data, ( error ) => {
-            console.log( err );  
+            console.log( err );
           } );
         } );
 
       } );
-        
+
       //windows[ "htmlReport"].webContents.send( "savePDF", data );
     } ) );
 
 /*
 
     ipcMain.on("htmlReport.printPDF", ( listenerPrintPDF = ( event, data ) => {
-      
+
       if( ! windows[ 'htmlReport' ] ) {
         return;
       }
@@ -335,20 +335,20 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
         }, ( err, data ) => {
 
           fs.writeFile( fileName, data, ( error ) => {
-            console.log( err );  
+            console.log( err );
           } );
         } );
-        
+
       //windows[ "htmlReport"].webContents.send( "savePDF", data );
     } ) );
 */
-    openForm( null, "htmlreport_control", { 
-      measurementName: measurementName, 
-      db: config.database, 
-      cellInfo: cellInfo, 
-      chanId: chanId 
+    openForm( null, "htmlreport_control", {
+      measurementName: measurementName,
+      db: config.database,
+      cellInfo: cellInfo,
+      chanId: chanId
     },   {
-      
+
       width: 400,
       height: 595,
       x: 50,
@@ -364,18 +364,18 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
     } );
 
     windows[ 'htmlReport' ] = new BrowserWindow( {
-      width: 1122, 
-      height: 795, 
-      x: 500, 
-      y: 100, 
+      width: 1122,
+      height: 795,
+      x: 500,
+      y: 100,
       center: false,
       resizable: false
     } )
-  
+
 
     windows[ 'htmlReport' ].webContents.once("dom-ready", () => {
       windows[ 'htmlReport' ].webContents.send("loadData", { measurementName: measurementName, db: config.database, cellInfo: cellInfo, chanId: chanId, instrumentId: instrumentId } );
-    });     
+    });
       // and load the index.html of the app.
     windows[ 'htmlReport' ].loadURL( url.format({
       pathname: path.join(__dirname, 'app/htmlreport.html'),
@@ -441,7 +441,7 @@ async function openScheduleLight( event, data ) {
 
 
   //await fetch( "http://" + data.config.trackerHost + ":" +   data.config.trackerPort + "/light.pause?instrumentId=" + data.instrumentId, { method: 'GET' } );
-  
+
 
   // Once the light has been updated, send the information to the main window for update
   let listener;
@@ -476,7 +476,7 @@ function removeInstrument( event, trackerHost ) {
     cancelId: 0,
     defaultId: 0,
     title: "Remove the instrument",
-    buttons: [ "Cancel", "Yes" ]    
+    buttons: [ "Cancel", "Yes" ]
   }, async ( index ) => {
 
     if( index == 1 ) {
@@ -505,7 +505,7 @@ function reportError( e ) {
     cancelId: 0,
     defaultId: 0,
     title: "Error",
-    buttons: [ "Ok" ]    
+    buttons: [ "Ok" ]
   }, ( index ) => {
 
   } );
@@ -524,7 +524,7 @@ function addInstrument() {
     resizable: false
 
   } ).then( async ( result ) => {
-    
+
     try {
       config.instruments.push( result );
       await saveConfig();
@@ -572,7 +572,7 @@ function loadInstrument( event, tracker ) {
 
     break;
   }
-  
+
   if( windows[ 'instrumentList' ] ) {
     windows[ 'instrumentList' ].close();
   }
@@ -588,26 +588,26 @@ function loadInstrument( event, tracker ) {
   });
 
   // Global
-  
+
 
 
   if( windows[ 'instrumentMain' ].webContents.isLoading() ) {
 
-    windows[ 'instrumentMain' ].webContents.once("dom-ready", () => {  
-      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: instrumentConfig, db: config.database } );  
+    windows[ 'instrumentMain' ].webContents.once("dom-ready", () => {
+      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: instrumentConfig, db: config.database } );
     });
-    
+
   } else {
 
-      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: instrumentConfig, db: config.database } );  
+      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: instrumentConfig, db: config.database } );
   }
-  
+
   windows[ 'instrumentMain' ].once("close", () => {
     windows[ 'instrumentMain' ] = null;
   });
 
   doMenu();
-  
+
   openSocket( instrumentConfig );
 }
 
@@ -638,13 +638,13 @@ function editInstrument( event, trackerHost ) {
     await saveConfig();
 
     if( windows[ 'instrumentMain' ] ) {
-      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: data, db: config.database } ); 
+      windows[ 'instrumentMain' ].webContents.send( "loadInstrument", { tracker: data, db: config.database } );
     }
-    
+
     if( windows[ 'instrumentList' ] ) {
-      windows[ 'instrumentList' ].webContents.send( "instrumentUpdated" ); 
+      windows[ 'instrumentList' ].webContents.send( "instrumentUpdated" );
     }
-    
+
     reloadInstruments();
 
   } ).catch( () => {} );
@@ -672,14 +672,14 @@ function editInfluxDB( event ) {
     });
 
     if( windows[ 'instrumentMain' ] ) {
-      windows[ 'instrumentMain' ].webContents.send( "reloadDB", { db: config.database } ); 
+      windows[ 'instrumentMain' ].webContents.send( "reloadDB", { db: config.database } );
     }
-    
+
   } ).catch( () => {} );
 }
 
 function showAllMeasurements( instrument ) {
-  
+console.log( instrument );
   openForm( null, "showallmeasurements", { config: instrument, configDB: config.database }, { width: 600, height: 700, resizable: false } ).then( ( results ) => {
 
   } ).catch( () => {} );
@@ -709,15 +709,15 @@ async function configChannel( event, data ) {
 
   instrumentConfig.instrumentId = data.instrumentId;
 
-  return openForm( null, "cellform", { 
-    instrumentConfig: instrumentConfig, 
+  return openForm( null, "cellform", {
+    instrumentConfig: instrumentConfig,
     groupName: data.groupName,
-    channelConfig: channelConfig, 
+    channelConfig: channelConfig,
     channelState: channelState[ data.groupName ].channels[ data.chanId ],
   }, { width: 600, height: 800 } ).then( ( results ) => {
-    
+
     event.sender.send( "channelConfigured", results );
-    return results;    
+    return results;
 
   } ).catch( () => {} );
 }
@@ -731,23 +731,23 @@ async function configChannels( event, data ) {
   var channelsState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&groupName=" + data.groupName, { method: 'GET' } ).then( ( response ) => response.json() );
   var instrumentConfig = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getInstrumentConfig?instrumentId=" + data.instrumentId, { method: 'GET' } ).then( ( response ) => response.json() );
   var channelState = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getStatus?instrumentId=" + data.instrumentId + "&chanId=" + data.chanIds[ 0 ], { method: 'GET' } ).then( ( response ) => response.json() );
-  
+
     instrumentConfig.instrumentId = data.instrumentId;
 
 
-  return openForm( null, "cellformall", { 
+  return openForm( null, "cellformall", {
 
-    channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ], 
-    channelsState: channelsState[ data.groupName ].channels, 
+    channelState: channelState[ data.groupName ].channels[ data.chanIds[ 0 ] ],
+    channelsState: channelsState[ data.groupName ].channels,
     groupName: data.groupName,
     instrumentConfig: instrumentConfig,
     channelIds: data.chanIds
 
   }, { width: 600, height: 800 } ).then( ( results ) => {
-  
+
     event.sender.send( "channelsConfigured", results );
-    return results;    
-    
+    return results;
+
   } ).catch( () => {} );
 }
 
@@ -786,7 +786,7 @@ function openForm( windowName, pageName, formData, options = { width: 300, heigh
 
   })
   return new Promise( ( resolver, rejecter ) => {
-    
+
     ipcMain.once("validateForm", ( event, data ) => {
 
       resolver( data );
@@ -803,7 +803,7 @@ function openForm( windowName, pageName, formData, options = { width: 300, heigh
     windowForm.webContents.once("dom-ready", () => {
       windowForm.webContents.send("loadForm", formData );
     });
-     
+
 
     windowForm._rejecter = rejecter;
   });

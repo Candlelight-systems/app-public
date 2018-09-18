@@ -174,6 +174,7 @@ class CellForm extends React.Component {
 							</div>
 						</div> :
 
+						( correctionFactor ? 
 						<div className="form-group">
 							<label htmlFor="cellarea" className="col-sm-3">Correction factor</label>
 							<div className="col-sm-9">
@@ -193,7 +194,7 @@ class CellForm extends React.Component {
 								<div className="help-block">Correction factor to the sun intensity. Use it to account for the geometrical uniformity of the light source, such as the edge effects. The correction goes as effective_sun = measured_sun / correction_factor.</div>
 							</div>
 							
-						</div>
+						</div> : null )
 					}
 
 				</div>
