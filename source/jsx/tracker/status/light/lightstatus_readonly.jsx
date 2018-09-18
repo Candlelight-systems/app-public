@@ -50,7 +50,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-                  { Math.round( this.state.lightValue * 100 ) / 100 } sun
+                  { ( this.state.lightValue ).toPrecision( 3 ) } sun
                 </div>
               </div> : "Current value unknown" 
             }

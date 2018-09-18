@@ -95,7 +95,7 @@ const toDate = ( date ) => {
 
 
 class HTMLReport extends React.Component {
-	
+
 	constructor( props ) {
 		super( props );
 		this.state = {};
@@ -120,7 +120,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Power conversion efficiency (PCE)");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -163,7 +163,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Power output");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -203,12 +203,12 @@ class HTMLReport extends React.Component {
 	/*********************/
 	/** Jsc **************/
 	/*********************/
-	
+
 	makeJscGraph( dom ) {
 
 		const g = new Graph( dom );
 		g.setTitle("Short circuit current");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -246,7 +246,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Open circuit voltage");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -288,7 +288,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Voltage");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -329,7 +329,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Current");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -368,7 +368,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Light intensity");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -407,7 +407,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Temperature");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -447,7 +447,7 @@ class HTMLReport extends React.Component {
 
 		const g = new Graph( dom );
 		g.setTitle("Humidity");
-		
+
 		this.graph_cfg_setBottomAxisTime( g );
 		this.graph_cfg_general( g );
 
@@ -488,14 +488,14 @@ class HTMLReport extends React.Component {
 
 		const axis = [];
 		const g = new Graph( this.domGraph, {
-			fontSize: 14, 
-			paddingLeft: 0, 
-			paddingRight: 0, 
-			paddingTop: 10, 
+			fontSize: 14,
+			paddingLeft: 0,
+			paddingRight: 0,
+			paddingTop: 10,
 			paddingBottom: 0,
 			close: false
 		}  );
-		
+
 		g.setWidth( 600 );
 		g.setHeight( pageHeight );
 
@@ -823,7 +823,7 @@ class HTMLReport extends React.Component {
 
 
 	graph_cfg_setBottomAxisTime( graph ) {
-		
+
 		graph.getBottomAxis()
 				.setLabel("Time")
 				.setUnit("h")
@@ -851,7 +851,7 @@ class HTMLReport extends React.Component {
 		}
 
 		const graph = this.graphJV;
-		
+
 		graph.resize( 420, 240 );
 
 		graph.getBottomAxis()
@@ -914,7 +914,7 @@ class HTMLReport extends React.Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		this.updateProps( nextProps );		
+		this.updateProps( nextProps );
 	}
 
 	componentDidUpdate() {
@@ -942,18 +942,18 @@ class HTMLReport extends React.Component {
 		} catch( e ) {
 			console.warn( e );
 		}
-		
+
 		this.data.ff = this.data.power.duplicate().divide( this.data.voc.duplicate().multiply( this.data.jsc ) ).multiply( 100 );
-			
+
 		while( this.domJV.firstChild ) {
 			this.domJV.removeChild( this.domJV.firstChild );
 		}
 
-		this.graphJV = new Graph( this.domJV, { 
-			fontSize: 14, 
-			paddingLeft: 0, 
-			paddingRight: 0, 
-			paddingTop: 10, 
+		this.graphJV = new Graph( this.domJV, {
+			fontSize: 14,
+			paddingLeft: 0,
+			paddingRight: 0,
+			paddingTop: 10,
 			paddingBottom: 0,
 			plugins: {
 				'makeTracesDifferent': {}
@@ -961,7 +961,7 @@ class HTMLReport extends React.Component {
 		} );
 
 		this.updateGraphs();
-		
+
 		this.setState( { data: this.data } );
 	}
 
@@ -975,7 +975,7 @@ class HTMLReport extends React.Component {
 			return;
 		}
 
-		var db = props.db.db;		
+		var db = props.db.db;
 		let time, wave = Graph.newWaveform();
 
 		return influxquery( `SELECT time,voc FROM "${ encodeURIComponent( props.measurementName ) }_voc" ORDER BY time`, db, props.db ).then( async ( results ) => {
@@ -986,9 +986,9 @@ class HTMLReport extends React.Component {
 			}
 
 			let values = results[ 0 ].series[ 0 ].values;
-			
+
 			values.forEach( ( value, index ) => {
-				
+
 				let date = new Date( value[ 0 ] ),
 					time = ( date.getTime() - this.offset ) / 1000 / 3600;
 
@@ -1001,13 +1001,13 @@ class HTMLReport extends React.Component {
 
 
 	async getJscData( props = this.props ) {
-		
+
 		if( ! props.measurementName ) {
 
 			return;
 		}
 
-		var db = props.db.db;		
+		var db = props.db.db;
 		let time, wave = Graph.newWaveform();
 
 		return influxquery( `SELECT time,jsc FROM "${ encodeURIComponent( props.measurementName ) }_jsc" ORDER BY time`, db, props.db ).then( async ( results ) => {
@@ -1018,9 +1018,9 @@ class HTMLReport extends React.Component {
 			}
 
 			let values = results[ 0 ].series[ 0 ].values;
-			
+
 			values.forEach( ( value, index ) => {
-				
+
 				let date = new Date( value[ 0 ] ),
 					time = ( date.getTime() - this.offset ) / 1000 / 3600;
 
@@ -1041,7 +1041,7 @@ class HTMLReport extends React.Component {
 		let jvCfg = props.config.jv || [];
 
 		await influxquery(`SELECT time,efficiency FROM "${ encodeURIComponent( props.measurementName ) }" ORDER BY time ASC limit 1; SELECT time,efficiency FROM "${ encodeURIComponent( props.measurementName ) }" ORDER BY time DESC limit 1;`, db, props.db ).then( async ( results ) => {
-			
+
 			if( ! results[ 0 ].series ) {
 				throw "No measurement with the name " + props.measurementName + " or no associated data";
 			}
@@ -1055,7 +1055,7 @@ class HTMLReport extends React.Component {
 			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + encodeURIComponent( props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
 			let toReturn = await influxquery(qString, db, props.db ).then( ( results ) => {
-				
+
 				if( ! results[ 0 ].series ) {
 					console.warn("Could not find any information linked to this serie");
 					console.warn("Query string: " + qString );
@@ -1087,7 +1087,7 @@ class HTMLReport extends React.Component {
 
 
 				values.forEach( ( value, index ) => {
-					
+
 					let date = new Date( value[ 0 ] ),
 						time;
 
@@ -1104,19 +1104,19 @@ class HTMLReport extends React.Component {
 				//	}
 
 					if( value[ 1 ] < 100 && value[ 1 ] > 0 ) {
-						waveEfficiency.append( time, value[ 1 ] );					
+						waveEfficiency.append( time, value[ 1 ] );
 					}
 
-					if( Math.abs( value[ 2 ] * value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].voltageRange * environment.instrument[ this.props.instrumentId ].fsr  ) {
+					if( ! this.props.instrumentId || Math.abs( value[ 2 ] * value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].voltageRange * environment.instrument[ this.props.instrumentId ].fsr  ) {
 						wavePower.append( time, value[ 2 ] * value[ 3 ] );
 					}
-					
-					
-					if( Math.abs( value[ 2 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
-						waveVoltage.append( time, value[ 2 ] );					
+
+
+					if(  ! this.props.instrumentId || Math.abs( value[ 2 ] ) < environment.instrument[ this.props.instrumentId ].voltageRange ) {
+						waveVoltage.append( time, value[ 2 ] );
 					}
-					
-					if( Math.abs( value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr ) {
+
+					if(  ! this.props.instrumentId ||  Math.abs( value[ 3 ] * 1000 ) < environment.instrument[ this.props.instrumentId ].fsr ) {
 						waveCurrent.append( time, value[ 3 ] );
 					}
 
@@ -1149,7 +1149,7 @@ class HTMLReport extends React.Component {
 				this.data.ellapsed = Math.round( 10 * timeDifference / 3600 ) / 10;
 				this.data.start_date = new Date( timefrom );
 				this.data.end_date = new Date( timeto );
-				
+
 			} );
 
 
@@ -1161,7 +1161,7 @@ class HTMLReport extends React.Component {
 			let time_100h = tfrom + 1000000000 * 3600 * 100;
 			let time_500h = tfrom + 1000000000 * 3600 * 500;
 			let time_1000h = tfrom + 1000000000 * 3600 * 1000;
-			
+
 			this.data.timeEfficiencies = await influxquery(`
 				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_1h } ORDER BY time ASC LIMIT 1;
 				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_24h } ORDER BY time ASC LIMIT 1;
@@ -1169,7 +1169,7 @@ class HTMLReport extends React.Component {
 				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_500h } ORDER BY time ASC LIMIT 1;
 				SELECT efficiency FROM "${ encodeURIComponent( props.measurementName ) }" WHERE time > ${ time_1000h } ORDER BY time ASC LIMIT 1;
 			`, db, props.db ).then( ( results ) => {
-			
+
 				return results.map( ( result ) => {
 
 					if( ! result.series ) {
@@ -1186,17 +1186,17 @@ class HTMLReport extends React.Component {
 			if( jvQuery.length > 0 ) {
 
 				this.data.jv = await influxquery( jvQuery, db, props.db ).then( ( results ) => {
-				
+
 					return results.map( ( result, index ) => {
 
 
 						if( ! result.series ) {
 							return;
 						}
-						
+
 						let jv = result.series[ 0 ].values[ 0 ][ 1 ].replace('"', '').split(',');
 						let waveform = Graph.newWaveform();
-						
+
 						for( var i = 0; i < jv.length; i += 2 ) {
 							waveform.append( parseFloat( jv[ i ] ), parseFloat( jv[ i + 1 ] ) );
 						}
@@ -1217,7 +1217,7 @@ class HTMLReport extends React.Component {
 		} );
 	}
 
-	render() {	 
+	render() {
 
 
 		this.jvDom = [];
@@ -1237,7 +1237,7 @@ class HTMLReport extends React.Component {
 		console.log( indexSpacing );
 
 		return (
-				
+
 			<div ref={ el => this.dom = el } className="container-fluid">
 
 				<div className="row">
@@ -1258,7 +1258,7 @@ class HTMLReport extends React.Component {
 						<div className="row">
 							<div className="col-xs-3">Start date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.start_date && toDate( this.state.data.start_date ) }</div>
 						</div>
-						
+
 						<div className="row">
 							<div className="col-xs-3">End date: </div><div className="col-xs-5 info">{ !!this.state.data && !! this.state.data.end_date && toDate( this.state.data.end_date ) }</div>
 						</div>
@@ -1266,7 +1266,7 @@ class HTMLReport extends React.Component {
 						<div className="row">
 							<div className="col-xs-3">Ageing time: </div><div className="col-xs-5 info">{ !!this.state.data &&  !! this.state.data.ellapsed && this.state.data.ellapsed } hours</div>
 						</div>
-						
+
 
 						<h4>Device parameters</h4>
 
@@ -1277,14 +1277,14 @@ class HTMLReport extends React.Component {
 						<div className="row">
 							<div className="col-xs-3">Comment: </div><div className="col-xs-5">{ this.props.config.comment }</div>
 						</div>
-	
+
 
 						<h4>Power conversion efficiencies (MPP)</h4>
 
 						<div className="row">
 							<div className="col-xs-3">Highest efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.maxEfficiency }%</div>
-						</div>	
-						{!! this.state.data && !! this.state.data.timeEfficiencies && [					
+						</div>
+						{!! this.state.data && !! this.state.data.timeEfficiencies && [
 							( this.state.data.timeEfficiencies[ 0 ] ? <div className="row"><div className="col-xs-3">Efficiency after 1h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 0 ] }%</div></div> : '' ),
 							( this.state.data.timeEfficiencies[ 1 ] ? <div className="row"><div className="col-xs-3">Efficiency after 24h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 1 ] }%</div></div> : '' ),
 							( this.state.data.timeEfficiencies[ 2 ] ? <div className="row"><div className="col-xs-3">Efficiency after 100h:</div><div className="col-xs-5 info">{ this.state.data.timeEfficiencies[ 2 ] }%</div></div> : '' ),
@@ -1293,7 +1293,7 @@ class HTMLReport extends React.Component {
 						] }
 						<div className="row"><div className="col-xs-3">Final efficiency: </div><div className="col-xs-5 info">{ !!this.state.data && this.state.data.finalEfficiency }%</div></div>
 
-						<h4>j-V sweeps</h4>	
+						<h4>j-V sweeps</h4>
 						<div id="ivTable">
 							<div className="row ivData" id="ivHead">
 								<div className="col-xs-3">Time<br /><nobr>(h)</nobr></div>
@@ -1307,11 +1307,11 @@ class HTMLReport extends React.Component {
 
 							{
 								!! this.state.data && !! this.state.data.jv && this.state.data.jv.map( ( jv, index ) => {
-									
+
 									if( ! lastIndex || ( index - lastIndex ) >= indexSpacing ) {
-										
+
 										lastIndex = lastIndex + indexSpacing;
-										return ( 
+										return (
 
 										<div className="row ivData" ref={ el => this.jvDom[ index ] = el }>
 											<div className="col-xs-3">{ jv.ellapsed } h</div>
@@ -1321,7 +1321,7 @@ class HTMLReport extends React.Component {
 											<div className="col-xs-1">{ isNaN( jv.waveInfo.powerin ) ? 'N/A' :  ( jv.waveInfo.powerin / 10 ).toPrecision( 3 ) }</div>
 											<div className="col-xs-1">{ isNaN( jv.waveInfo.ff ) ? 'N/A' : jv.waveInfo.ff.toPrecision( 2 ) }</div>
 											<div className="col-xs-1">{ isNaN( jv.waveInfo.pce ) ? 'N/A' : jv.waveInfo.pce.toPrecision( 3 ) }</div>
-										</div> 
+										</div>
 										);
 									} else {
 										return null;
@@ -1332,13 +1332,13 @@ class HTMLReport extends React.Component {
 
 						<div ref={ el => this.domJV = el }></div>
 
-					</div>	
+					</div>
 					<div className="col-xs-5">
 						<div id="graph" ref={ el => this.domGraph = el }></div>
 					</div>
 				</div>
 				<div className="row footer">
-				<div className="pull-right">Generated on : { new Date().toString() } </div>&copy; Candlelight systems ltd. 
+				<div className="pull-right">Generated on : { new Date().toString() } </div>&copy; Candlelight systems ltd.
 				</div>
 			</div>
 		);

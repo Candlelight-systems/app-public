@@ -154,7 +154,7 @@ class TrackerGroupDevices extends React.Component {
 
 
   doEnvironmentalSensing() {
-
+    return;
     fetch( `http://${ this.props.config.trackerHost }:${ this.props.config.trackerPort }/environmentalSensing?instrumentId=${ this.props.instrumentId }&groupName=${ this.props.name }`, {
 
       method: 'GET'

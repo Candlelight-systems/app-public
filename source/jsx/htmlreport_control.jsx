@@ -16,7 +16,7 @@ const possibleGraphs = {
 };
 
 class HTMLReportControl extends React.Component {
-	
+
 	constructor( props ) {
 		super( props );
 		this.state = {
@@ -86,7 +86,7 @@ class HTMLReportControl extends React.Component {
 		var db = this.props.db.db;
 
 		return influxquery("SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time DESC limit 1;", db, this.props.db ).then( async ( results ) => {
-			
+
 			if( ! results[ 0 ].series ) {
 				throw "No measurement with the name " + encodeURIComponent( this.props.measurementName ) + " or no associated data";
 			}
@@ -97,7 +97,7 @@ class HTMLReportControl extends React.Component {
 				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
 
 			influxquery(`SELECT time,iv from "${ encodeURIComponent( this.props.measurementName ) }_iv" ORDER BY time ASC;`, db, this.props.db ).then( ( results ) => {
-				
+
 				if( ! results[ 0 ].series ) {
 					console.warn("No IV curves for this serie");
 					this.state.data.jv_available = [];
@@ -109,7 +109,7 @@ class HTMLReportControl extends React.Component {
 
 				let values = results[ 0 ].series[ 0 ].values;
 				this.state.data.jv_available = values.map( ( value, index ) => {
-				
+
 					return {
 						ellapsed: Math.round( ( new Date( value[ 0 ] ) - new Date( timefrom ) ) / 3600 / 1000 * 10 ) / 10,
 						time: value[ 0 ]
@@ -123,7 +123,7 @@ class HTMLReportControl extends React.Component {
 
 
 
-	render() {	 
+	render() {
 // test6_1494506615016_iv
 		if( ! this.state.data.jv_available ) {
 			return null;
@@ -146,7 +146,7 @@ class HTMLReportControl extends React.Component {
 				availableGraphs.push( possibleGraphs.jsc );
 				availableGraphs.push( possibleGraphs.voc );
 			break;
-			
+
 			case 'JSC':
 				availableGraphs.push( possibleGraphs.jsc );
 			break;
@@ -160,27 +160,27 @@ class HTMLReportControl extends React.Component {
 		if( this.props.cellInfo.lightMonitoring ) {
 			availableGraphs.push( possibleGraphs.light );
 		}
-		
+
 		if( this.props.cellInfo.temperatureMonitoring ) {
 			availableGraphs.push( possibleGraphs.temperature );
 		}
-		
+
 		if( this.props.cellInfo.humidityMonitoring ) {
 			availableGraphs.push( possibleGraphs.humidity );
 		}
 
 		return (
-			
+
 			<div className="container-fluid">
 				<form className="form-horizontal">
-						
-					
+
+
 						<h3>j-V curves</h3>
 						<div className="form-group">
 							<label className="col-sm-3">Select the j-V curves for the report</label>
 							<div className="col-sm-9">
 								<select className="form-control" multiple="multiple" name="jv" value={ this.state.jv } onChange={ this.handleSelectChange }>
-									{ this.state.data.jv_available.map( ( jv ) => 
+									{ this.state.data.jv_available.map( ( jv ) =>
 										<option key={ jv.time } value={ jv.time }>{ jv.ellapsed } hours</option>
 									) }
 								</select>

@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';	
+import ReactDOM from 'react-dom';
 import InfluxForm from "./jsx/influxform.jsx"
 import Error from "./jsx/error.jsx"
 import { query as influxquery } from "./influx";
 import { ipcRenderer, remote } from 'electron';
 const dialog = remote.dialog;
-	
+
 let data;
 ipcRenderer.on("loadForm", ( event, d ) => {
 
@@ -33,7 +33,7 @@ function pad( number ) {
 
 function downloadData( measurementName ) {
 
-	ipcRenderer.send( "downloadData", data.config, measurementName );
+	ipcRenderer.send( "downloadData", data.config, measurementName, undefined, data.instrumentId );
 }
 
 
@@ -45,7 +45,7 @@ function removeData( measurementName ) {
     cancelId: 0,
     defaultId: 0,
     title: "Delete this measurement ?",
-    buttons: [ "Cancel", "Yes" ]    
+    buttons: [ "Cancel", "Yes" ]
   }, async ( index ) => {
 
     if( index == 1 ) {
@@ -56,7 +56,7 @@ function removeData( measurementName ) {
     		await influxquery(`DROP MEASUREMENT ${ measurementName };`, data.configDB.db, data.configDB )
     		render();
 
-    	} catch ( e ) { 
+    	} catch ( e ) {
 
     		dialog.showMessageBox( {
 			    type: 'error',
@@ -64,7 +64,7 @@ function removeData( measurementName ) {
 			    cancelId: 0,
 			    defaultId: 0,
 			    title: "Error",
-			    buttons: [ "Ok" ]   
+			    buttons: [ "Ok" ]
 			} );
     	}
     }
@@ -95,9 +95,9 @@ async function render( ) {
 
 		let jsonArray = [];
 		for( var i in json ) {
-			jsonArray.push( { 
-				measurementName: i, 
-				startDate: json[ i ].startDate, 
+			jsonArray.push( {
+				measurementName: i,
+				startDate: json[ i ].startDate,
 				endDate: json[ i ].endDate,
 				cellInfo: json[ i ].cellInfo } );
 		}
@@ -116,10 +116,10 @@ async function render( ) {
 					Showing all existing measurements
 				</h2>
 
-				{ jsonArray.map( ( val ) => { 
+				{ jsonArray.map( ( val ) => {
 
 					switch( val.cellInfo.trackingMode ) {
-						
+
 						case 'CONSTV':
 							tracking = `Constant voltage`;
 						break;
@@ -144,7 +144,7 @@ async function render( ) {
 					return (
 
 						<li className="list-group-item" key={ val.measurementName } >
-							
+
 							<div className="pull-right">
 								<button className="btn btn-sm btn-primary" onClick={ () => downloadData( val.measurementName ) }>Download data</button>
 								{ val.endDate && <button className="btn btn-sm btn-danger" onClick={ () => removeData( val.measurementName ) }>Delete data</button> }
@@ -157,11 +157,11 @@ async function render( ) {
 							<div>
 								{ formatDate( val.startDate ) } <span className="glyphicon glypicon-arrow-left"></span> { val.endDate ? formatDate( val.endDate ) + " (" + Math.round( ( val.endDate - val.startDate ) / 1000 / 3600 * 10 ) / 10 + "h)" : '(Running)' }
 							</div>
-							
+
 							<div>
 								Tracking mode: { tracking }
 							</div>
-						</li> 
+						</li>
 					);
 				} ) }
 				</ul>
