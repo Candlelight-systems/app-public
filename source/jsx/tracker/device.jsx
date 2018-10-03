@@ -884,6 +884,10 @@ class TrackerDevice extends React.Component {
 		const j_currentdensity = this.processCurrent( this.state.currentdensity );
 		const jsc_currentdensity = this.processCurrent( this.state.jsc );
 
+		if( ! instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ] ) {
+			return ( <div className="alert alert-danger">Group could not be found in software config. Expecting "{ this.props.groupName }"</div> );
+		}
+
 		//console.log( this.props, instrumentEnvironment );
 		const displayElements = instrumentEnvironment[ this.props.instrumentId ].groups[ this.props.groupName ].displayDeviceInformation;
 		const button_autozero = instrumentEnvironment[ this.props.instrumentId ].autoZero == "device" ? <button className="btn btn-cl" onClick={ this.autoZero }> Auto zero</button> : null;

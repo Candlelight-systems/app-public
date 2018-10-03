@@ -95,6 +95,10 @@ class InstrumentStatus extends React.Component {
 
 	render() {
 
+		if( ! environment.instrument[ this.props.instrumentId ].groups[ this.props.name ] ) {
+			return ( <div className="alert alert-danger">Instrument could not be found in software config. Expecting "{ this.props.name }". Available: { Object.keys( environment.instrument[ this.props.instrumentId ].groups ).join(", ") }.  </div> );
+		}
+
 		return ( 
 
 		<div className="col-lg-2 group-status group-status-instrument">

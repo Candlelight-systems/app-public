@@ -70,15 +70,15 @@ class CellForm extends React.Component {
 
 		let active = !! this.state.enable && this.state.tracking_mode > 0;
 		let groups = this.props.instrumentConfig.groups;
-		let relayController = false;
+		let relayController = !! this.props.instrumentConfig.relayController;
 		
 		let lightSourceSelect = environment.instrument[ this.props.instrumentConfig.instrumentId ].groups[ this.props.groupName ].manualLightIntensity;
 		let correctionFactor = 'N/A';
 
+
 		for( var i = 0; i < groups.length; i ++ ) {
 			if( groups[ i ].groupName == this.props.groupName ) {
-				relayController = groups[ i ].dualOutput || groups[ i ].relayController;
-
+				
 				for( var j = 0; j < groups[ i ].channels.length; j ++ ) {
 
 					if( groups[ i ].channels[ j ].chanId == this.props.formState.chanId ) {
