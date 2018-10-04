@@ -303,7 +303,7 @@ class DownloadForm extends React.Component {
 				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
 				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
 
-			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
+			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
 
 				let values = results[ 0 ].series[ 0 ].values,
 					offset,
@@ -353,7 +353,12 @@ class DownloadForm extends React.Component {
 					wavePower.append( time, value[ 8 ] );
 					waveHumidity.append( time, value[ 4 ] );
 					waveSun.append( time, value[ 5 ] );
-					waveTemperature.append( time, value[ 6 ] );
+
+					if( value[ 6 ] !== null ) {
+						waveTemperature.append( time, value[ 6 ] );
+					} else if( value[ 8 ] !== null ) {
+						waveTemperature.append( time, value[ 8 ] );
+					} 
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
 				} );
