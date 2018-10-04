@@ -53,7 +53,6 @@ function removeData( measurementName ) {
     	try {
 
     		await fetch(`http://${ data.config.trackerHost }:${ data.config.trackerPort }/dropMeasurement?measurementName=${measurementName}`)
-    		await influxquery(`DROP MEASUREMENT ${ measurementName };`, data.configDB.db, data.configDB )
     		render();
 
     	} catch ( e ) { 
@@ -66,6 +65,12 @@ function removeData( measurementName ) {
 			    title: "Error",
 			    buttons: [ "Ok" ]   
 			} );
+    	}
+
+    	try {
+    		await influxquery(`DROP MEASUREMENT ${ measurementName };`, data.configDB.db, data.configDB );
+    	} catch( e ) {
+    		// Error in delete from the DB. However the measurement will be removed from the list even if no data exists
     	}
     }
   } );

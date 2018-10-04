@@ -18,7 +18,10 @@ class DownloadForm extends React.Component {
 		this.downloadPDF = this.downloadPDF.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
-			dl_format: 'itx'
+			dl_format: 'itx',
+			error_track: false,
+			error_vocjs: false,
+			error_jv: false
 		};
 	}
 
@@ -81,7 +84,13 @@ class DownloadForm extends React.Component {
 
 	async downloadTrack( outputfile ) {
 
-		let data = await this.getTrackData();
+		try {
+			let data = await this.getTrackData();
+		} catch( e ) {
+			this.setState( { error_track: true } );
+		}
+
+
 		outputfile.addWaveform( data.date, { 
 			waveName: "Date"
 		} );
@@ -125,8 +134,13 @@ class DownloadForm extends React.Component {
 
 	async downloadVocJsc( outputfile ) {
 
-		let data = await this.getVocJscData();
+		try {
+			let data = await this.getVocJscData();
 		
+		} catch( e ) {
+			this.setState( { error_vocjs: true } );
+		}
+
 		outputfile.addWaveform( data.waveVoc, { 
 			waveName: "Voc",
 			waveNameX: "Time_voc_h"
@@ -140,7 +154,11 @@ class DownloadForm extends React.Component {
 
 	async downloadIV( outputfile ) {
 
-		let data = await this.getJVData();
+		try {
+			let data = await this.getJVData();
+		} catch( e ) {
+			this.setState( { error_jv: true } );
+		}
 		data[ 0 ].map( ( data ) => {
 
 			if( ! data.wave ) {
@@ -486,7 +504,11 @@ class DownloadForm extends React.Component {
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
 
-					<h3>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h3>
+					<h4>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h4>
+
+					{ this.state.error_track ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download tracking data. It could be that no data exists in the database.</div> : null }
+					{ this.state.error_jv ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download IV data. It could be that no data exists in the database.</div> : null }
+					{ this.state.error_vocjsc ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download Voc/Jsc data. It could be that no data exists in the database.</div> : null }
 
 					<div className="form-group">
 						<label className="col-sm-3">Format</label>
