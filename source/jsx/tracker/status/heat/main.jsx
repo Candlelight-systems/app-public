@@ -1,6 +1,7 @@
 import React from 'react';
 import { ipcRenderer } from "electron";
 import { default as HeatStatus_1_0 } from "./heatstatus_1.0.jsx"
+import { default as HeatStatus_2_1 } from "./heatstatus_2.1.jsx"
 import { default as HeatStatus_2_0 } from "./heatstatus_2.0.jsx"
 import { default as HeatStatus_ssr_1_0 } from "./heatstatus_ssr_1.0.jsx"
 import environment from "../../../../../app/environment.json"
@@ -47,6 +48,12 @@ class HeatStatus extends React.Component {
 
       case "1.0": {
         content = ( <HeatStatus_1_0 {...this.props } /> );
+        break;
+      }
+
+
+      case "2.1": {
+        content = ( <HeatStatus_2_1 {...this.props } /> );
         break;
       }
 
