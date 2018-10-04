@@ -100,7 +100,7 @@ class CSVBuilder extends FileBuilder {
 
 	build() {
 
-		const separator = "\t";
+		const separator = ",";
 		let output = "";
 		output += this.waves.map( ( wave ) => {
 
@@ -130,12 +130,15 @@ class CSVBuilder extends FileBuilder {
 				if( data !== undefined && ! isNaN( data ) ) {
 					iterating = true;
 
-
 					if( wave.options.waveNameX ) {
 						string += wave.data.getX( i ) + separator;
 					}
 
 					return string + data;
+				}
+
+				if( wave.options.waveNameX ) {
+					return separator;
 				}
 
 				return "";
