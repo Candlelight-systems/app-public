@@ -550,7 +550,7 @@ function loadInstrument( event, tracker ) {
 
   if( ! windows[ 'instrumentMain' ] ) {
     // Create the browser window.
-    windows[ 'instrumentMain' ] = new BrowserWindow({width: 1400, height: 1024, center: true, resizable: false})
+    windows[ 'instrumentMain' ] = new BrowserWindow({width: 1400, height: 1024, center: true, resizable: true})
 
 
   }

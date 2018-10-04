@@ -1052,7 +1052,7 @@ class HTMLReport extends React.Component {
 				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
 				grouping = Math.max( 1, Math.round( timeDifference / 2000 ) );
 
-			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff FROM \"" + encodeURIComponent( props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
+			let qString = "SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(temperature_base) as tMean2 FROM \"" + encodeURIComponent( props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;";
 
 			let toReturn = await influxquery(qString, db, props.db ).then( ( results ) => {
 
@@ -1126,8 +1126,11 @@ class HTMLReport extends React.Component {
 						waveHumidity.append( time, value[ 4 ] );
 					}
 
-					if( value[ 6 ] !== 0 ) {
+
+					if( value[ 6 ] !== null ) {
 						waveTemperature.append( time, value[ 6 ] );
+					} else if( value[ 8 ] !== null ) {
+						waveTemperature.append( time, value[ 8 ] );
 					}
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
