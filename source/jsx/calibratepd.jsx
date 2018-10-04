@@ -21,7 +21,8 @@ class CalibratePD extends React.Component {
 
 		this.state = {
 			channelsJsc: {},
-			sunIntensity: 1000
+			sunIntensity: 1000,
+			darkOffset: 0
 		};
 
 		this.handleInputChange = this.handleInputChange.bind( this );
@@ -57,7 +58,8 @@ class CalibratePD extends React.Component {
 		} );
 
 		this.setState( {
-			rescaling_success: true
+			rescaling_success: true,
+			darkOffset: this.state.channelsJsc[ 'pd' ]
 		});
 
 		await this.getPD();
@@ -75,8 +77,9 @@ class CalibratePD extends React.Component {
 		if( ! sunValue ) {
 			scalingFactor = this.state.control.factory_scaling_ma_to_sun;
 		} else {
-			scalingFactor = sunValue / 1000 / this.state.channelsJsc[ "pd" ];
+			scalingFactor = sunValue / 1000 / ( this.state.channelsJsc[ "pd" ] - this.state.darkOffset );
 		}
+
 
 		scalingFactor = Math.round( scalingFactor * 1000 ) / 1000;
 		
@@ -345,25 +348,28 @@ class CalibratePD extends React.Component {
 							<input className="form-control" readOnly="readonly" value={ ( jsc = this.jsc( "pd", false ) ).toPrecision( 4 ) ? jsc + " mA" : "" } />
 						</div>
 
-						<h3>1. Calibration of the dark offset</h3>
+						<h4>1. Calibration of the dark offset</h4>
 						<div className="form-group">
 							<div className="btn-group">
 								<button className="btn btn-default" type="button" onClick={ () => this.offsetPD( ) }>Calibrate</button>
 						    </div>
 						</div>
+						{ this.state.darkOffset ?
+							<div>
+								<h4>2. Calibration of the sun intensity</h4>
+								<div className="form-group">
+									<label>Sun intensity</label>
+									<div className="input-group">
+										<input type="text" className="form-control" name="sunIntensity" value={ this.state.sunIntensity } onChange={ this.handleInputChange } />
+										<span className="input-group-addon">W m<sup>-2</sup></span>
+									</div>
+								</div>
 
-						<h3>2. Calibration of the sun intensity</h3>
-						<div className="form-group">
-							<label>Sun intensity</label>
-							<div className="input-group">
-								<input type="text" className="form-control" name="sunIntensity" value={ this.state.sunIntensity } onChange={ this.handleInputChange } />
-								<span className="input-group-addon">W m<sup>-2</sup></span>
-							</div>
-						</div>
-						<div className="btn-group">
-							<button className="btn btn-default" type="button" onClick={ () => this.scalePD( this.state.sunIntensity ) }>Calibrate</button>
-					        { !! this.state.control && <button className="btn btn-default" type="button" onClick={ () => this.scalePD( ) } >Factory reset ({ Math.round( 100 * this.state.channelsJsc[ "pd" ] * control.factory_scaling_ma_to_sun ) / 100 } sun)</button> }
-					    </div>
+							<div className="btn-group">
+								<button className="btn btn-default" type="button" onClick={ () => this.scalePD( this.state.sunIntensity ) }>Calibrate</button>
+						        { !! this.state.control && <button className="btn btn-default" type="button" onClick={ () => this.scalePD( ) } >Factory reset ({ Math.round( 100 * this.state.channelsJsc[ "pd" ] * control.factory_scaling_ma_to_sun ) / 100 } sun)</button> }
+						    </div>
+						 </div> : null }
 					</div>
 
 					<div className="btn-group">

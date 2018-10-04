@@ -82,6 +82,10 @@ class DownloadForm extends React.Component {
 	async downloadTrack( outputfile ) {
 
 		let data = await this.getTrackData();
+		outputfile.addWaveform( data.date, {
+			waveName: "Date"
+		} );
+
 		outputfile.addWaveform( data.efficiency, {
 			waveName: "Efficiency",
 			waveNameX: "Time_MPP_h"
@@ -281,7 +285,8 @@ class DownloadForm extends React.Component {
 					wavePower = Graph.newWaveform(),
 					waveSun = Graph.newWaveform(),
 					waveTemperature = Graph.newWaveform(),
-					waveHumidity = Graph.newWaveform();
+					waveHumidity = Graph.newWaveform(),
+					waveDate = Graph.newWaveform();
 
 				waveEfficiency.setUnit("%");
 				waveEfficiency.setXUnit("h");
@@ -313,6 +318,7 @@ class DownloadForm extends React.Component {
 						value[ 2 ] = NaN;
 					}*/
 
+					waveDate.append( time, date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() );
 					waveEfficiency.append( time, value[ 1 ] );
 					waveVoltage.append( time, value[ 2 ] );
 					waveCurrent.append( time, value[ 3 ] );
