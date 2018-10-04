@@ -18,7 +18,10 @@ class DownloadForm extends React.Component {
 		this.downloadPDF = this.downloadPDF.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
-			dl_format: 'itx'
+			dl_format: 'itx',
+			error_track: false,
+			error_vocjs: false,
+			error_jv: false
 		};
 	}
 
@@ -81,7 +84,16 @@ class DownloadForm extends React.Component {
 
 	async downloadTrack( outputfile ) {
 
-		let data = await this.getTrackData();
+		let data;
+		try {
+			data = await this.getTrackData();
+		} catch( e ) {
+			this.setState( { error_track: true } );
+			console.error( e );
+			return;
+		}
+
+
 		outputfile.addWaveform( data.date, {
 			waveName: "Date"
 		} );
@@ -125,7 +137,16 @@ class DownloadForm extends React.Component {
 
 	async downloadVocJsc( outputfile ) {
 
-		let data = await this.getVocJscData();
+		let data;
+
+		try {
+			data = await this.getVocJscData();
+
+		} catch( e ) {
+			this.setState( { error_vocjs: true } );
+			console.error( e );
+			return;
+		}
 
 		outputfile.addWaveform( data.waveVoc, {
 			waveName: "Voc",
@@ -140,7 +161,14 @@ class DownloadForm extends React.Component {
 
 	async downloadIV( outputfile ) {
 
-		let data = await this.getJVData();
+	let data;
+		try {
+			data = await this.getJVData();
+		} catch( e ) {
+			this.setState( { error_jv: true } );
+			console.error( e );
+			return;
+		}
 		data[ 0 ].map( ( data ) => {
 
 			if( ! data.wave ) {
@@ -279,14 +307,14 @@ class DownloadForm extends React.Component {
 
 				let values = results[ 0 ].series[ 0 ].values,
 					offset,
+					waveDate = Graph.newWaveform(),
 					waveEfficiency = Graph.newWaveform(),
 					waveVoltage = Graph.newWaveform(),
 					waveCurrent = Graph.newWaveform(),
 					wavePower = Graph.newWaveform(),
 					waveSun = Graph.newWaveform(),
 					waveTemperature = Graph.newWaveform(),
-					waveHumidity = Graph.newWaveform(),
-					waveDate = Graph.newWaveform();
+					waveHumidity = Graph.newWaveform();
 
 				waveEfficiency.setUnit("%");
 				waveEfficiency.setXUnit("h");
@@ -340,6 +368,7 @@ class DownloadForm extends React.Component {
 					temperature: waveTemperature,
 					humidity: waveHumidity,
 					power: wavePower,
+					date: waveDate,
 
 					maxEfficiency: maxEfficiency,
 					finalEfficiency: finalEfficiency,
@@ -486,7 +515,11 @@ class DownloadForm extends React.Component {
 			<div className="container-fluid">
 				<form onSubmit={ this.submit } className="form-horizontal">
 
-					<h3>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h3>
+					<h4>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h4>
+
+					{ this.state.error_track ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download tracking data. It could be that no data exists in the database.</div> : null }
+					{ this.state.error_jv ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download IV data. It could be that no data exists in the database.</div> : null }
+					{ this.state.error_vocjsc ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download Voc/Jsc data. It could be that no data exists in the database.</div> : null }
 
 					<div className="form-group">
 						<label className="col-sm-3">Format</label>

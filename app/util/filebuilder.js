@@ -8,9 +8,9 @@ class FileBuilder {
 
 	addWaveform( waveform, options ) {
 
-		this.waves.push( { 
+		this.waves.push( {
 			data: waveform,
-			options: options 
+			options: options
 		});
 	}
 }
@@ -100,7 +100,7 @@ class CSVBuilder extends FileBuilder {
 
 	build() {
 
-		const separator = ",";
+		const separator = "\t";
 		let output = "";
 		output += this.waves.map( ( wave ) => {
 
@@ -140,7 +140,7 @@ class CSVBuilder extends FileBuilder {
 
 				return "";
 
-			} ).join(",");
+			} ).join( separator );
 
 			i++;
 
@@ -154,4 +154,3 @@ class CSVBuilder extends FileBuilder {
 }
 
 export { CSVBuilder, ITXBuilder }
-

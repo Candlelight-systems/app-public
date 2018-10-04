@@ -304,6 +304,10 @@ function htmlReport( event, cellInfo, chanId, measurementName, instrumentId ) {
 
       }, ( fileName ) => {
 
+        if( ! fileName ) {
+          return;
+        }
+
         windows[ 'htmlReport' ].webContents.printToPDF( {
           marginsType: 1,
           pageSize: 'A4',
