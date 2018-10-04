@@ -33,6 +33,18 @@ class CalibratePD extends React.Component {
 	}
 
 	close() {
+
+		if( this.state.channels && Array.isArray( this.state.channels ) ) {
+			for( var i in this.state.channels ) {
+				let chanId = this.state.channels[ i ].chanId,
+					strObj = 'mon_' + chanId;
+
+				if( this.state[ strObj ] ) {
+					this.disableChannel( chanId );
+				}
+			}
+		}
+
 		this.props.onClose();
 	}
 
@@ -215,6 +227,8 @@ class CalibratePD extends React.Component {
 			method: 'GET'
 		} );
 
+
+
 //		this.getState[ chanId ] = true;
 	}
 
@@ -228,7 +242,6 @@ class CalibratePD extends React.Component {
 	}
 
 	componentWillUpdate( nextProps, nextState ) {
-
 
 		if( this.state.channels && Array.isArray( this.state.channels ) ) {
 			for( var i in this.state.channels ) {
