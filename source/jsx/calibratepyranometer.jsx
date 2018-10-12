@@ -130,7 +130,7 @@ class CalibratePyranometer extends React.Component {
 						<label>Pyranometer Sensitivity</label>
 					</div>
 					<div className="col-sm-3">
-						<input type="text" name="pyranoSensitivity" value={ this.state.pyranoSensitivity } onChange={ this.handleInputChange } /> V / ( W m<sup>-2</sup> )
+						<input type="text" name="pyranoSensitivity" value={ this.state.pyranoSensitivity } onChange={ this.handleInputChange } /> &micro;V / ( W m<sup>-2</sup> )
 					</div>
 				</div>
 

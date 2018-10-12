@@ -2,6 +2,8 @@
 	"environment": {
 		"ageing": true,
 
+		"lightUnit": "Wm2",
+		
 		"statuses": {
 			"light": {
 				"version": "readonly",
