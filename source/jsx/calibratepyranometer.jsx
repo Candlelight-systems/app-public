@@ -147,7 +147,7 @@ class CalibratePyranometer extends React.Component {
 				<div className="row">
 					<div className="col-sm-9">
 						<div className="btn-group">
-							<button type="button" className="btn btn-primary" onClick={ () => this.applyScaling( this.state.scale, this.state.offset ) }>Apply scaling</button>
+							<button type="button" className="btn btn-primary" onClick={ () => this.applyScaling( this.state.pyranoSensitivity, this.state.ampBoxGain ) }>Apply scaling</button>
 							<button type="button" className="btn btn-default" onClick={this.close}>Close</button>
 						</div>
 					</div>
