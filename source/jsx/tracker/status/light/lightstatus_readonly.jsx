@@ -1,5 +1,6 @@
 import React from 'react';
 import { ipcRenderer } from "electron";
+import environment from "../../../../../app/environment.json"
 
 class LightStatus extends React.Component {
 
@@ -40,6 +41,14 @@ class LightStatus extends React.Component {
 
   render() {
 
+    let lightValue;
+    if( environment.lightUnit == 'Wm2' ) {
+      lightValue = <span>{ ( this.state.lightValue * 1000 ).toPrecision( 3 ) } W m<sup>-2</sup></span>;
+    } else {
+      lightValue = <span>{ ( this.state.lightValue ).toPrecision( 3 ) } sun</span>;
+    }
+
+
     return (
         <div>
             { this.state.lightValue !== undefined && this.state.lightValue !== null ?
@@ -50,7 +59,7 @@ class LightStatus extends React.Component {
                   </span> 
                 </div> 
                 <div className="col-lg-4">
-                  { ( this.state.lightValue ).toPrecision( 3 ) } sun
+                  { lightValue }
                 </div>
               </div> : "Current value unknown" 
             }
