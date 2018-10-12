@@ -232,7 +232,7 @@ class HeatStatus extends React.Component {
   }
 
   render() {
-
+console.log( this.state );
     return ( <div>
           { this.props.serverState.heatController ?
             <div>
