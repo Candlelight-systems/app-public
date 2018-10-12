@@ -6,8 +6,7 @@
 			"readonly": false
 		},
 		"heat": {
-			"version": "ssr_1.0",
-			"switch": false
+			"version": "2.1"
 		}
 	},
 	"instrument": {
@@ -16,43 +15,14 @@
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
-			"fsr": 30,
-			"LSB": 0.33,
-			"LSBValue": 1,
-			"voltageRange": 2.5,
-			"autoZero": "device",
-			"groups": {
-				"Slot A": {
-					"resettable": false,
-					"displayDeviceInformation": {
-						"time_ellapsed": true,
-						"pce": true,
-						"power": false,
-						"sun": true,
-						"voc": true,
-						"jsc": true,
-						"ff": true,
-						"vnow": true,
-						"jnow": true,
-						"temperature": true,
-						"humidity": true,
-						"kwh_yr": false
-					}
-				}
-			}
-		},
-		"Module": {
-			"ADC": {
-				"model": "ADS1259"
-			},
-			"changeSpeed": false,
-			"fsr": 30,
+			"fsr": 400,
 			"LSB": 4.88,
 			"LSBValue": 1,
 			"voltageRange": 10,
 			"autoZero": "device",
 			"groups": {
-				"Module slot": {
+				"Sample holder": {
+					"manualLightIntensity": true,
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,

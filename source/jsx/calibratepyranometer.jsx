@@ -34,14 +34,14 @@ class CalibratePyranometer extends React.Component {
 	}
 
 
-	async applyScaling( scale, offset ) {
+	async applyScaling( pyranoSensitivity, ampBoxGain ) {
 
 		try {
 			let body = JSON.stringify( {
 				instrumentId: this.props.instrumentId,
 				groupName: this.props.groupName,
-				scale: scale,
-				offset: offset
+				ampBoxGain: ampBoxGain,
+				pyranoSensitivity: pyranoSensitivity
 			});
 
 			let headers = new Headers({
@@ -86,7 +86,7 @@ class CalibratePyranometer extends React.Component {
 		} ).then( response => response.json() )
 		   .then( response => {
 		   	
-		   	this.setState( { scale: response.scale, offset: response.offset } );
+		   	this.setState( { pyranoSensitivity: response.pyranoSensitivity, ampBoxGain: response.ampBoxGain } );
 		   	this.setState( { rescaling_error_read: false } );
 
 		} ).catch( ( error ) => {
@@ -126,10 +126,23 @@ class CalibratePyranometer extends React.Component {
 				<div className="alert alert-info"><span className="glyphicon glyphicon-info"></span> The result of the equation should be in sun intensity (where 1 sun = 1'000 W m<sup>-2</sup>)</div>
 
 				<div className="row">
-					<div className="col-sm-9">
-						sun = <input type="text" name="scale" value={ this.state.scale } onChange={ this.handleInputChange } /> * [Pyranometer current 4-20mA] + <input type="text" name="offset" value={ this.state.offset } onChange={ this.handleInputChange } />
+					<div className="col-sm-3">
+						<label>Pyranometer Sensitivity</label>
+					</div>
+					<div className="col-sm-3">
+						<input type="text" name="pyranoSensitivity" value={ this.state.pyranoSensitivity } onChange={ this.handleInputChange } /> V / ( W m<sup>-2</sup> )
 					</div>
 				</div>
+
+				<div className="row">
+					<div className="col-sm-3">
+						<label>AmpBox gain</label>
+					</div>
+					<div className="col-sm-3">
+						<input type="text" name="ampBoxGain" value={ this.state.ampBoxGain } onChange={ this.handleInputChange } /> mV / mA
+					</div>
+				</div>
+
 				<br />
 				<div className="row">
 					<div className="col-sm-9">
