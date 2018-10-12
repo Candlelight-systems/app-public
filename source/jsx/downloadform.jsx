@@ -356,9 +356,9 @@ class DownloadForm extends React.Component {
 
 					if( value[ 6 ] !== null ) {
 						waveTemperature.append( time, value[ 6 ] );
-					} else if( value[ 8 ] !== null ) {
-						waveTemperature.append( time, value[ 8 ] );
-					} 
+					} else if( value[ 9 ] !== null ) {
+						waveTemperature.append( time, value[ 9 ] );
+					}
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
 				} );

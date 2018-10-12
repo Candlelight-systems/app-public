@@ -1,14 +1,14 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "192.168.0.100",
+			"trackerHost": "172.18.10.10",
 			"trackerName": "Main Instrument",
 			"trackerPort": 8080,
 			"trackerPortWS": 8081
 		}
 	],
 	"database": {
-		"host": "192.168.0.101",
+		"host": "172.18.7.248",
 		"username": "",
 		"password": "",
 		"port": 8086,
