@@ -1,10 +1,12 @@
 {
 	"ageing": true,
-	"ivmeasurement": true,
 	"statuses": {
 		"light": {
 			"version": "2.0",
 			"readonly": false
+		},
+		"heat": {
+			"version": "2.1"
 		}
 	},
 	"instrument": {
@@ -13,13 +15,14 @@
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
-			"fsr": 30,
-			"LSB": 1.22,
+			"fsr": 400,
+			"LSB": 4.88,
 			"LSBValue": 1,
-			"voltageRange": 2.5,
-			"autoZero": "instrument",
+			"voltageRange": 10,
+			"autoZero": "device",
 			"groups": {
 				"Sample holder": {
+					"manualLightIntensity": true,
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
