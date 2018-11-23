@@ -1,20 +1,16 @@
-
 import React from 'react';
 
-import Group from "./group.jsx"
-import ActivityStatus from './status/activity/main.jsx'
-import ErrorMessage from "../error.jsx"
-import { ipcRenderer } from "electron";
+import Group from './group.jsx';
+import ActivityStatus from './status/activity/main.jsx';
+import ErrorMessage from '../error.jsx';
+import { ipcRenderer } from 'electron';
 
-import debounce from "lodash.debounce"
-import { ping } from "../../influx";
-
+import debounce from 'lodash.debounce';
+import { ping } from '../../influx';
 
 class TrackerInstrument extends React.Component {
-
-  constructor( props ) {
-
-    super( props );
+  constructor(props) {
+    super(props);
 
     this.state = {
       cfg: props.config,
@@ -22,245 +18,257 @@ class TrackerInstrument extends React.Component {
       serverState: {}
     };
 
-    if( ! props.config ) {
-      this.state.error = "No configuration file was found for this instrument."
+    if (!props.config) {
+      this.state.error = 'No configuration file was found for this instrument.';
     }
 
-    setInterval( () => {
+    setInterval(() => {
       this.updateInstrument();
       this.updateStatus();
-    }, 10000 );
+    }, 10000);
 
+    this.configure = this.configure.bind(this);
+    this.editInstrument = this.editInstrument.bind(this);
+    this.updateInstrument = this.updateInstrument.bind(this);
+    this.getStatus = this.getStatus.bind(this);
+    this.updateStatus = this.updateStatus.bind(this);
 
-    this.configure = this.configure.bind( this );
-    this.editInstrument = this.editInstrument.bind( this );
-    this.updateInstrument = this.updateInstrument.bind( this );
-    this.getStatus = this.getStatus.bind( this );
-    this.updateStatus = this.updateStatus.bind( this );
-    
-//    this.checkAll = this.checkAll.bind( this );
+    //    this.checkAll = this.checkAll.bind( this );
 
-    window.addEventListener("online", ( ) => {
+    window.addEventListener('online', () => {
       this.updateStatus();
       this.ping();
     });
 
-    window.addEventListener("offline", ( ) => {
+    window.addEventListener('offline', () => {
       this.updateStatus();
       this.ping();
     });
 
-    ipcRenderer.on("light.updated", () => { this.updateInstrument() } );
-
-
+    ipcRenderer.on('light.updated', () => {
+      this.updateInstrument();
+    });
   }
 
-  async ping( props = this.props ) {
-    return ping( this.props.configDB ).then( () => {
+  async ping(props = this.props) {
+    return ping(this.props.configDB)
+      .then(() => {
+        this.setState({
+          error_influxdb: false
+        });
+      })
+      .catch(error => {
+        console.warn('Cannot reach influx DB. Error was: ', error);
 
-      this.setState( {
-        error_influxdb: false
-      } );
+        this.setState({
+          error_influxdb: 'Connection to influxDB has failed: "' + error + '"'
+        });
 
-    }).catch( ( error ) => { 
-
-      console.warn("Cannot reach influx DB. Error was: ", error );
-      
-      this.setState( {
-        error_influxdb: "Connection to influxDB has failed: \"" + error + "\""
-      } );
-
-      return Promise.resolve();
-
-    } );
+        return Promise.resolve();
+      });
   }
 
   async updateStatus() {
-    this.getStatus().then( ( serverState ) => {
-
-     this.setState( { 
-      serverState: serverState, 
-      error_tracker: false 
-    } ); 
-
-   } ).catch( ( error ) => {
-
-    console.warn("Cannot retrieve channel statuses. Error was: ", error );
-      // TODO something
-      this.setState( { error_tracker: error } );
-    } );
+    this.getStatus()
+      .then(serverState => {
+        this.setState({
+          serverState: serverState,
+          error_tracker: false
+        });
+      })
+      .catch(error => {
+        console.warn('Cannot retrieve channel statuses. Error was: ', error);
+        // TODO something
+        this.setState({ error_tracker: error });
+      });
   }
 
-  async getStatus( props = this.props ) {
-
-    return fetch( "http://" + props.config.trackerHost + ":" + props.config.trackerPort + "/getStatus?instrumentId=" + props.instrumentId, {
-
-      method: 'GET'
-
-    } )
-    .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
-    .then( response => response.json() )
-    .then( response => {
-
-      // An error has been notified on the server side
-      if( response.error ) {
-        this.setState( { error: `An error has occured: ${ error.toString }` } ); 
+  async getStatus(props = this.props) {
+    return fetch(
+      'http://' +
+        props.config.trackerHost +
+        ':' +
+        props.config.trackerPort +
+        '/getStatus?instrumentId=' +
+        props.instrumentId,
+      {
+        method: 'GET'
       }
+    )
+      .then(response => {
+        if (response.status !== 200) throw '500 Internal server error';
+        else return response;
+      })
+      .then(response => response.json())
+      .then(response => {
+        // An error has been notified on the server side
+        if (response.error) {
+          this.setState({ error: `An error has occured: ${error.toString}` });
+        }
 
-      return response;
-    } )
-    .catch( error => {
-
-/*
+        return response;
+      })
+      .catch(error => {
+        /*
       setTimeout( () => {
         
         this.updateInstrument();
       }, 3000 );
 */
-      this.setState( {
-        error: `Error while retrieving the instrument status. The returned error was ${ error.toString() }.`,
-        errorMethods: [ [ "Retry", this.updateInstrument ] ] 
-      } );
-
-    } );
+        this.setState({
+          error: `Error while retrieving the instrument status. The returned error was ${error.toString()}.`,
+          errorMethods: [['Retry', this.updateInstrument]]
+        });
+      });
   }
 
   editInstrument() {
-    ipcRenderer.send( "editInstrument", this.props.config.trackerHost );
+    ipcRenderer.send('editInstrument', this.props.config.trackerHost);
   }
 
-  componentWillReceiveProps( nextProps ) {
+  componentWillReceiveProps(nextProps) {
+    this.setState({ cfg: nextProps.config });
 
-    this.setState( { cfg: nextProps.config } );
-
-    this.updateInstrument( nextProps );
+    this.updateInstrument(nextProps);
   }
 
   configure() {
-    $( this.modal ).modal( 'show' );
+    $(this.modal).modal('show');
   }
 
   componentDidMount() {
-    this.ipChanged( );
+    this.ipChanged();
   }
 
-  ipChanged( ) {
+  ipChanged() {
     this.updateInstrument();
   }
 
-  getConfig( props = this.props ) {
+  getConfig(props = this.props) {
+    return fetch(
+      'http://' +
+        this.state.cfg.trackerHost +
+        ':' +
+        this.state.cfg.trackerPort +
+        '/getInstrumentConfig?instrumentId=' +
+        props.instrumentId,
+      { method: 'GET' }
+    )
+      .then(response => {
+        if (response.status !== 200) throw '500 Internal server error';
+        else return response;
+      })
+      .then(response => response.json())
+      .catch(error => {
+        setTimeout(() => {
+          this.updateInstrument();
+        }, 3000);
 
-    return fetch( "http://" + this.state.cfg.trackerHost + ":" + this.state.cfg.trackerPort + "/getInstrumentConfig?instrumentId=" + props.instrumentId, { method: 'GET'  } )
-    .then( ( response ) => { if( response.status !== 200 ) throw "500 Internal server error"; else return response; } )
-    .then( ( response ) => response.json() )
-    .catch( error => {
+        this.setState({
+          error:
+            error.message ||
+            'The connection to the tracker has failed. Check that the ip address (' +
+              this.state.cfg.trackerHost +
+              ') is correct and that you have access to the network',
+          errorMethods: [
+            ['Edit the instrument config', this.editInstrument],
+            ['Retry', this.updateInstrument]
+          ]
+        });
 
-      setTimeout( () => {        
-        this.updateInstrument();
-      }, 3000 );
-
-      this.setState( { 
-        error: error.message || "The connection to the tracker has failed. Check that the ip address (" + this.state.cfg.trackerHost + ") is correct and that you have access to the network", 
-        errorMethods: [ [ "Edit the instrument config", this.editInstrument ], [ "Retry", this.updateInstrument ] ] 
-      } ); 
-
-      return Promise.reject();
-    } );
+        return Promise.reject();
+      });
   }
 
-  updateInstrument = debounce( ( props = this.props ) => {
+  updateInstrument = debounce((props = this.props) => {
+    return Promise.all([
+      this.getConfig(props),
 
-    return Promise.all( [
+      this.getStatus(props),
 
-      this.getConfig( props ),
+      this.ping(props)
+    ])
+      .then(args => {
+        let groups = args[0],
+          status = args[1],
+          ping = args[2];
 
-      this.getStatus( props ),
-
-      this.ping( props )
-
-      ] ).then( ( args ) => {
-
-        let groups = args[ 0 ],
-        status = args[ 1 ],
-        ping = args[ 2 ];
-
-
-        this.setState( { 
+        this.setState({
           groups: groups.groups,
           serverState: status,
           paused: status.paused,
-          
+
           error: false
-        } );
+        });
+      })
+      .catch(e => {});
+  }, 100);
 
-      } ).catch( ( e ) => { } );
-
-    }, 100 )
-
-  refreshrateChanged( rate ) {
-
-    this.setState( {
-      refreshRate: rate 
-    } );
+  refreshrateChanged(rate) {
+    this.setState({
+      refreshRate: rate
+    });
   }
 
-  
   render() {
-
     let content;
-    
-    if( this.state.error || ! this.state.serverState ) {
-      
+
+    if (this.state.error || !this.state.serverState) {
       content = (
         <div>
-          <ErrorMessage message={ this.state.error || this.state.error_influxdb || this.state.error_tracker } methods={ this.state.errorMethods } />
-        </div> 
-      );
-
-    } else if( this.state.groups ) {
-
-        var groupsDoms = this.state.groups.map( ( group, i ) => {
-
-         return <Group 
-
-           showHeader={this.state.groups.length > 1}
-           key={ group.groupID } 
-           instrumentId={ this.props.instrumentId } 
-           id={ group.groupID } 
-           name={ group.groupName }
-           channels={ group.channels }
-           groupConfig={ group }
-           config={ this.props.config } 
-           configDB={ this.props.configDB } 
-           serverState={ this.state.serverState[ group.groupName ] }
-           update={ this.updateInstrument }
-           getStatus={ this.updateStatus }
-
-           error_influxdb={ this.state.error_influxdb }
-           error_tracker={ this.state.error_tracker }
-           paused={ this.state.paused }
-         />
-       } );
-    
-
-      content = ( 
-      <div>
-        <div className="row statuses">
-          <ActivityStatus {...this.props } />
-          <div className="clearfix"></div>
+          <ErrorMessage
+            message={
+              this.state.error ||
+              this.state.error_influxdb ||
+              this.state.error_tracker
+            }
+            methods={this.state.errorMethods}
+          />
         </div>
-        { groupsDoms }
-      </div> );
+      );
+    } else if (this.state.groups) {
+      var groupsDoms = this.state.groups.map((group, i) => {
+        return (
+          <Group
+            showHeader={this.state.groups.length > 1}
+            key={group.groupID}
+            instrumentId={this.props.instrumentId}
+            id={group.groupID}
+            name={group.groupName}
+            channels={group.channels}
+            groupConfig={group}
+            config={this.props.config}
+            configDB={this.props.configDB}
+            serverState={this.state.serverState[group.groupName]}
+            update={this.updateInstrument}
+            getStatus={this.updateStatus}
+            error_influxdb={this.state.error_influxdb}
+            error_tracker={this.state.error_tracker}
+            paused={this.state.paused}
+          />
+        );
+      });
+
+      content = (
+        <div>
+          <div className="row statuses">
+            <div className="col-lg-2 group-status group-status-instrument">
+              <ActivityStatus {...this.props} />
+            </div>
+            <div className="clearfix" />
+          </div>
+          {groupsDoms}
+        </div>
+      );
     }
 
     return (
       <div>
-        <h3>Instrument: { this.props.instrumentId }</h3>
-        { content }
-      </div> 
+        <h3>Instrument: {this.props.instrumentId}</h3>
+        {content}
+      </div>
     );
   }
 }
 
-
-export default TrackerInstrument
+export default TrackerInstrument;

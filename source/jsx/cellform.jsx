@@ -53,7 +53,9 @@ class CellForm extends React.Component {
 
 
 		this.setState( this.props.formState );
-		this.setState( { lightSource: this.props.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
+		if( this.props.formState.lightSource === undefined ) {
+			this.setState( { lightSource: this.props.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
+		}
 
 	
 	}
@@ -61,8 +63,9 @@ class CellForm extends React.Component {
 	componentWillReceiveProps( nextProps ) {
 
 		this.setState( nextProps.formState );
-		this.setState( { lightSource: nextProps.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
-
+		if( this.props.formState.lightSource === undefined ) {
+			this.setState( { lightSource: nextProps.formState.lightRefValue > 0  ? 'manual' : 'pd_pyr' } );
+		}
 	
 	}
 

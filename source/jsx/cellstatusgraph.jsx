@@ -121,7 +121,7 @@ class statusGraph extends GraphComponent {
 
 		//this.serie.setData();
 
-		if( this.props.mode !== 'sparkline' ) {
+		if( this.props.mode !== 'sparkline' && this.serie ) {
 				
 			this.flag1 = this.graph.newShape("html");
 			this.flag1.addTransform("translate", this.graph.newPosition( { dx: "-60px", dy: "0px"} ) );

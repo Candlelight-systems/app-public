@@ -1,15 +1,12 @@
+import React from 'react';
+import { ipcRenderer } from 'electron';
+import environment from '../../../../../app/environment.json';
+import urllib from 'url-lib';
+import { autoZero } from '../../../../queries';
 
-import React from "react";
-import { ipcRenderer } from "electron";
-import environment from "../../../../../app/environment.json"
-import urllib from 'url-lib'
-import { autoZero } from '../../../../queries'
-
-import { MessageInfo, MessageError, MessageWarning } from './messages.jsx'
+import { MessageInfo, MessageError, MessageWarning } from './messages.jsx';
 
 //import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
-
-
 
 let speedOptions = [];
 
@@ -38,81 +35,88 @@ let speedOptions = [];
 */
 
 class InstrumentStatus extends React.Component {
+  constructor() {
+    super(...arguments);
+    this.state = {
+      messages: []
+    };
 
-	constructor() {
+    this.wsUpdate = this.wsUpdate.bind(this);
+  }
 
-		super( ...arguments );
-		this.state = {
-			messages: []
-		};
+  componentDidUpdate() {
+    if (this.atBottom) {
+      this.logDiv.scrollTop = this.logDiv.scrollHeight;
+    }
+  }
 
-		this.wsUpdate = this.wsUpdate.bind( this );
-		
-	}
-
-	componentDidUpdate() {
-		if( this.atBottom ) {
-			this.logDiv.scrollTop = this.logDiv.scrollHeight;
-		}
-	}
-
-componentWillUpdate() {
-
-	this.atBottom = this.logDiv.scrollTop >= this.logDiv.scrollHeight - 150;
-}
+  componentWillUpdate() {
+    this.atBottom = this.logDiv.scrollTop >= this.logDiv.scrollHeight - 150;
+  }
 
   componentDidMount() {
-
-    ipcRenderer.on("instrument.log." + this.props.instrumentId, this.wsUpdate );
+    ipcRenderer.on('instrument.log.' + this.props.instrumentId, this.wsUpdate);
   }
 
   componentWillUnmount() {
-
-    ipcRenderer.removeListener("instrument.log." + this.props.instrumentId, this.wsUpdate );  
+    ipcRenderer.removeListener(
+      'instrument.log.' + this.props.instrumentId,
+      this.wsUpdate
+    );
   }
 
+  wsUpdate(event, message) {
+    this.state.messages.push(message);
+    if (this.state.messages.length > 100) {
+      this.state.messages.shift();
+    }
 
-	wsUpdate( event, message ) {
+    this.setState({
+      message: this.state.message
+    });
+  }
 
-		this.state.messages.push( message );
-		if( this.state.messages.length > 100 ) {
-			this.state.messages.shift();
-		}
+  render() {
+    const messages = this.state.messages.map(message => {
+      switch (message.type) {
+        case 'info':
+          return (
+            <MessageInfo
+              key={message.time + '_' + message.channel}
+              {...message}
+            />
+          );
+          break;
 
-		this.setState( {
-			message: this.state.message
-		} );
-	}
+        case 'warning':
+          return (
+            <MessageWarning
+              key={message.time + '_' + message.channel}
+              {...message}
+            />
+          );
+          break;
 
-	render() {
+        case 'error':
+          return (
+            <MessageError
+              key={message.time + '_' + message.channel}
+              {...message}
+            />
+          );
+          break;
+      }
+    });
 
-		const messages = this.state.messages.map( ( message ) => {
-
-			switch( message.type ) {
-
-				case 'info':
-					return <MessageInfo {...message} />;
-				break;
-
-				case 'warning':
-					return <MessageWarning {...message} />;
-				break;
-
-				case 'error':
-					return <MessageError {...message} />;
-				break;
-			}
-		});
-
-		return ( 
-
-		<div className="col-lg-2 group-status group-status-instrument">
-          <h4>Activity log</h4>
-          <div className="activityLog" ref={ el => this.logDiv = el }>
-          	{ messages.length > 0 ? messages : 'No message to display' }
-          </div>
-        </div> );
-	}
+    return (
+      <div>
+        <h4>Activity log</h4>
+        <div className="activityLog" ref={el => (this.logDiv = el)}>
+          {messages.length > 0 ? messages : 'No message to display'}
+        </div>
+      </div>
+    );
+  }
 }
 
-export default InstrumentStatus
+export default InstrumentStatus;
