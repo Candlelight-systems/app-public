@@ -26,6 +26,4 @@ function render( props ) {
 		<InstrumentForm formState={props} onValidate={ onValidate } onClose={ onClose } />,
 		document.getElementById('root')
 	);
-
-
 }

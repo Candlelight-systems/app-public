@@ -1,22 +1,15 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "192.168.0.100",
-			"trackerName": "Small cells",
+			"trackerHost": "localhost",
+			"trackerName": "Main Instrument",
 			"trackerPort": 8080,
-			"trackerPortWS": 8081,
-			"buttonValue": "Update",
-			"connect": "Success ! Instrument response: candlelight.1206.10001",
-			"connectstate": "success",
-			"title": "Edit a Candlelight instrument"
+			"trackerPortWS": 8081
 		}
 	],
 	"database": {
 		"db": "matahari",
-		"db_authentication": "No user defined",
-		"db_connection": "ok",
-		"db_dbexists": "ok",
-		"host": "192.168.0.103",
+		"host": "192.168.1.123",
 		"password": "",
 		"port": 8086,
 		"username": ""
