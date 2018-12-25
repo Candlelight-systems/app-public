@@ -55,7 +55,10 @@ class InstrumentStatus extends React.Component {
   }
 
   componentDidMount() {
+    // Subscript to instrument specific log
     ipcRenderer.on('instrument.log.' + this.props.instrumentId, this.wsUpdate);
+    // Subscribe also to broadcast messaging
+    ipcRenderer.on('instrument.log', this.wsUpdate);
   }
 
   componentWillUnmount() {
