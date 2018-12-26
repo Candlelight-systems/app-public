@@ -178,7 +178,6 @@ class statusIV extends GraphComponent {
 
 				s.setWaveform( data.iv );
 				s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
-
 	//			maxY = Math.max( maxY, data.iv.getMaxY() );
 				k++;
 			});
@@ -192,8 +191,6 @@ class statusIV extends GraphComponent {
 				this.serieIV.setWaveform( nextProps.dataIV );
 			}
 
-			this.graph.autoscaleAxes();
-			this.graph.show();
 			
 			this.graph.getYAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );	
 			this.graph.getYAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );
@@ -201,6 +198,7 @@ class statusIV extends GraphComponent {
 			this.graph.getXAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].voltageRange );	
 
 			
+			this.graph.show();
 			this.graph.autoscaleAxes();
 			this.graph.draw();
 			this.graph.updateLegend();

@@ -52,7 +52,8 @@ class CellFormAll extends CellForm {
 	render() {	 
 
 		var unique = "";
-
+		let relayController = !! this.props.instrumentConfig.relayController;
+		
 		return (
 		<div className="container-fluid">
 
@@ -91,7 +92,7 @@ class CellFormAll extends CellForm {
 						</div>
 
 
-						{ ( this.props.instrumentConfig.relayController || this.props.instrumentConfig.dualOutput ) &&
+						{ relayController &&
 							<div className="form-group">
 								<label htmlFor="cellarea" className="col-sm-3">Connection</label>
 								<div className="col-sm-9">

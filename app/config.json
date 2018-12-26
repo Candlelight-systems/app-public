@@ -1,14 +1,14 @@
 {
 	"instruments": [
 		{
-			"trackerHost": "172.18.10.10",
-			"trackerName": "Main Instrument",
+			"trackerHost": "192.168.1.100",
+			"trackerName": "Small cells",
 			"trackerPort": 8080,
 			"trackerPortWS": 8081
 		}
 	],
 	"database": {
-		"host": "172.18.7.248",
+		"host": "localhost",
 		"username": "",
 		"password": "",
 		"port": 8086,
