@@ -3,36 +3,40 @@
 	"statuses": {
 		"light": {
 			"version": "readonly",
-			"readonly": true,
-			"type": "pyranometer"
+			"readonly": true
+		},
+		"heat": {
+			"version": "2.1"
 		}
 	},
 	"instrument": {
-		"Outdoor modules": {
+		"Small cells": {
 			"ADC": {
 				"model": "ADS1259"
 			},
-			"fsr": 30,
-			"voltageRange": 2.5,
 			"changeSpeed": false,
+			"fsr": 400,
+			"LSB": 4.88,
+			"LSBValue": 1,
+			"voltageRange": 10,
+			"autoZero": "device",
 			"groups": {
-				"Box 1": {
-					"resettable": false,
-					"autoZero": "device",
+				"Sample holder": {
 					"manualLightIntensity": true,
+					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,
 						"pce": true,
-						"power": true,
+						"power": false,
 						"sun": true,
 						"voc": true,
 						"jsc": true,
 						"ff": true,
 						"vnow": true,
 						"jnow": true,
-						"temperature": false,
-						"humidity": false,
-						"kwh_yr": true
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
 					}
 				}
 			}

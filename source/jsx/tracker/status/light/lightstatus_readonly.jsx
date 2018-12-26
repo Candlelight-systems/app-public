@@ -7,7 +7,9 @@ class LightStatus extends React.Component {
   constructor() {
 
     super( ...arguments );
-    this.state = {};
+    this.state = {
+    lightValue: 0
+    };
     this.wsUpdate = this.wsUpdate.bind( this );
   }
 
@@ -17,7 +19,7 @@ class LightStatus extends React.Component {
   }
 
   componentWillUnmount() {
-    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
+    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
   }
 
 
@@ -27,7 +29,7 @@ class LightStatus extends React.Component {
     this.setState( data.data );
 
     // New state means re-enabling
-    
+
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
       this.setState( { paused: data.state.paused } );
     }*/
@@ -36,7 +38,7 @@ class LightStatus extends React.Component {
 
   componentDidUpdate( prevProps ) {
 
-    
+
   }
 
   render() {
@@ -56,12 +58,12 @@ class LightStatus extends React.Component {
                 <div className="col-lg-5">
                   <span className="grey">
                     Live value:
-                  </span> 
-                </div> 
+                  </span>
+                </div>
                 <div className="col-lg-4">
                   { lightValue }
                 </div>
-              </div> : "Current value unknown" 
+              </div> : "Current value unknown"
             }
         </div> );
   }
