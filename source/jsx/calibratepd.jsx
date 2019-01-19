@@ -2,13 +2,13 @@ import React from 'react';
 import { ipcRenderer } from "electron";
 
 class CalibratePD extends React.Component {
-	
+
 	/**
 	 *	@param props.name The name of the cell
 	 */
 	constructor( props ) {
 		super( props );
-		
+
 		this.unit = {
 			"voltage": <span>V</span>,
 			"currentdensity": <span>mA cm<sup>-2</sup></span>,
@@ -28,8 +28,8 @@ class CalibratePD extends React.Component {
 		this.handleInputChange = this.handleInputChange.bind( this );
 		this.handleInputChangeLi = this.handleInputChangeLi.bind( this );
 		this.scalePD = this.scalePD.bind( this );
-		this.close = this.close.bind( this );	
-		this.setRequestTimeout();		
+		this.close = this.close.bind( this );
+		this.setRequestTimeout();
 	}
 
 	close() {
@@ -94,7 +94,7 @@ class CalibratePD extends React.Component {
 
 
 		scalingFactor = Math.round( scalingFactor * 1000 ) / 1000;
-		
+
 		let body = JSON.stringify( {
 			instrumentId: this.props.instrumentId,
 			groupName: this.props.groupName,
@@ -118,7 +118,7 @@ class CalibratePD extends React.Component {
 
 		await this.getPD();
 	}
-	
+
 	setRequestTimeout() {
 
 		setTimeout( () => {
@@ -130,7 +130,7 @@ class CalibratePD extends React.Component {
 					str.push( this.state.channels[ i ].chanId );
 				}
 			}
-		
+
 
 			fetch( `http://${this.props.config.trackerHost}:${this.props.config.trackerPort}/measureCurrent?instrumentId=${encodeURIComponent( this.props.instrumentId )}&groupName=${ this.props.groupName }&chanIds=${str.join(",")}`, {
 				method: 'GET',
@@ -160,14 +160,14 @@ class CalibratePD extends React.Component {
 
 
 	async componentDidMount() {
-	
+
 		await fetch( "http://" + this.props.config.trackerHost + ":" + this.props.config.trackerPort + "/getChannels?instrumentId=" + this.props.instrumentId + "&groupName=" + this.props.groupName , {
 
 			method: 'GET',
 
 		} ).then( ( values ) => values.json() )
 		   .then( ( channels ) => {
-		   	
+
 		   	this.setState( { channels: channels } );
 
 		   	channels.forEach( ( chan ) => {
@@ -191,7 +191,7 @@ class CalibratePD extends React.Component {
 		} )
 		.then( ( values ) => values.json() )
 		.then( ( control ) => {
-			
+
 			this.setState( { control: control } );
 		} ).catch( ( error ) => {
 			console.error( error );
@@ -215,7 +215,7 @@ class CalibratePD extends React.Component {
 	    this.setState( { [name]: value } );
 	}
 
-	
+
 
 	async enableChannel( chanId ) {
 
@@ -307,7 +307,7 @@ class CalibratePD extends React.Component {
 				<div className="col-sm-9">
 					<div className="alert alert-info"> <span className="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Switch to manual mode in order to gain control of the light intensity</div>
 				</div>
-				{ !! this.state.rescaling_success &&		
+				{ !! this.state.rescaling_success &&
 					<div className="col-sm-9">
 						<div className="alert alert-success"> <span className="glyphicon glyphicon-check-sign" aria-hidden="true"></span> Successfully updated the photodiode scaling factor</div>
 					</div>
@@ -329,8 +329,8 @@ class CalibratePD extends React.Component {
 					</div>
 
 						<ul className="list-group">
-						
-						{ control ? 
+
+						{ control ?
 							<li key="_photodiode" data-name="pd" className="list-group-item active">
 								{ this.jsc( "pd", true, false, control.scaling ) }
 								Photodiode

@@ -429,11 +429,9 @@ class TrackerDevice extends React.Component {
 			if( data.chanId != this.props.chanId ) {
 				return;
 			}
-
 			if( data.lightSource !== "manual" ) {
 				data.lightRefValue = 0;
 			}
-			
 			this.saveStatus( data );
 		});
 

@@ -118,8 +118,6 @@ class statusIV extends GraphComponent {
 			});
 		}
 
-		console.log( shouldUpdateIV );
-
 		if( shouldUpdateIV ) {
 
 			nextProps.data.sort( ( a, b ) => {
@@ -164,11 +162,19 @@ class statusIV extends GraphComponent {
 				}
 
 				let s = this.graph.newSerie( "iv_" + k );
-				s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
+
+				const ellapsed =  ( data.time - firstTime ) / 1000 / 3600;
+
+				if( ellapsed < 1 ) {
+					s.setLabel( Math.round( ellapsed * 60 ) + "min" );
+				} else {
+					s.setLabel( Math.round( ellapsed * 10 ) / 10 + "h" );
+				}
+
 				s.setLineColor( colors[ k ] );
 				s.autoAxis();
 				s.setLineWidth( 2 );
-
+				s.ellapsed = ellapsed;
 				let s2 = this.graph.newSerie( "power_" + k );
 				s2.setLineColor( colors[ k ] );
 				s2.setLineStyle( 2 );
@@ -176,6 +182,7 @@ class statusIV extends GraphComponent {
 				s2.autoAxis();
 				s2.setLineWidth( 2 );
 
+				s2.ellapsed = ellapsed;
 				s.setWaveform( data.iv );
 				s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
 	//			maxY = Math.max( maxY, data.iv.getMaxY() );
@@ -191,6 +198,18 @@ class statusIV extends GraphComponent {
 				this.serieIV.setWaveform( nextProps.dataIV );
 			}
 
+			this.graph.sortSeries( ( sA, sB ) => {
+console.log( sA.ellapsed, sB.ellapsed, sA.getLabel(), sB.getLabel() );
+				if( typeof sA.ellapsed == 'undefined' ) {
+					return 1;
+				}
+
+				if( typeof sB.ellapsed == 'undefined' ) {
+					return -1;
+				}
+
+				return sA.ellapsed < sB.ellapsed ? -1 : 1
+			} );
 			
 			this.graph.getYAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );	
 			this.graph.getYAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );

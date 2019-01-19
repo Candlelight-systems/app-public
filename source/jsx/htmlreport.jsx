@@ -1247,9 +1247,10 @@ class HTMLReport extends React.Component {
 					<div className="col-xs-4">
 
 						<div className="logos">
-							<img src="images/logo_client.png" width="120" />
+							
 							<div className="pull-right">
-								<img src="images/logo.png" width="120" />
+								<img src="images/logo.png" width="120" /><br />
+								<img src="images/logo_client.png" width="120" />
 							</div>
 						</div>
 						<h3>

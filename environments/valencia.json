@@ -21,7 +21,7 @@
 				"changeSpeed": false,
 				"fsr": 30,
 				"voltageRange": 2.5,
-
+				"autoZero": "instrument",
 				"groups": {
 
 					"Sample holder": {
@@ -92,14 +92,14 @@
 	"defaultConfig": {
 		"instruments": [
 			{
-				"trackerHost": "192.168.1.106",
+				"trackerHost": "192.168.0.100",
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
-			"host": "192.168.1.101",
+			"host": "192.168.0.103",
 			"username": "",
 			"password": "",
 			"port": 8086,

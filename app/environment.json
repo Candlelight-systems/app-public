@@ -2,27 +2,50 @@
 	"ageing": true,
 	"statuses": {
 		"light": {
-			"version": "readonly",
-			"readonly": true
+			"version": "2.0"
 		},
 		"heat": {
-			"version": "2.1"
+			"version": "ssr_1.0"
 		}
 	},
 	"instrument": {
-		"Small cells": {
+		"Slot left": {
 			"ADC": {
 				"model": "ADS1259"
 			},
 			"changeSpeed": false,
-			"fsr": 400,
-			"LSB": 4.88,
-			"LSBValue": 1,
-			"voltageRange": 10,
-			"autoZero": "device",
+			"fsr": 30,
+			"voltageRange": 2.5,
+			"autoZero": "instrument",
 			"groups": {
 				"Sample holder": {
-					"manualLightIntensity": true,
+					"resettable": false,
+					"displayDeviceInformation": {
+						"time_ellapsed": true,
+						"pce": true,
+						"power": false,
+						"sun": true,
+						"voc": true,
+						"jsc": true,
+						"ff": true,
+						"vnow": true,
+						"jnow": true,
+						"temperature": true,
+						"humidity": true,
+						"kwh_yr": false
+					}
+				}
+			}
+		},
+		"Slot right": {
+			"ADC": {
+				"model": "ADS1259"
+			},
+			"changeSpeed": false,
+			"fsr": 30,
+			"voltageRange": 2.5,
+			"groups": {
+				"Sample holder": {
 					"resettable": false,
 					"displayDeviceInformation": {
 						"time_ellapsed": true,

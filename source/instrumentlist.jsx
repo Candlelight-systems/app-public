@@ -17,8 +17,6 @@ ipcRenderer.on('dbInformation', async (event, db) => {
   influx_error = false;
 
   try {
-    console.log(db);
-
     await ping(db);
     await checkDB(db, db.username, db.password, db.db);
     await checkAuth(db, db.username, db.password, db.db);

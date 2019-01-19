@@ -139,7 +139,11 @@ function openSocket(instrumentConfig) {
 
 function wsIncoming(data) {
   data = JSON.parse(data);
-  
+
+  if (!data.instrumentId && windows['instrumentMain']) {
+    windows['instrumentMain'].webContents.send(`instrument.log`, data.log);
+  }
+
   if (data.instrumentId && windows['instrumentMain']) {
     if (data.chanId) {
       windows['instrumentMain'].webContents.send(
@@ -776,6 +780,13 @@ function editInfluxDB(event) {
         windows['instrumentMain'].webContents.send('reloadDB', {
           db: config.database
         });
+
+        if (windows['instrumentList']) {
+          windows['instrumentList'].webContents.send(
+            'dbInformation',
+            config.database
+          );
+        }
       }
     })
     .catch(() => {});
