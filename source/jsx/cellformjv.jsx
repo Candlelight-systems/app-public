@@ -99,7 +99,11 @@ class CellFormTracking extends React.Component {
 				<div className="form-group">
 					<label htmlFor="iv_measurement_interval_auto_pdrop" className="col-sm-3">Measure upon efficiency drop</label>
 					<div className="col-sm-9">
+<<<<<<< HEAD
 						<select disabled={ this.props.iv_measurement_interval_type == 'fixed' } name="iv_measurement_interval_auto_pdrop" id="iv_measurement_interval_auto_pdrop" className="form-control" value={ this.props.iv_measurement_interval_auto_pdrop } onChange={ this.handleInputChange }>
+=======
+						<select name="iv_measurement_interval_auto_pdrop" id="iv_measurement_interval_auto_pdrop" className="form-control" value={ this.props.iv_measurement_interval_auto_pdrop } onChange={ this.handleInputChange }>
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 							<option value="0.25">0.25%</option>
 							<option value="0.5">0.5%</option>
 							<option value="1">1%</option>
@@ -128,10 +132,16 @@ class CellFormTracking extends React.Component {
 							<option value="86400000">1 day</option>
 							<option value="604800000">1 week</option>
 						</select>
+<<<<<<< HEAD
 						<div className="help-block">Sets a minimum interval under which the j-V curve will not be measured, even if the PCE has changed above the threshold.</div>
 				
 					</div>
 					</div>
+=======
+					</div>
+					<div className="help-block">Sets a minimum interval under which the j-V curve will not be measured, even if the PCE has changed above the threshold.</div>
+				</div>
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 
 
 
@@ -147,9 +157,14 @@ class CellFormTracking extends React.Component {
 							<option value="604800000">1 week</option>
 							<option value="-1">Never</option>
 						</select>
+<<<<<<< HEAD
 						<div className="help-block">Sets a maximum time interval. Even if the power hasn't changed above the threshold, the j-V curve will be measured at this interval.</div>
 				
 					</div>
+=======
+					</div>
+					<div className="help-block">Sets a maximum time interval. Even if the power hasn't changed above the threshold, the j-V curve will be measured at this interval.</div>
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 				</div>
 
 

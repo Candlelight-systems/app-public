@@ -141,6 +141,7 @@ class DownloadForm extends React.Component {
 
 		try {
 			data = await this.getVocJscData();
+<<<<<<< HEAD
 
 		} catch( e ) {
 			this.setState( { error_vocjs: true } );
@@ -148,6 +149,15 @@ class DownloadForm extends React.Component {
 			return;
 		}
 
+=======
+
+		} catch( e ) {
+			this.setState( { error_vocjs: true } );
+			console.error( e );
+			return;
+		}
+
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 		outputfile.addWaveform( data.waveVoc, {
 			waveName: "Voc",
 			waveNameX: "Time_voc_h"
@@ -356,9 +366,15 @@ class DownloadForm extends React.Component {
 
 					if( value[ 6 ] !== null ) {
 						waveTemperature.append( time, value[ 6 ] );
+<<<<<<< HEAD
 					} else if( value[ 9 ] !== null ) {
 						waveTemperature.append( time, value[ 9 ] );
 					}
+=======
+					} else if( value[ 8 ] !== null ) {
+						waveTemperature.append( time, value[ 8 ] );
+					} 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 
 					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
 				} );

@@ -100,6 +100,7 @@ class statusIV extends GraphComponent {
 		this.ellipse.draw();
 	}
 
+<<<<<<< HEAD
 
 	componentWillUpdate( nextProps ) {
 
@@ -117,6 +118,27 @@ class statusIV extends GraphComponent {
 				}
 			});
 		}
+=======
+
+	componentWillUpdate( nextProps ) {
+
+		let shouldUpdateIV = false;
+
+		if( nextProps.updatedTime !== this.props.updatedTime ) {
+			shouldUpdateIV = true;
+		} else if( this.props.data.length !== nextProps.data.length ) {
+			shouldUpdateIV = true;
+		} else {
+			nextProps.data.map( ( el, index ) => {
+
+				if( ! this.props.data[ index ] || el.time != this.props.data[ index ].time ) {
+					shouldUpdateIV = true;
+				}
+			});
+		}
+
+		console.log( shouldUpdateIV );
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 
 		if( shouldUpdateIV ) {
 
@@ -162,6 +184,7 @@ class statusIV extends GraphComponent {
 				}
 
 				let s = this.graph.newSerie( "iv_" + k );
+<<<<<<< HEAD
 
 				const ellapsed =  ( data.time - firstTime ) / 1000 / 3600;
 
@@ -175,6 +198,13 @@ class statusIV extends GraphComponent {
 				s.autoAxis();
 				s.setLineWidth( 2 );
 				s.ellapsed = ellapsed;
+=======
+				s.setLabel( Math.round( ( data.time - firstTime ) / 1000 / 3600 * 10 ) / 10 + "h" );
+				s.setLineColor( colors[ k ] );
+				s.autoAxis();
+				s.setLineWidth( 2 );
+
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 				let s2 = this.graph.newSerie( "power_" + k );
 				s2.setLineColor( colors[ k ] );
 				s2.setLineStyle( 2 );
@@ -182,7 +212,10 @@ class statusIV extends GraphComponent {
 				s2.autoAxis();
 				s2.setLineWidth( 2 );
 
+<<<<<<< HEAD
 				s2.ellapsed = ellapsed;
+=======
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 				s.setWaveform( data.iv );
 				s2.setWaveform( data.iv.duplicate().math( ( y, x ) => y * x ) );
 	//			maxY = Math.max( maxY, data.iv.getMaxY() );
@@ -198,6 +231,7 @@ class statusIV extends GraphComponent {
 				this.serieIV.setWaveform( nextProps.dataIV );
 			}
 
+<<<<<<< HEAD
 			this.graph.sortSeries( ( sA, sB ) => {
 console.log( sA.ellapsed, sB.ellapsed, sA.getLabel(), sB.getLabel() );
 				if( typeof sA.ellapsed == 'undefined' ) {
@@ -228,6 +262,26 @@ console.log( sA.ellapsed, sB.ellapsed, sA.getLabel(), sB.getLabel() );
 
 	componentDidUpdate() {
 
+=======
+			
+			this.graph.getYAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );	
+			this.graph.getYAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].fsr * 1e-3 );
+			this.graph.getXAxis().setLowestMin( - environment.instrument[ nextProps.instrumentId ].voltageRange );
+			this.graph.getXAxis().setHighestMax( environment.instrument[ nextProps.instrumentId ].voltageRange );	
+
+			
+			this.graph.show();
+			this.graph.autoscaleAxes();
+			this.graph.draw();
+			this.graph.updateLegend();
+
+		}
+
+	}
+
+	componentDidUpdate() {
+
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 		this.ellipse.setPosition( { x: this.props.voltage, y: this.props.current / 1000 } );
 		this.ellipse.redraw();
 

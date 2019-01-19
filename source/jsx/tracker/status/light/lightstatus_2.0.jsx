@@ -147,7 +147,11 @@ console.log( data.data );
 
                 </div>
                 <div className="col-lg-4">
+<<<<<<< HEAD
                   { this.state.lightUVSetpoint } mW cm<sup>-2</sup>
+=======
+                  { this.state.lightValue < 0 ? 0 : ( this.state.lightValue  ).toPrecision( 3 ) } sun
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
                 </div>
               </div>
               :
@@ -155,11 +159,34 @@ console.log( data.data );
             }
 
 
+<<<<<<< HEAD
+=======
+            { 
+              this.state.lightMode == 'auto' && this.state.lightUVSetpoint !== undefined ? // In case the light is in automatic mode
+
+              <div className="row">
+                <div className="col-lg-5">
+                  <span className="grey">
+                    UV(A) set point:
+                  </span> 
+                    
+                </div> 
+                <div className="col-lg-4">
+                  { this.state.lightUVSetpoint } mW cm<sup>-2</sup>
+                </div>
+              </div>
+              : 
+              null 
+            }
+
+
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
             { this.state.lightUVValue !== undefined ?
               <div className="row">
                 <div className="col-lg-5">
                   <span className="grey">
                     UV(A) intensity:
+<<<<<<< HEAD
                   </span>
                 </div>
                 {}
@@ -167,12 +194,26 @@ console.log( data.data );
                   { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ?
                     this.state.lightUVValue
                     :
+=======
+                  </span> 
+                </div> 
+                {}
+                <div className="col-lg-4">
+                  { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ? 
+                    this.state.lightUVValue 
+                    : 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
                     ( this.state.lightUVValue < 0 ? 0 : <span>{ Math.round( this.state.lightUVValue * 1000 ) / 1000 } mW cm<sup>-2</sup></span> )
                   }
                 </div>
                 <div class="text-warning"><strong><span className="glyphicon glyphicon-danger"></span> Caution !</strong> UV sensor readout can be influenced by the white light intensity</div>
+<<<<<<< HEAD
 
               </div> : null
+=======
+                
+              </div> : null 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
             }
 
             </div> : null }

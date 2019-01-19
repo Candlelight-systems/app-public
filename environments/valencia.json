@@ -21,7 +21,11 @@
 				"changeSpeed": false,
 				"fsr": 30,
 				"voltageRange": 2.5,
+<<<<<<< HEAD
 				"autoZero": "instrument",
+=======
+
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 				"groups": {
 
 					"Sample holder": {
@@ -92,14 +96,22 @@
 	"defaultConfig": {
 		"instruments": [
 			{
+<<<<<<< HEAD
 				"trackerHost": "192.168.0.100",
+=======
+				"trackerHost": "192.168.1.106",
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 				"trackerName": "Main Instrument",
 				"trackerPort": 8080,
 				"trackerPortWS": 8081
 			}
 		],
 		"database": {
+<<<<<<< HEAD
 			"host": "192.168.0.103",
+=======
+			"host": "192.168.1.101",
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 			"username": "",
 			"password": "",
 			"port": 8086,

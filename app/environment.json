@@ -1,5 +1,6 @@
 {
 	"ageing": true,
+	"ivmeasurement": true,
 	"statuses": {
 		"light": {
 			"version": "2.0"
@@ -9,6 +10,7 @@
 		}
 	},
 	"instrument": {
+<<<<<<< HEAD
 		"Slot left": {
 			"ADC": {
 				"model": "ADS1259"
@@ -38,6 +40,9 @@
 			}
 		},
 		"Slot right": {
+=======
+		"Small cells": {
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
 			"ADC": {
 				"model": "ADS1259"
 			},
