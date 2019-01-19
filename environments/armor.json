@@ -1,0 +1,80 @@
+{
+	"environment": {
+		"ageing": true,
+
+		"lightUnit": "Wm2",
+		
+		"statuses": {
+			"light": {
+				"version": "readonly",
+				"readonly": true,
+				"type": "pyranometer"
+			}
+		},
+
+		"instrument": {
+
+			"Outdoor modules": {
+
+				"ADC": {
+					"model": "ADS1259"
+				},
+				"fsr": 30,
+				"voltageRange": 2.5,
+				"changeSpeed": false,
+
+				"groups": {
+
+					"Box 1": {
+						"resettable": false,
+						"autoZero": "device",
+						"manualLightIntensity": true,
+						
+						"displayDeviceInformation": {
+							"time_ellapsed": true,
+							"pce": true,
+							"power": true,
+							"sun": true,
+							"voc": true,
+							"jsc": true,
+							"ff": true,
+							"vnow": true,
+							"jnow": true,
+							"temperature": false,
+							"humidity": false,
+							"kwh_yr": true
+						}
+
+
+					}
+				}
+
+			}
+		}
+
+	},		
+
+	"development": true,
+
+	"defaultConfig": {
+		"instruments": [
+			{
+				"trackerHost": "172.18.10.10",
+				"trackerName": "Main Instrument",
+				"trackerPort": 8080,
+				"trackerPortWS": 8081
+			}
+		],
+		"database": {
+			"host": "172.18.7.248",
+			"username": "",
+			"password": "",
+			"port": 8086,
+			"db": "matahari"
+		},
+
+		"githubtokens": {
+			"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"
+		}
+	}
+}

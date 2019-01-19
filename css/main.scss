@@ -1,0 +1,285 @@
+@import './node_modules/bootstrap/less/bootstrap.less';
+
+@grid-columns: 9;
+@grid-gutter-width: 10px;
+
+// Import the grunt generated theme file
+@import './_theme.scss';
+
+@import './calib_light.scss';
+@import './cell.scss';
+@import './group.scss';
+
+body {
+  height: 100%;
+  padding-top: 10px;
+  background: @page-background;
+  &.nofooter {
+    padding-bottom: 0px;
+  }
+}
+
+.navbar-default {
+  border: 0px solid black;
+  bakground-color: transparent;
+}
+
+html {
+  height: 100%;
+}
+
+h3 {
+  margin-bottom: 30px;
+}
+
+.btn-cl {
+  border-radius: 0px;
+  color: @text-color;
+  border: 1px solid @text-color;
+  background-color: @page-background;
+  float: left;
+  font-size: 11px;
+  margin: 2px;
+  margin-right: 10px;
+}
+
+a {
+  cursor: pointer;
+}
+
+#root-wrapper {
+  min-height: 100%;
+  margin-bottom: -@footerheight;
+}
+
+#root {
+  .vertical-align {
+    align-items: center;
+  }
+
+  .small {
+    font-size: 9pt !important;
+  }
+
+  .parameters {
+    td {
+      padding-left: 5px;
+
+      &:first-child {
+        font-weight: bold;
+        text-align: right;
+      }
+    }
+
+    tr {
+      margin-bottom: 5px;
+    }
+  }
+
+  .graph_tooltip {
+    &.small {
+      > div {
+        width: 75px;
+
+        &.right {
+          margin-left: -52px;
+        }
+      }
+    }
+
+    &.medium {
+      > div {
+        width: 100px;
+
+        &.right {
+          margin-left: -77px;
+        }
+      }
+    }
+
+    &.large {
+      > div {
+        width: 125px;
+
+        &.right {
+          margin-left: -102px;
+        }
+      }
+    }
+
+    &.absolute {
+      position: absolute;
+    }
+
+    text-align: center;
+    white-space: nowrap;
+
+    > div {
+      background: @green;
+      border-radius: 5px;
+      color: white;
+      padding: 2px 10px;
+      z-index: 98;
+
+      position: relative;
+      width: 75px;
+
+      &.right {
+        margin-left: -52px;
+        margin-top: -3px;
+      }
+
+      &.top {
+        margin-left: -45px;
+        margin-top: 14px;
+      }
+
+      &.bottom:before {
+        border: solid;
+        border-color: @green transparent;
+        border-width: 6px 6px 0px 6px;
+        position: absolute;
+        content: '';
+        left: calc(~'50% - 6px');
+        bottom: -5px;
+        z-index: 99;
+      }
+
+      &.top:before {
+        border: solid;
+        border-color: @green transparent;
+        border-width: 0px 6px 6px 6px;
+        position: absolute;
+        content: '';
+        left: calc(~'50% - 6px');
+        top: -5px;
+        z-index: 99;
+      }
+
+      &.left:before {
+        border: solid;
+        border-color: transparent @green;
+        border-width: 6px 6px 6px 0px;
+        position: absolute;
+        content: '';
+        top: calc(~'50% - 6px');
+        left: -5px;
+        z-index: 99;
+      }
+
+      &.right:before {
+        border: solid;
+        border-color: transparent @green;
+        border-width: 6px 0px 6px 6px;
+        position: absolute;
+        content: '';
+        top: calc(~'50% - 6px');
+        right: -5px;
+        z-index: 99;
+      }
+    }
+  }
+
+  .modal-dialog a {
+    color: #555;
+  }
+}
+
+ul.formTabs {
+  margin-bottom: 15px;
+}
+
+.error {
+  background-color: @grey;
+  border-radius: 5px;
+  margin: auto;
+  width: 500px;
+  text-align: center;
+  font-size: 2em;
+  padding: 5px 20px;
+}
+
+#footer-push {
+  height: @footerheight;
+}
+
+#footer {
+  @textcolor: #7d7f88;
+  margin-top: 10px;
+  border-top: 1px solid #1a1a24;
+  width: 100%;
+  position: relative;
+  height: @footerheight;
+  background-color: #303142;
+  color: @textcolor;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  .borderTop {
+    position: absolute;
+    bottom: 20px;
+    border-top: 1px solid @textcolor;
+    padding-top: 3px;
+    width: 98%;
+  }
+
+  .footer-info {
+    margin-top: 20px;
+    margin-right: 10px;
+  }
+
+  .logo {
+    margin-top: 10px;
+  }
+}
+
+#instrumentList li.list-group-item {
+  &.bg-success {
+    background-color: @state-success-bg;
+    cursor: pointer;
+  }
+
+  &.bg-danger {
+    background-color: @state-danger-bg;
+    color: grey;
+  }
+}
+
+.activityLog {
+  height: 150px;
+  overflow-y: scroll;
+}
+
+.state-message {
+  padding: 10px;
+}
+
+.statuses {
+  display: flex;
+
+  margin-left: -5px;
+  margin-right: -5px;
+
+  .alert {
+    margin: 5px;
+
+    .pull-right {
+      position: relative;
+      > div {
+        position: absolute;
+        right: 0px;
+        width: 100px;
+        text-align: right;
+        top: -(@alert-padding / 2);
+      }
+    }
+  }
+}
+
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+
+.margin-bottom {
+  margin-bottom: 20px;
+}

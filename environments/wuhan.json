@@ -1,0 +1,136 @@
+{
+	"environment": {
+		"ageing": true,
+		
+
+		"statuses": {
+			"light": {
+				"version": "2.0"
+			},
+			"heat": {
+				"version": "ssr_1.0",
+				"switch": false
+			}
+		},
+
+
+		"instrument": {
+
+			"Small cells": {
+				"ADC": {
+					"model": "ADS1259"
+				},
+
+				"fsr": 50,
+				"voltageRange": 2.5,
+				"autoZero": "instrument",
+				"groups": {
+
+					"Slot left": {
+
+						"resettable": false,
+
+						"displayDeviceInformation": {
+							"time_ellapsed": true,
+							"pce": true,
+							"power": false,
+							"sun": true,
+							"voc": true,
+							"jsc": true,
+							"ff": true,
+							"vnow": true,
+							"jnow": true,
+							"temperature": true,
+							"humidity": true,
+							"kwh_yr": false
+						}
+
+
+					},
+
+
+					"Slot right": {
+
+						"resettable": false,
+
+						"displayDeviceInformation": {
+							"time_ellapsed": true,
+							"pce": true,
+							"power": false,
+							"sun": true,
+							"voc": true,
+							"jsc": true,
+							"ff": true,
+							"vnow": true,
+							"jnow": true,
+							"temperature": true,
+							"humidity": true,
+							"kwh_yr": false
+						}
+
+
+					}
+				}
+
+			},
+
+			"Small modules": {
+				"ADC": {
+					"model": "ADS1147"
+				},
+
+				"fsr": 100,
+				"voltageRange": 10,
+				"autoZero": "instrument",
+				"groups": {
+				"Modules": {
+
+						"resettable": false,
+
+						"displayDeviceInformation": {
+							"time_ellapsed": true,
+							"pce": true,
+							"power": false,
+							"sun": true,
+							"voc": true,
+							"jsc": true,
+							"ff": true,
+							"vnow": true,
+							"jnow": true,
+							"temperature": false,
+							"humidity": false,
+							"kwh_yr": true
+						}
+
+
+					}
+				}
+			}
+		}
+
+	},	
+
+	"development": true,
+
+	"defaultConfig": {
+		"instruments": [
+			{
+				"trackerHost": "192.168.1.105",
+				"trackerName": "Main Instrument",
+				"trackerPort": 8080,
+				"trackerPortWS": 8081
+			}
+		],
+		"database": {
+			"host": "192.168.1.101",
+			"username": "",
+			"password": "",
+			"port": 8086,
+			"db": "matahari"
+		},
+
+		"githubtokens": {
+			"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"
+		}
+	}
+}

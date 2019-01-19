@@ -1,0 +1,105 @@
+{
+  "name": "candlelight-ageing-interface",
+  "author": "Candlelight systems <contact@candlelight-systems.com>",
+  "email": "contact@candlelight-systems.com",
+  "license": "MIT",
+  "description": "Front-end interface for the Candlelight ageing systems",
+  "version": "0.0.3",
+  "homepage": "http://candlelight-systems.com",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-minify": "^0.4.3",
+    "babel-plugin-inline-replace-variables": "^1.3.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-node-env-inline": "^0.1.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-minify": "^0.4.3",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "babili": "^0.1.4",
+    "bootstrap": "^3.3.7",
+    "electron-builder": "^19.19.1",
+    "grunt-babel": "^7.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-less": "^2.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-rollup": "^9.0.0",
+    "grunt-webpack": "^2.0.1",
+    "jquery": "^3.2.1",
+    "node-jsgraph": "^2.0.90",
+    "react": "^15.5.4",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-json": "^3.0.0",
+    "webpack": "^3.4.1"
+  },
+  "dependencies": {
+    "bootstrap-slider": "^9.9.0",
+    "fix-path": "^2.1.0",
+    "grunt": "^1.0.3",
+    "html-pdf": "^2.1.0",
+    "lodash.debounce": "^4.0.8",
+    "pdfkit": "^0.8.3",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "rollup-plugin-replace": "^2.0.0",
+    "shell": "^0.3.2",
+    "url-lib": "^2.0.2"
+  },
+  "scripts": {
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.candlelight.ageing",
+    "productName": "Candlelight ageing",
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.developer-tools"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "util/",
+      "config.json"
+    ],
+    "files": [
+      "app/",
+      "main.js",
+      "package.json",
+      "environment.json",
+      "config.json",
+      "util/"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "linux": {
+      "target": "deb",
+      "icon": "build/candlelight.iconset",
+      "maintainer": "Candlelight-Systems <contact@candlelight-systems.com>"
+    },
+    "nsis": {},
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 120
+        },
+        {
+          "x": 310,
+          "y": 120,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "x": 400,
+        "y": 100,
+        "width": 540,
+        "height": 420
+      }
+    }
+  }
+}
