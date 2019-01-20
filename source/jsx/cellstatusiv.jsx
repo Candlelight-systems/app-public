@@ -118,8 +118,6 @@ class statusIV extends GraphComponent {
 			});
 		}
 
-		console.log( shouldUpdateIV );
-
 		if( shouldUpdateIV ) {
 
 			nextProps.data.sort( ( a, b ) => {

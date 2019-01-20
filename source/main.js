@@ -13,7 +13,8 @@ const fix = require('fix-path');
 const fetch = require('node-fetch');
 const WebSocket = require('ws');
 const environment = require('./environment.json');
-
+const diagnostics = require('./app/scripts/diagnostics');
+const { openForm, sendToForm } = require('./app/util/windows.js');
 fix();
 
 let currentInstrument;
@@ -46,10 +47,20 @@ ipcMain.on('scheduleLight', openScheduleLight);
 
 ipcMain.on('reportError', reportError);
 
+ipcMain.on('get-config', (event, arg) => {
+  event.sender.send('get-config', config);
+});
+
 function makeInstrumentMenu() {
   return {
     label: 'Instrument',
     submenu: [
+      {
+        label: 'Diagnostics',
+        click() {
+          diagnostics.openDiagnostics(currentInstrument);
+        }
+      },
       {
         label: 'Add a new instrument',
         click() {
@@ -757,19 +768,20 @@ function editInfluxDB(event) {
   })
     .then(async results => {
       config.database = results;
+
       saveConfig();
 
-      windows['form'].webContents.send('uploading', {
+      sendToForm('uploading', {
         status: 'progress',
         host: config.instruments.map(i => i.trackerHost).join(', ')
       });
 
       updateInfluxDB()
         .then(() => {
-          windows['form'].webContents.send('uploading', { status: 'done' });
+          sendToForm('uploading', { status: 'done' });
         })
         .catch(err => {
-          windows['form'].webContents.send('uploading', {
+          sendToForm('uploading', {
             status: 'error',
             error: err,
             host: err.options.host
@@ -780,13 +792,13 @@ function editInfluxDB(event) {
         windows['instrumentMain'].webContents.send('reloadDB', {
           db: config.database
         });
+      }
 
-        if (windows['instrumentList']) {
-          windows['instrumentList'].webContents.send(
-            'dbInformation',
-            config.database
-          );
-        }
+      if (windows['instrumentList']) {
+        windows['instrumentList'].webContents.send(
+          'dbInformation',
+          config.database
+        );
       }
     })
     .catch(() => {});
@@ -936,60 +948,4 @@ async function configChannels(event, data) {
       return results;
     })
     .catch(() => {});
-}
-
-let windowForm;
-
-function openForm(
-  windowName,
-  pageName,
-  formData,
-  options = { width: 300, height: 420 },
-  onClose
-) {
-  if (windowForm) {
-    windowForm._rejecter && windowForm._rejecter();
-    windowForm.close();
-  }
-  // Create the browser window.
-  windowForm = new BrowserWindow(options);
-
-  // and load the index.html of the app.
-  windowForm.loadURL(
-    url.format({
-      pathname: path.join(__dirname, 'app/' + pageName + '.html'),
-      protocol: 'file:',
-      slashes: true
-    })
-  );
-
-  windows['form'] = windowForm;
-
-  windowForm.once('closed', () => {
-    windows['form'] = null;
-    windowForm && windowForm._rejecter && windowForm._rejecter();
-    windowForm = null;
-
-    if (typeof onClose == 'function') {
-      onClose();
-    }
-  });
-  return new Promise((resolver, rejecter) => {
-    ipcMain.once('validateForm', (event, data) => {
-      resolver(data);
-    });
-
-    ipcMain.once('closeForm', (event, data) => {
-      if (windowForm) {
-        windowForm.close();
-        windowForm = null;
-      }
-    });
-
-    windowForm.webContents.once('dom-ready', () => {
-      windowForm.webContents.send('loadForm', formData);
-    });
-
-    windowForm._rejecter = rejecter;
-  });
 }

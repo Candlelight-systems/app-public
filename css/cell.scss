@@ -1,205 +1,180 @@
-
 div.cell-configure-all {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 div.cl-device {
+  height: 40px;
+  border: 1px solid @text-color-grey;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background-color: @cell-background;
+  border-radius: 2px;
+  margin-bottom: 10px;
 
-	height: 40px;
-	border: 1px solid @text-color-grey;
-	overflow-y: hidden;
-	overflow-x: hidden;
-	background-color: @cell-background;
-	border-radius: 2px;
-	margin-bottom: 10px;
-		
-	color: @text-color;
-	.label {
-		color: @text-color;
-	}
+  color: @text-color;
+  .label {
+    color: @text-color;
+  }
 
-	padding-left: 0px;
-	padding-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
 
+  &.cell-running {
+    //height: 240px;
+    height: 700px;
+  }
 
+  .cell-main-info {
+    .cell-area {
+      color: @text-color-grey;
+      font-size: 0.8em;
+    }
 
+    .channel-check {
+      margin-left: 5px;
+    }
 
-	&.cell-running {
-		height: 240px;
-	}
+    font-size: 1.1em;
+    height: 40px;
+    line-height: 40px;
 
+    input[type='checkbox'] {
+      position: relative;
+      top: -2px;
+    }
 
-	.cell-main-info {
+    .btn-cl {
+      margin-top: 4px;
+    }
+  }
 
-		.cell-area {
-			color: @text-color-grey;
-			font-size: 0.8em;
-		}
+  .cell-actions {
+    > div {
+      line-height: 28px;
+      font-size: 1em;
+    }
 
-		.channel-check {
-			margin-left: 5px;
-		}
+    .label {
+      text-align: center;
+      color: @text-color-grey;
+    }
+  }
 
-		
-		font-size: 1.1em;
-		height: 40px;
-		line-height: 40px;
+  .record {
+    float: right;
+    margin-right: 3px;
+    margin-top: -6px;
+    color: @red;
+    font-size: 0.8em;
+    cursor: pointer;
+  }
 
-		input[type="checkbox"] {
-			position: relative;
-			top: -2px;
-		}
+  .propElement {
+    &.processing {
+      background-color: @cell-background-processing;
 
-		.btn-cl {
-			margin-top: 4px;
-		}
-	}
+      .record {
+        display: none;
+      }
+    }
 
-	.cell-actions {
+    &.processing-error {
+      background-color: @cell-background-error;
+    }
+  }
+  .cell-summary {
+    .cell-status {
+      &.active {
+        color: @green;
+      }
 
-		> div {
-			line-height: 28px;
-			font-size: 1em;
-		}
+      > div {
+        margin: 10px;
+      }
 
-		.label {
-			text-align: center;
-			color: @text-color-grey;
-		}
-	}
+      background-color: @page-background;
+      font-size: 1.3em;
+      height: 120px;
+    }
 
+    text-align: center;
 
-	.record {
-		float: right;
-		margin-right: 3px;
-		margin-top: -6px;
-		color: @red;
-		font-size: 0.8em;
-		cursor: pointer;
-	}
+    > div {
+      padding-top: 10px;
 
+      .label {
+        font-size: 1.1em;
+      }
 
-	.propElement {
+      .value {
+        font-size: 1.1em;
+        whitespace: no-wrap;
+        color: @green;
+      }
 
-		&.processing {
-			background-color: @cell-background-processing;
-			
-			.record {
-				display: none;
-			}
-		}
+      background-color: @page-background;
+      height: 60px;
+      border-left: 2px solid @cell-background;
+      border-bottom: 2px solid @cell-background;
+      border-right: 2px solid @cell-background;
+    }
 
-		&.processing-error {
-			background-color: @cell-background-error;
-		}
+    .cell-efficiency {
+      background-color: @cell-background;
 
-	}
-	.cell-summary {
+      padding: 0px;
+    }
+  }
 
+  .cell-timing {
+    div {
+      text-align: center;
+    }
+    color: @text-color-grey;
+    margin-bottom: 4px;
+  }
 
-		.cell-status {
+  .cell-actions {
+    button {
+      float: left;
+    }
+  }
 
-			&.active {
-				color: @green;
-			}
+  &.toprow {
+    border: 1px solid transparent;
+    background-color: transparent;
+    height: 33px;
+    margin-bottom: 0px;
+  }
 
-			> div {
-				margin: 10px;
-			}
+  .bar {
+    height: 3px;
+    width: 100%;
+    cursor: pointer;
 
-			background-color: @page-background;
-			font-size: 1.3em;
-			height: 120px;
-		}
+    :after {
+      clear: both;
+    }
 
+    > div {
+      height: 3px;
+      float: left;
+      overflow: hidden;
+    }
 
-		text-align: center;
+    .barGreen {
+      background-color: #195196;
+      border-bottom-left-radius: 5px;
+      color: white;
+    }
 
-		> div {
+    .barRed {
+      background-color: #bd7117;
+      color: white;
+    }
+  }
 
-			padding-top: 10px;
-
-			.label {
-				font-size: 1.1em;
-			}
-			
-			.value {
-				font-size: 1.1em;
-				whitespace: no-wrap;
-				color: @green;
-			}
-
-
-
-			background-color: @page-background;
-			height: 60px;
-			border-left: 2px solid @cell-background;
-			border-bottom: 2px solid @cell-background;
-			border-right: 2px solid @cell-background;
-		}
-
-
-		.cell-efficiency {
-			background-color: @cell-background;
-			
-			padding: 0px;
-		}
-	}
-
-
-	.cell-timing {
-		
-		div {
-			text-align: center;
-		}
-		color: @text-color-grey;
-		margin-bottom: 4px;
-	}
-	
-
-	.cell-actions {
-
-		button {
-		float: left;
-		}
-	}
-
-	&.toprow {
-		border: 1px solid transparent;
-		background-color: transparent;
-		height: 33px;
-		margin-bottom: 0px;
-	}
-
-	.bar {
-
-		height: 3px;
-		width: 100%;
-		cursor: pointer;
-
-		:after {
-			clear: both;
-		}
-
-		> div {
-			height: 3px;
-			float: left;
-			overflow: hidden;
-		}
-
-		.barGreen {
-			background-color: #195196;
-			border-bottom-left-radius: 5px;
-			color: white;
-		}
-
-		.barRed {
-			background-color: #bd7117;
-			color: white;
-		}
-	}
-
-	.action {
-		cursor: pointer;
-	}
+  .action {
+    cursor: pointer;
+  }
 }

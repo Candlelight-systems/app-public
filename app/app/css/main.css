@@ -6599,7 +6599,7 @@ div.cl-device .label {
   color: #1b2d37;
 }
 div.cl-device.cell-running {
-  height: 240px;
+  height: 700px;
 }
 div.cl-device .cell-main-info {
   font-size: 1.1em;
@@ -6613,7 +6613,7 @@ div.cl-device .cell-main-info .cell-area {
 div.cl-device .cell-main-info .channel-check {
   margin-left: 5px;
 }
-div.cl-device .cell-main-info input[type="checkbox"] {
+div.cl-device .cell-main-info input[type='checkbox'] {
   position: relative;
   top: -2px;
 }

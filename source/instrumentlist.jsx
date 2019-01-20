@@ -14,6 +14,7 @@ ipcRenderer.on('reloadInstruments', () => {
 });
 
 ipcRenderer.on('dbInformation', async (event, db) => {
+  console.log(event, db);
   influx_error = false;
 
   try {

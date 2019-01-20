@@ -67,13 +67,6 @@ module.exports = function(grunt) {
             filter: 'isFile'
           },
 
-          /*    expand: true,
-                cwd: '/Users/normanpellet/Documents/Web/graph/dist/',
-                src: ['jsgraph-es6.js'],
-                dest: 'node_modules/node-jsgraph/dist/',
-                filter: 'isFile'
-              },
-*/
           {
             expand: true,
             cwd: '/Users/normanpellet/Documents/Web/graph/dist/',
@@ -86,6 +79,14 @@ module.exports = function(grunt) {
             expand: true,
             cwd: './source/',
             src: ['**/**.html'],
+            dest: 'app/app/',
+            filter: 'isFile'
+          },
+
+          {
+            expand: true,
+            cwd: './source/app',
+            src: ['**/**.js'],
             dest: 'app/app/',
             filter: 'isFile'
           },
@@ -164,7 +165,9 @@ module.exports = function(grunt) {
             'extend',
             'jquery',
             'lodash.debounce',
-            'default'
+            'default',
+            'url',
+            'node-jsgraph/dist/jsgraph-es6'
           ],
           plugins: function() {
             return [
@@ -207,7 +210,7 @@ module.exports = function(grunt) {
           'app/app/htmlreport_control.js': 'source/htmlreport_control.jsx',
           'app/app/showallmeasurements.js': 'source/showallmeasurements.jsx',
           'app/app/mppt.js': 'source/mppt.jsx',
-
+          'app/app/diagnostics.js': 'source/diagnostics.jsx',
           'app/app/ivmeasurements.js': 'source/ivmeasurements/index.jsx'
         }
       }
