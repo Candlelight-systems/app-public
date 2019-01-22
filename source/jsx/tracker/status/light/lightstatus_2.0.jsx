@@ -16,7 +16,7 @@ class LightStatus extends React.Component {
 
   componentWillUnmount() {
 
-    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
+    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
   }
 
 
@@ -24,7 +24,7 @@ class LightStatus extends React.Component {
 
     // Update directly the state
     this.setState( data.data );
-
+console.log( data.data );
     // New state means re-enabling
     if( this.toggleLightEnable ) {
       $( this.toggleLightEnable ).bootstrapToggle('enable');
@@ -58,7 +58,7 @@ class LightStatus extends React.Component {
 
 
         } );
-      } );      
+      } );
       this.transformed = true;
     }
 
@@ -68,7 +68,6 @@ class LightStatus extends React.Component {
   }
 
   render() {
-
     return (
       <div>
          <div className="row">
@@ -81,19 +80,19 @@ class LightStatus extends React.Component {
               </label>
             </div>
           </div>
-            
-          { this.state.lightOnOff ? 
-            
+
+          { this.state.lightOnOff ?
+
             <div>
-              { this.state.lightOnOffButton !== this.state.lightOnOff ? 
+              { this.state.lightOnOffButton !== this.state.lightOnOff ?
               <div className="row">
                 <div className="col-lg-9">
                   <span className="grey"><em><small><span className="glyphicon glyphicon-danger"></span>The light switch is off. Push it to turn the light on.</small></em></span>
                 </div>
-              </div> 
-              : 
+              </div>
+              :
               null }
-            
+
 
             <div className="row">
               <div className="col-lg-5">
@@ -102,25 +101,25 @@ class LightStatus extends React.Component {
               <div className="col-lg-4">
                 { this.state.lightMode == 'auto' ? <span>Automatic</span> : <span>Manual</span> }
               </div>
-            </div> 
+            </div>
 
 
-            { 
+            {
               this.state.lightMode == 'auto' && this.state.lightSetpoint !== undefined ? // In case the light is in automatic mode
 
               <div className="row">
                 <div className="col-lg-5">
                   <span className="grey">
                     Set point:
-                  </span> 
-                    
-                </div> 
+                  </span>
+
+                </div>
                 <div className="col-lg-4">
                   { this.state.lightSetpoint } sun
                 </div>
               </div>
-              : 
-              null 
+              :
+              null
             }
 
             { this.state.lightValue !== undefined ?
@@ -128,15 +127,40 @@ class LightStatus extends React.Component {
                 <div className="col-lg-5">
                   <span className="grey">
                     Current value:
-                  </span> 
-                </div> 
+                  </span>
+                </div>
                 <div className="col-lg-4">
                   { this.state.lightValue < 0 ? 0 : ( this.state.lightValue  ).toPrecision( 3 ) } sun
                 </div>
-              </div> : null 
+              </div> : null
             }
 
 
+            {
+              this.state.lightMode == 'auto' && this.state.lightUVSetpoint !== undefined ? // In case the light is in automatic mode
+
+              <div className="row">
+                <div className="col-lg-5">
+                  <span className="grey">
+                    UV(A) set point:
+                  </span>
+
+                </div>
+                <div className="col-lg-4">
+<<<<<<< HEAD
+                  { this.state.lightUVSetpoint } mW cm<sup>-2</sup>
+=======
+                  { this.state.lightValue < 0 ? 0 : ( this.state.lightValue  ).toPrecision( 3 ) } sun
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
+                </div>
+              </div>
+              :
+              null
+            }
+
+
+<<<<<<< HEAD
+=======
             { 
               this.state.lightMode == 'auto' && this.state.lightUVSetpoint !== undefined ? // In case the light is in automatic mode
 
@@ -156,11 +180,21 @@ class LightStatus extends React.Component {
             }
 
 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
             { this.state.lightUVValue !== undefined ?
               <div className="row">
                 <div className="col-lg-5">
                   <span className="grey">
                     UV(A) intensity:
+<<<<<<< HEAD
+                  </span>
+                </div>
+                {}
+                <div className="col-lg-4">
+                  { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ?
+                    this.state.lightUVValue
+                    :
+=======
                   </span> 
                 </div> 
                 {}
@@ -168,17 +202,23 @@ class LightStatus extends React.Component {
                   { isNaN( this.state.lightUVValue ) || this.state.lightUVValue !== parseFloat( this.state.lightUVValue ) ? 
                     this.state.lightUVValue 
                     : 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
                     ( this.state.lightUVValue < 0 ? 0 : <span>{ Math.round( this.state.lightUVValue * 1000 ) / 1000 } mW cm<sup>-2</sup></span> )
                   }
                 </div>
                 <div class="text-warning"><strong><span className="glyphicon glyphicon-danger"></span> Caution !</strong> UV sensor readout can be influenced by the white light intensity</div>
+<<<<<<< HEAD
+
+              </div> : null
+=======
                 
               </div> : null 
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
             }
 
             </div> : null }
           </div>
-          
+
       );
   }
 }

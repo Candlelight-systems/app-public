@@ -64,21 +64,20 @@ function round(value, digits) {
   return Math.round(value * 10 ** digits) / 10 ** digits;
 }
 
-const zeroSerieTime = (serie, indexTimestamp = 0 ) => {
+const zeroSerieTime = (serie, indexTimestamp = 0) => {
   let date, time, timeRef;
 
-  serie.forEach( ( serieElement, index ) => {
-
+  serie.forEach((serieElement, index) => {
     date = new Date(serieElement[indexTimestamp]);
     time = date.getTime();
 
-    if( index == 0 ) {
+    if (index == 0) {
       timeRef = time;
       serieElement[indexTimestamp] = 0;
-      return;  
+      return;
     }
-//console.log( date.getTime(), serieElement[indexTimestamp] );
-    
+    //console.log( date.getTime(), serieElement[indexTimestamp] );
+
     serieElement[indexTimestamp] = time - timeRef;
     serieElement[indexTimestamp] /= 1000 * 3600;
   });
@@ -720,7 +719,6 @@ class TrackerDevice extends React.Component {
         }
 
         if (results[4] && results[4].series) {
-          
           if (this.state.serverState.tracking_mode == 1) {
             newState.jsc =
               (results[4].series[0].values[0][1] / serverState.cellArea) * 1000;
@@ -729,7 +727,6 @@ class TrackerDevice extends React.Component {
           results[4].series[0].values.reverse();
           zeroSerieTime(results[4].series[0].values);
           populateWaveformWithData(newState.jscs, results[4].series[0].values);
-
         }
 
         console.log(newState.jscs, newState.vocs);

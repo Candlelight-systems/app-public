@@ -9,11 +9,12 @@
 		}
 	],
 	"database": {
-		"host": "192.168.1.100",
-		"username": "",
+		"db": "matahari",
+		"db_authentication": null,
+		"host": "192.168.0.100",
 		"password": "",
 		"port": 8086,
-		"db": "matahari"
+		"username": ""
 	},
 	"githubtokens": {
 		"issuetracker": "81d7cb9ad6905e5a4e0cffbd4f47de13b0a2de4f"

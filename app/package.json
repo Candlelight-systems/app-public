@@ -30,7 +30,11 @@
     "lodash.debounce": "^4.0.8",
     "mathjax": "^2.7.5",
     "node-fetch": "^2.2.0",
+<<<<<<< HEAD
+    "node-jsgraph": "^2.1.11",
+=======
     "node-jsgraph": "^2.1.9",
+>>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
     "pdfkit": "^0.8.3",
     "python-shell": "^0.5.0",
     "qs": "^6.5.2",
