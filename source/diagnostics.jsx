@@ -256,14 +256,12 @@ class Diagnostics extends React.Component {
             <small>&nbsp;({instrument.trackerHost})</small>
           </h4>
 
-          <p>
-            <div className={alertPing}>
+                    <div className={alertPing}>
               {txtPing}&nbsp;Network access to the machine
             </div>
 
             <div className={alertStatus}>{txtStatus}</div>
             <div className={alertBoards}>{txtBoards}</div>
-          </p>
         </div>
       );
     });

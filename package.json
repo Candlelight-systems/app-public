@@ -20,6 +20,7 @@
     "babel-preset-stage-1": "^6.24.1",
     "babili": "^0.1.4",
     "bootstrap": "^3.3.7",
+    "bootstrap-toggle": "^2.2.2",
     "electron-builder": "^19.19.1",
     "grunt-babel": "^7.0.0",
     "grunt-contrib-copy": "^1.0.0",

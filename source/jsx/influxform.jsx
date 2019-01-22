@@ -98,8 +98,11 @@ class AppForm extends React.Component {
         state.db_authentication = e.toString();
       }
     } catch (e) {
-      console.log(e);
-      state.db_connection = e.toString();
+      console.error(e);
+
+      if( e !== null ) {
+        state.db_connection = e.toString();
+      }
     }
 
     this.setState(state);

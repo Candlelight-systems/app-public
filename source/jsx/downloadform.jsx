@@ -1,198 +1,175 @@
 import React from 'react';
-const {dialog} = require('electron').remote;
+const { dialog } = require('electron').remote;
 import fs from 'fs';
-import { CSVBuilder, ITXBuilder } from "../../app/util/filebuilder"
-import { query as influxquery } from "../influx";
+import { CSVBuilder, ITXBuilder } from '../../app/util/filebuilder';
+import { query as influxquery } from '../influx';
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
-import svgToPDF from "../../app/util/svgToPDF"
-import PDFDocument from 'pdfkit'
-import { ipcRenderer } from "electron";
+import svgToPDF from '../../app/util/svgToPDF';
+import PDFDocument from 'pdfkit';
+import { ipcRenderer } from 'electron';
 
 class DownloadForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.makeDownload = this.makeDownload.bind(this);
+    this.downloadPDF = this.downloadPDF.bind(this);
+    this.close = this.close.bind(this);
+    this.state = {
+      dl_format: 'itx',
+      error_track: false,
+      error_vocjs: false,
+      error_jv: false
+    };
+  }
 
+  close() {
+    this.props.onClose();
+  }
 
-	constructor( props ) {
-		super( props );
-		this.handleInputChange = this.handleInputChange.bind(this);
-		this.makeDownload = this.makeDownload.bind( this );
-		this.downloadPDF = this.downloadPDF.bind( this );
-		this.close = this.close.bind( this );
-		this.state = {
-			dl_format: 'itx',
-			error_track: false,
-			error_vocjs: false,
-			error_jv: false
-		};
-	}
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({ [name]: value });
+  }
 
-	close() {
-		this.props.onClose();
-	}
+  componentWillReceiveProps(nextProps) {}
 
-	handleInputChange(event) {
-	    const target = event.target;
-	    const value = target.type === 'checkbox' ? target.checked : target.value;
-	    const name = target.name;
-	    this.setState( { [name]: value } );
-	}
+  componentDidMount() {}
 
-	componentWillReceiveProps( nextProps ) {
+  async makeDownload(track = true, jv = true, vocjsc = true) {
+    let outputfile;
 
-	}
+    if (this.state.dl_format == 'itx') {
+      outputfile = new ITXBuilder();
+    } else {
+      outputfile = new CSVBuilder();
+    }
 
-	componentDidMount() {
+    let fileappend = [];
+    if (track) {
+      await this.downloadTrack(outputfile);
+      fileappend.push('track');
+    }
 
-	}
+    if (jv) {
+      await this.downloadIV(outputfile);
+      fileappend.push('jv');
+    }
 
-	async makeDownload( track = true, jv = true, vocjsc = true ) {
+    if (vocjsc) {
+      await this.downloadVocJsc(outputfile);
+      fileappend.push('vocjsc');
+    }
 
-		let outputfile;
+    dialog.showSaveDialog(
+      {
+        message:
+          'Save the data for the cell "' + this.props.cellInfo.cellName + '"',
+        defaultPath: `~/${this.props.cellInfo.cellName}_${fileappend.join(
+          '_'
+        )}.${this.state.dl_format}`
+      },
+      fileName => {
+        fs.writeFileSync(fileName, outputfile.build());
+      }
+    );
+  }
 
-		if( this.state.dl_format == "itx" ) {
-			outputfile = new ITXBuilder();
-		} else {
-			outputfile = new CSVBuilder();
-		}
+  async downloadTrack(outputfile) {
+    let data;
+    try {
+      data = await this.getTrackData();
+    } catch (e) {
+      this.setState({ error_track: true });
+      console.error(e);
+      return;
+    }
 
-		let fileappend = [];
-		if( track ) {
-			await this.downloadTrack( outputfile );
-			fileappend.push( "track" );
-		}
+    outputfile.addWaveform(data.date, {
+      waveName: 'Date'
+    });
 
-		if( jv ) {
-			await this.downloadIV( outputfile );
-			fileappend.push( "jv" );
-		}
+    outputfile.addWaveform(data.efficiency, {
+      waveName: 'Efficiency',
+      waveNameX: 'Time_MPP_h'
+    });
 
-		if( vocjsc ) {
-			await this.downloadVocJsc( outputfile );
-			fileappend.push( "vocjsc" );
-		}
+    outputfile.addWaveform(data.power, {
+      waveName: 'Power',
+      noXWave: true
+    });
 
-		dialog.showSaveDialog( {
+    outputfile.addWaveform(data.voltage, {
+      waveName: 'Voltage',
+      noXWave: true
+    });
 
-			message: "Save the data for the cell \"" + this.props.cellInfo.cellName + "\"",
-			defaultPath: `~/${ this.props.cellInfo.cellName  }_${ fileappend.join("_") }.${ this.state.dl_format }`
+    outputfile.addWaveform(data.current, {
+      waveName: 'Current',
+      noXWave: true
+    });
 
-		}, ( fileName ) => {
+    outputfile.addWaveform(data.temperature, {
+      waveName: 'Temperature',
+      noXWave: true
+    });
 
-			fs.writeFileSync(fileName, outputfile.build() );
-		} );
-	}
+    outputfile.addWaveform(data.sun, {
+      waveName: 'Sun',
+      noXWave: true
+    });
 
+    outputfile.addWaveform(data.humidity, {
+      waveName: 'Humidity',
+      noXWave: true
+    });
+  }
 
-	async downloadTrack( outputfile ) {
+  async downloadVocJsc(outputfile) {
+    let data;
 
-		let data;
-		try {
-			data = await this.getTrackData();
-		} catch( e ) {
-			this.setState( { error_track: true } );
-			console.error( e );
-			return;
-		}
+    try {
+      data = await this.getVocJscData();
+    } catch (e) {
+      this.setState({ error_vocjs: true });
+      console.error(e);
+      return;
+    }
 
+    outputfile.addWaveform(data.waveVoc, {
+      waveName: 'Voc',
+      waveNameX: 'Time_voc_h'
+    });
 
-		outputfile.addWaveform( data.date, {
-			waveName: "Date"
-		} );
+    outputfile.addWaveform(data.waveJsc, {
+      waveName: 'Jsx',
+      waveNameX: 'Time_jsc_h'
+    });
+  }
 
-		outputfile.addWaveform( data.efficiency, {
-			waveName: "Efficiency",
-			waveNameX: "Time_MPP_h"
-		} );
+  async downloadIV(outputfile) {
+    let data;
+    try {
+      data = await this.getJVData();
+    } catch (e) {
+      this.setState({ error_jv: true });
+      console.error(e);
+      return;
+    }
+    data[0].map(data => {
+      if (!data.wave) {
+        return;
+      }
 
-		outputfile.addWaveform( data.power, {
-			waveName: "Power",
-			noXWave: true
-		} );
-
-		outputfile.addWaveform( data.voltage, {
-			waveName: "Voltage",
-			noXWave: true
-		} );
-
-		outputfile.addWaveform( data.current, {
-			waveName: "Current",
-			noXWave: true
-		} );
-
-		outputfile.addWaveform( data.temperature, {
-			waveName: "Temperature",
-			noXWave: true
-		} );
-
-		outputfile.addWaveform( data.sun, {
-			waveName: "Sun",
-			noXWave: true
-		} );
-
-		outputfile.addWaveform( data.humidity, {
-			waveName: "Humidity",
-			noXWave: true
-		} );
-
-	}
-
-	async downloadVocJsc( outputfile ) {
-
-		let data;
-
-		try {
-			data = await this.getVocJscData();
-<<<<<<< HEAD
-
-		} catch( e ) {
-			this.setState( { error_vocjs: true } );
-			console.error( e );
-			return;
-		}
-
-=======
-
-		} catch( e ) {
-			this.setState( { error_vocjs: true } );
-			console.error( e );
-			return;
-		}
-
->>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
-		outputfile.addWaveform( data.waveVoc, {
-			waveName: "Voc",
-			waveNameX: "Time_voc_h"
-		} );
-
-		outputfile.addWaveform( data.waveJsc, {
-			waveName: "Jsx",
-			waveNameX: "Time_jsc_h"
-		} );
-	}
-
-	async downloadIV( outputfile ) {
-
-	let data;
-		try {
-			data = await this.getJVData();
-		} catch( e ) {
-			this.setState( { error_jv: true } );
-			console.error( e );
-			return;
-		}
-		data[ 0 ].map( ( data ) => {
-
-			if( ! data.wave ) {
-				return;
-			}
-
-			outputfile.addWaveform( data.wave, {
-				waveName: "Current_" + data.time_h + "h",
-				waveNameX: "Voltage_" + data.time_h + "h"
-			} );
-		} );
-
-	}
-/*
+      outputfile.addWaveform(data.wave, {
+        waveName: 'Current_' + data.time_h + 'h',
+        waveNameX: 'Voltage_' + data.time_h + 'h'
+      });
+    });
+  }
+  /*
 	plotMPPT( data ) {
 
 		let graph, serie;
@@ -298,310 +275,420 @@ class DownloadForm extends React.Component {
 		}
 	}*/
 
-	getTrackData( getEfficiencyAtIntervals ) {
+  getTrackData(getEfficiencyAtIntervals) {
+    var db = this.props.db.db;
 
-		var db = this.props.db.db;
+    return influxquery(
+      'SELECT time,efficiency FROM "' +
+        encodeURIComponent(this.props.measurementName) +
+        '" ORDER BY time ASC limit 1;SELECT time,efficiency FROM "' +
+        encodeURIComponent(this.props.measurementName) +
+        '" ORDER BY time DESC limit 1;',
+      db,
+      this.props.db
+    ).then(async results => {
+      if (!results[0].series) {
+        throw 'No measurement with the name ' +
+          encodeURIComponent(this.props.measurementName) +
+          ' or no associated data';
+      }
 
-		return influxquery("SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time ASC limit 1;SELECT time,efficiency FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" ORDER BY time DESC limit 1;", db, this.props.db ).then( async ( results ) => {
+      let timefrom = results[0].series[0].values[0][0],
+        timeto = results[1].series[0].values[0][0],
+        timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
+        grouping = Math.max(1, Math.round(timeDifference / 1000));
 
-			if( ! results[ 0 ].series ) {
-				throw "No measurement with the name " + encodeURIComponent( this.props.measurementName ) + " or no associated data";
-			}
+      let toReturn = await influxquery(
+        'SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM "' +
+          encodeURIComponent(this.props.measurementName) +
+          '" WHERE time >= \'' +
+          timefrom +
+          "' and time <= '" +
+          timeto +
+          "'  GROUP BY time(" +
+          grouping +
+          's) FILL(none) ORDER BY time ASC;',
+        db,
+        this.props.db
+      ).then(results => {
+        let values = results[0].series[0].values,
+          offset,
+          waveDate = Graph.newWaveform(),
+          waveEfficiency = Graph.newWaveform(),
+          waveVoltage = Graph.newWaveform(),
+          waveCurrent = Graph.newWaveform(),
+          wavePower = Graph.newWaveform(),
+          waveSun = Graph.newWaveform(),
+          waveTemperature = Graph.newWaveform(),
+          waveHumidity = Graph.newWaveform();
 
-			let timefrom = results[ 0 ].series[ 0 ].values[ 0 ][ 0 ],
-				timeto = results[ 1 ].series[ 0 ].values[ 0 ][ 0 ],
-				timeDifference = ( new Date( timeto ) - new Date( timefrom ) ) / 1000,
-				grouping = Math.max( 1, Math.round( timeDifference / 1000 ) );
+        waveEfficiency.setUnit('%');
+        waveEfficiency.setXUnit('h');
+        waveVoltage.setUnit('V');
+        wavePower.setUnit('W');
+        waveCurrent.setUnit('mA cm-2');
 
-			let toReturn = await influxquery("SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM \"" + encodeURIComponent( this.props.measurementName ) + "\" WHERE time >= '" + timefrom + "' and time <= '" + timeto + "'  GROUP BY time(" + grouping + "s) FILL(none) ORDER BY time ASC;", db, this.props.db ).then( ( results ) => {
+        waveSun.setUnit('-');
+        waveTemperature.setUnit('°C');
+        waveHumidity.setUnit('%');
 
-				let values = results[ 0 ].series[ 0 ].values,
-					offset,
-					waveDate = Graph.newWaveform(),
-					waveEfficiency = Graph.newWaveform(),
-					waveVoltage = Graph.newWaveform(),
-					waveCurrent = Graph.newWaveform(),
-					wavePower = Graph.newWaveform(),
-					waveSun = Graph.newWaveform(),
-					waveTemperature = Graph.newWaveform(),
-					waveHumidity = Graph.newWaveform();
+        let maxEfficiency = 0;
+        let finalEfficiency = 0;
 
-				waveEfficiency.setUnit("%");
-				waveEfficiency.setXUnit("h");
-				waveVoltage.setUnit("V");
-				wavePower.setUnit("W");
-				waveCurrent.setUnit("mA cm-2");
+        values.forEach((value, index) => {
+          let date = new Date(value[0]),
+            time;
 
-				waveSun.setUnit("-");
-				waveTemperature.setUnit("°C");
-				waveHumidity.setUnit("%");
+          if (index == 0) {
+            offset = date.getTime();
+            time = 0;
+          } else {
+            time = (date.getTime() - offset) / 1000 / 3600;
+          }
 
-				let maxEfficiency = 0;
-				let finalEfficiency = 0;
-
-				values.forEach( ( value, index ) => {
-
-					let date = new Date( value[ 0 ] ),
-						time;
-
-					if( index == 0 ) {
-						offset = date.getTime();
-						time = 0;
-					} else {
-						time = ( date.getTime() - offset ) / 1000 / 3600;
-					}
-
-					/*if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
+          /*if( value[ 1 ] > 35 || value[ 1 ] < 0 ) { // Higher than 35% => fail. Lower than 0% => fail.
 						value[ 1 ] = NaN;
 						value[ 2 ] = NaN;
 					}*/
 
-					waveDate.append( time, date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() );
-					waveEfficiency.append( time, value[ 1 ] );
-					waveVoltage.append( time, value[ 2 ] );
-					waveCurrent.append( time, value[ 3 ] );
-					wavePower.append( time, value[ 8 ] );
-					waveHumidity.append( time, value[ 4 ] );
-					waveSun.append( time, value[ 5 ] );
-
-					if( value[ 6 ] !== null ) {
-						waveTemperature.append( time, value[ 6 ] );
-<<<<<<< HEAD
-					} else if( value[ 9 ] !== null ) {
-						waveTemperature.append( time, value[ 9 ] );
-					}
-=======
-					} else if( value[ 8 ] !== null ) {
-						waveTemperature.append( time, value[ 8 ] );
-					} 
->>>>>>> a862b52bbda128ce9575ae7e639cf9615f539e8e
-
-					maxEfficiency = Math.max( maxEfficiency, value[ 7 ] );
-				} );
-
-				finalEfficiency = values[ values.length - 1 ][ 7 ];
-
-				return {
-					efficiency: waveEfficiency,
-					voltage: waveVoltage,
-					current: waveCurrent,
-					sun: waveSun,
-					temperature: waveTemperature,
-					humidity: waveHumidity,
-					power: wavePower,
-					date: waveDate,
-
-					maxEfficiency: maxEfficiency,
-					finalEfficiency: finalEfficiency,
-					ellapsed: timeDifference / 3600 // in hours
-				};
-			});
-
-
-
-			if( getEfficiencyAtIntervals ) {
-
-				let tfrom = new Date( timefrom ).getTime() * 1000000;
-
-				let time_1h = tfrom + 1000000000 * 3600;
-				let time_24h = tfrom + 1000000000 * 3600 * 24;
-				let time_100h = tfrom + 1000000000 * 3600 * 100;
-				let time_500h = tfrom + 1000000000 * 3600 * 500;
-				let time_1000h = tfrom + 1000000000 * 3600 * 1000;
-
-				toReturn.timeEfficiencies = await influxquery(`
-					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_1h } ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_24h } ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_100h } ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_500h } ORDER BY time ASC LIMIT 1;
-					SELECT efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" WHERE time > ${ time_1000h } ORDER BY time ASC LIMIT 1;
-				`, db, this.props.db ).then( ( results ) => {
-
-					return results.map( ( result ) => {
-
-						if( ! result.series ) {
-							return;
-						}
-
-						return result.series[ 0 ].values[ 0 ][ 1 ];
-					} );
-
-				});
-			}
-
-			return toReturn;
-
-		});
-	}
-
-
-	getVocJscData( getEfficiencyAtIntervals ) {
-
-		var db = this.props.db.db;
-
-		let waveVoc = Graph.newWaveform(),
-			waveJsc = Graph.newWaveform(),
-			timefrom;
-
-		return influxquery(`
-			SELECT time,efficiency FROM "${ encodeURIComponent( this.props.measurementName ) }" ORDER BY time ASC limit 1;
-			SELECT time,voc FROM "${ encodeURIComponent( this.props.measurementName ) }_voc" ORDER BY time ASC;
-			SELECT time,jsc FROM "${ encodeURIComponent( this.props.measurementName ) }_jsc" ORDER BY time ASC;`, db, this.props.db ).then( async ( results ) => {
-
-
-			results.map( ( results, index ) => {
-
-				if( index == 0 ) {
-					timefrom = new Date( results.series[ 0 ].values[ 0 ][ 0 ] );
-					return;
-				}
-
-				if( ! results.series ) {
-					return [];
-				}
-
-				return results.series[ 0 ].values.map( ( value ) => {
-
-					let date = new Date( value[ 0 ] ),
-						time = Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10,
-						val = value[ 1 ]
-
-					if( index == 1 ) {
-						waveVoc.append( time, val );
-					} else if( index == 2 ) {
-						waveJsc.append( time, val );
-					}
-
-				} );
-			} );
-
-			return {
-				waveVoc: waveVoc,
-				waveJsc: waveJsc
-			};
-
-		} );
-	}
-
-	getJVData() {
-
-
-		var db = this.props.db.db;
-
-		let timefrom;
-
-		return influxquery(`
-			SELECT time,iv FROM "${ encodeURIComponent( this.props.measurementName ) }_iv" ORDER BY time ASC;`, db, this.props.db ).then( async ( results ) => {
-
-			return results.map( ( results, index ) => {
-
-				if( ! results.series ) {
-					return {};
-				}
-
-				if( index == 0 ) {
-					timefrom = new Date( results.series[ 0 ].values[ 0 ][ 0 ] );
-				}
-
-				return results.series[ 0 ].values.map( ( value ) => {
-
-					let date = new Date( value[ 0 ] ),
-						data = value[ 1 ].split(","),
-						wave = Graph.newWaveform();
-
-					for( let i = 0; i < data.length - 1; i += 2 ) {
-						wave.append( parseFloat( data[ i ].replace('"', '') ), parseFloat( data[ i + 1 ].replace('"', '') ) );
-					}
-
-					return {
-						wave: wave,
-						time_h: Math.round( ( date.getTime() - timefrom.getTime() ) / 1000 / 3600 * 10 ) / 10
-					};
-
-				} );
-			} );
-		} );
-	}
-
-	async downloadPDF() {
-
-		ipcRenderer.send( "htmlReport", this.props.cellInfo, this.props.chanId, this.props.measurementName, this.props.instrumentId );
-
-	}
-
-	render() {
-
-		return (
-
-			<div className="container-fluid">
-				<form onSubmit={ this.submit } className="form-horizontal">
-
-					<h4>Download data for device "{ this.props.cellInfo.cellName }" { this.props.chanId && <span>( channel { this.props.chanId } )</span> }</h4>
-
-					{ this.state.error_track ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download tracking data. It could be that no data exists in the database.</div> : null }
-					{ this.state.error_jv ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download IV data. It could be that no data exists in the database.</div> : null }
-					{ this.state.error_vocjsc ? <div className="alert alert-warning"><strong><span className="glyphicon glyphicon-warning"></span></strong> Could not download Voc/Jsc data. It could be that no data exists in the database.</div> : null }
-
-					<div className="form-group">
-						<label className="col-sm-3">Format</label>
-						<div className="col-sm-6">
-							<select name="dl_format" id="dl_format" className="form-control" value={this.state.dl_format} onChange={this.handleInputChange}>
-								<option value="csv">Comma separated (.csv)</option>
-								<option value="itx">Igor text file (.itx)</option>
-							</select>
-						</div>
-					</div>
-
-					<div className="form-group">
-						<label className="col-sm-3">Number of points</label>
-						<div className="col-sm-6">
-							<select name="dl_track_nb" id="dl_track_nb" className="form-control" value={this.state.dl_track_nb} onChange={this.handleInputChange}>
-								<option value="100">100</option>
-								<option value="300">300</option>
-								<option value="1000">1000</option>
-								<option value="3000">3000</option>
-								<option value="10000">10000</option>
-							</select>
-						</div>
-					</div>
-
-					<div className="form-group">
-
-						<div className="col-sm-3">
-						</div>
-						<div className="col-sm-6">
-							<div className="btn-group">
-								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, false, false ) } }>Download MPP</button>
-								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, false, true ) } }>Download Voc and Jsc</button>
-								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( false, true, false ) } }>Download JV</button>
-								<button className="btn btn-primary" type="button" onClick={ () => { this.makeDownload( true, true, true ) } }>Download All</button>
-							</div>
-						</div>
-					</div>
-
-
-					<div className="form-group">
-
-						<div className="col-sm-3">
-						</div>
-						<div className="col-sm-6">
-							<div className="btn-group">
-								<button  className="btn btn-success"  type="button" onClick={ this.downloadPDF }>Make PDF report</button>
-								<button type="button" className="btn btn-default"name="update"  onClick={this.close}>Close</button>
-							</div>
-
-
-						</div>
-					</div>
-
-				</form>
-
-				<div className="btn-group pull-right">
-
-		      	</div>
-			</div>
-		);
-	}
+          waveDate.append(
+            time,
+            date.getDate() +
+              '.' +
+              date.getMonth() +
+              '.' +
+              date.getFullYear() +
+              ' ' +
+              date.getHours() +
+              ':' +
+              date.getMinutes() +
+              ':' +
+              date.getSeconds()
+          );
+          waveEfficiency.append(time, value[1]);
+          waveVoltage.append(time, value[2]);
+          waveCurrent.append(time, value[3]);
+          wavePower.append(time, value[8]);
+          waveHumidity.append(time, value[4]);
+          waveSun.append(time, value[5]);
+
+          if (value[6] !== null) {
+            waveTemperature.append(time, value[6]);
+          } else if (value[9] !== null) {
+            waveTemperature.append(time, value[9]);
+          }
+
+          maxEfficiency = Math.max(maxEfficiency, value[7]);
+        });
+
+        finalEfficiency = values[values.length - 1][7];
+
+        return {
+          efficiency: waveEfficiency,
+          voltage: waveVoltage,
+          current: waveCurrent,
+          sun: waveSun,
+          temperature: waveTemperature,
+          humidity: waveHumidity,
+          power: wavePower,
+          date: waveDate,
+
+          maxEfficiency: maxEfficiency,
+          finalEfficiency: finalEfficiency,
+          ellapsed: timeDifference / 3600 // in hours
+        };
+      });
+
+      if (getEfficiencyAtIntervals) {
+        let tfrom = new Date(timefrom).getTime() * 1000000;
+
+        let time_1h = tfrom + 1000000000 * 3600;
+        let time_24h = tfrom + 1000000000 * 3600 * 24;
+        let time_100h = tfrom + 1000000000 * 3600 * 100;
+        let time_500h = tfrom + 1000000000 * 3600 * 500;
+        let time_1000h = tfrom + 1000000000 * 3600 * 1000;
+
+        toReturn.timeEfficiencies = await influxquery(
+          `
+					SELECT efficiency FROM "${encodeURIComponent(
+            this.props.measurementName
+          )}" WHERE time > ${time_1h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(
+            this.props.measurementName
+          )}" WHERE time > ${time_24h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(
+            this.props.measurementName
+          )}" WHERE time > ${time_100h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(
+            this.props.measurementName
+          )}" WHERE time > ${time_500h} ORDER BY time ASC LIMIT 1;
+					SELECT efficiency FROM "${encodeURIComponent(
+            this.props.measurementName
+          )}" WHERE time > ${time_1000h} ORDER BY time ASC LIMIT 1;
+				`,
+          db,
+          this.props.db
+        ).then(results => {
+          return results.map(result => {
+            if (!result.series) {
+              return;
+            }
+
+            return result.series[0].values[0][1];
+          });
+        });
+      }
+
+      return toReturn;
+    });
+  }
+
+  getVocJscData(getEfficiencyAtIntervals) {
+    var db = this.props.db.db;
+
+    let waveVoc = Graph.newWaveform(),
+      waveJsc = Graph.newWaveform(),
+      timefrom;
+
+    return influxquery(
+      `
+			SELECT time,efficiency FROM "${encodeURIComponent(
+        this.props.measurementName
+      )}" ORDER BY time ASC limit 1;
+			SELECT time,voc FROM "${encodeURIComponent(
+        this.props.measurementName
+      )}_voc" ORDER BY time ASC;
+			SELECT time,jsc FROM "${encodeURIComponent(
+        this.props.measurementName
+      )}_jsc" ORDER BY time ASC;`,
+      db,
+      this.props.db
+    ).then(async results => {
+      results.map((results, index) => {
+        if (index == 0) {
+          timefrom = new Date(results.series[0].values[0][0]);
+          return;
+        }
+
+        if (!results.series) {
+          return [];
+        }
+
+        return results.series[0].values.map(value => {
+          let date = new Date(value[0]),
+            time =
+              Math.round(
+                ((date.getTime() - timefrom.getTime()) / 1000 / 3600) * 10
+              ) / 10,
+            val = value[1];
+
+          if (index == 1) {
+            waveVoc.append(time, val);
+          } else if (index == 2) {
+            waveJsc.append(time, val);
+          }
+        });
+      });
+
+      return {
+        waveVoc: waveVoc,
+        waveJsc: waveJsc
+      };
+    });
+  }
+
+  getJVData() {
+    var db = this.props.db.db;
+
+    let timefrom;
+
+    return influxquery(
+      `
+			SELECT time,iv FROM "${encodeURIComponent(
+        this.props.measurementName
+      )}_iv" ORDER BY time ASC;`,
+      db,
+      this.props.db
+    ).then(async results => {
+      return results.map((results, index) => {
+        if (!results.series) {
+          return {};
+        }
+
+        if (index == 0) {
+          timefrom = new Date(results.series[0].values[0][0]);
+        }
+
+        return results.series[0].values.map(value => {
+          let date = new Date(value[0]),
+            data = value[1].split(','),
+            wave = Graph.newWaveform();
+
+          for (let i = 0; i < data.length - 1; i += 2) {
+            wave.append(
+              parseFloat(data[i].replace('"', '')),
+              parseFloat(data[i + 1].replace('"', ''))
+            );
+          }
+
+          return {
+            wave: wave,
+            time_h:
+              Math.round(
+                ((date.getTime() - timefrom.getTime()) / 1000 / 3600) * 10
+              ) / 10
+          };
+        });
+      });
+    });
+  }
+
+  async downloadPDF() {
+    ipcRenderer.send(
+      'htmlReport',
+      this.props.cellInfo,
+      this.props.chanId,
+      this.props.measurementName,
+      this.props.instrumentId
+    );
+  }
+
+  render() {
+    return (
+      <div className="container-fluid">
+        <form onSubmit={this.submit} className="form-horizontal">
+          <h4>
+            Download data for device "{this.props.cellInfo.cellName}"{' '}
+            {this.props.chanId && <span>( channel {this.props.chanId} )</span>}
+          </h4>
+
+          {this.state.error_track ? (
+            <div className="alert alert-warning">
+              <strong>
+                <span className="glyphicon glyphicon-warning" />
+              </strong>{' '}
+              Could not download tracking data. It could be that no data exists
+              in the database.
+            </div>
+          ) : null}
+          {this.state.error_jv ? (
+            <div className="alert alert-warning">
+              <strong>
+                <span className="glyphicon glyphicon-warning" />
+              </strong>{' '}
+              Could not download IV data. It could be that no data exists in the
+              database.
+            </div>
+          ) : null}
+          {this.state.error_vocjsc ? (
+            <div className="alert alert-warning">
+              <strong>
+                <span className="glyphicon glyphicon-warning" />
+              </strong>{' '}
+              Could not download Voc/Jsc data. It could be that no data exists
+              in the database.
+            </div>
+          ) : null}
+
+          <div className="form-group">
+            <label className="col-sm-3">Format</label>
+            <div className="col-sm-6">
+              <select
+                name="dl_format"
+                id="dl_format"
+                className="form-control"
+                value={this.state.dl_format}
+                onChange={this.handleInputChange}>
+                <option value="csv">Comma separated (.csv)</option>
+                <option value="itx">Igor text file (.itx)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="col-sm-3">Number of points</label>
+            <div className="col-sm-6">
+              <select
+                name="dl_track_nb"
+                id="dl_track_nb"
+                className="form-control"
+                value={this.state.dl_track_nb}
+                onChange={this.handleInputChange}>
+                <option value="100">100</option>
+                <option value="300">300</option>
+                <option value="1000">1000</option>
+                <option value="3000">3000</option>
+                <option value="10000">10000</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <div className="col-sm-3" />
+            <div className="col-sm-6">
+              <div className="btn-group">
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    this.makeDownload(true, false, false);
+                  }}>
+                  Download MPP
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    this.makeDownload(false, false, true);
+                  }}>
+                  Download Voc and Jsc
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    this.makeDownload(false, true, false);
+                  }}>
+                  Download JV
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    this.makeDownload(true, true, true);
+                  }}>
+                  Download All
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <div className="col-sm-3" />
+            <div className="col-sm-6">
+              <div className="btn-group">
+                <button
+                  className="btn btn-success"
+                  type="button"
+                  onClick={this.downloadPDF}>
+                  Make PDF report
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  name="update"
+                  onClick={this.close}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div className="btn-group pull-right" />
+      </div>
+    );
+  }
 }
 
 export default DownloadForm;
