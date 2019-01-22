@@ -2,3 +2,6 @@ release
 node_modules
 app/app
 app/node_modules
+app/config.json
+app/environment.json
+app/main.js
