@@ -131,6 +131,7 @@ class TrackerDevice extends React.Component {
     this.downloadData = this.downloadData.bind(this);
     this.autoZero = this.autoZero.bind(this);
 
+    this.details = this.details.bind(this);
     this.wsUpdate = this.wsUpdate.bind(this);
 
     //	this.formChanged = this.formChanged.bind( this );
@@ -357,6 +358,9 @@ class TrackerDevice extends React.Component {
     this.setState(newState);
   }
 
+  details() {
+    this.setState({ details: !this.state.details });
+  }
   saveStatus(newState) {
     return saveChannelStatus(this.props.config, newState);
   }
@@ -1060,7 +1064,8 @@ class TrackerDevice extends React.Component {
             'cl-device ' +
             (active ? 'cell-running' : 'cell-stopped') +
             ' show-details'
-          }>
+          }
+          style={this.state.details && active ? { height: '700px' } : {}}>
           <div className="col-lg-7">
             <div className="cell-name cell-main-info row">
               <div className="col-lg-9">
@@ -1441,6 +1446,13 @@ class TrackerDevice extends React.Component {
                 <button className="btn btn-cl" onClick={this.cfg}>
                   <span className="glyphicon glyphicon-cog" /> Configure
                 </button>
+                <button
+                  className={
+                    'btn btn-cl' + (this.state.details ? ' btn-active' : '')
+                  }
+                  onClick={this.details}>
+                  <span className="glyphicon glyphicon-stats" /> Detailed graphs
+                </button>
               </div>
             </div>
           </div>
@@ -1459,20 +1471,23 @@ class TrackerDevice extends React.Component {
               updatedTime={this.state.influxTime}
             />
           </div>
-
-          <div className="col-lg-9">
-            <CellDetailedGraphs
-              voltage={this.state.data_voltage}
-              current={this.state.data_current}
-              pce={this.state.data_pce}
-              vocs={this.state.vocs}
-              jscs={this.state.jscs}
-              //ff={this.state.ff }
-              power={this.state.power}
-              ivData={this.state.iv_values}
-              width="920"
-              height="100"
-            />
+          <div>
+            {this.state.details && (
+              <div className="col-lg-9">
+                <CellDetailedGraphs
+                  voltage={this.state.data_voltage}
+                  current={this.state.data_current}
+                  pce={this.state.data_pce}
+                  vocs={this.state.vocs}
+                  jscs={this.state.jscs}
+                  //ff={this.state.ff }
+                  power={this.state.power}
+                  ivData={this.state.iv_values}
+                  width="920"
+                  height="100"
+                />
+              </div>
+            )}
           </div>
         </div>
       );

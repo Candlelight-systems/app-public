@@ -14,12 +14,13 @@ class DetailedGraphs extends React.PureComponent {
   }
 
   componentDidMount() {
-    const axisWidth = 60;
+    const axisWidth = 40;
 
     const opts = {
-      paddingTop: 5,
+      paddingTop: 2,
       paddingBottom: 0
     };
+
     const legendOptions = {
       paddingLeft: 5,
       paddingRight: 5,
@@ -38,11 +39,7 @@ class DetailedGraphs extends React.PureComponent {
       .setUnit('%')
       .forceWidth(axisWidth)
       .setUnitWrapper('(', ')');
-    this.graphs.pce
-      .getBottomAxis()
-      .setLabel('Time')
-      .setUnit('h')
-      .setUnitWrapper('(', ')');
+    this.graphs.pce.getBottomAxis({ hideTicks: true });
 
     this.graphs.v = new Graph(this.graphVoltage, opts);
 
@@ -52,11 +49,7 @@ class DetailedGraphs extends React.PureComponent {
       .setUnit('V')
       .forceWidth(axisWidth)
       .setUnitWrapper('(', ')');
-    this.graphs.v
-      .getBottomAxis()
-      .setLabel('Time')
-      .setUnit('h')
-      .setUnitWrapper('(', ')');
+    this.graphs.v.getBottomAxis({ hideTicks: true });
 
     this.graphs.j = new Graph(this.graphCurrent, opts);
 
@@ -66,12 +59,9 @@ class DetailedGraphs extends React.PureComponent {
       .setUnit('A')
       .forceWidth(axisWidth)
       .setUnitDecade(true)
+      .setScientific(true)
       .setUnitWrapper('(', ')');
-    this.graphs.j
-      .getBottomAxis()
-      .setLabel('Time')
-      .setUnit('h')
-      .setUnitWrapper('(', ')');
+    this.graphs.j.getBottomAxis({ hideTicks: true });
 
     this.graphs.jvFF = new Graph(this.graphJVFF, opts);
 
@@ -138,6 +128,7 @@ class DetailedGraphs extends React.PureComponent {
 
     this.graph.getYAxis().forceMin(0);
 */
+    this.setAllData();
   }
 
   makeSeries(graph, labels) {
@@ -164,6 +155,10 @@ class DetailedGraphs extends React.PureComponent {
   }
 
   componentDidUpdate() {
+    this.setAllData();
+  }
+
+  setAllData() {
     if (!this.props.ivData) {
       return;
     }
@@ -187,6 +182,7 @@ class DetailedGraphs extends React.PureComponent {
     for (var i in this.graphs) {
       this.graphs[i].autoscaleAxes();
       this.graphs[i].draw();
+      this.graphs[i].updateLegend();
     }
   }
 
