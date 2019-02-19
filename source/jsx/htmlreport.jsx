@@ -570,8 +570,7 @@ class HTMLReport extends React.Component {
 				.setUnitDecade( true )
 				.setColor( colors.current )
 				.setUnitWrapper("(", ")")
-				.setSpan( 0.5, 0.7 )
-				.forceMin( 0 );
+				.setSpan( 0.5, 0.7 );
 
 
 		axis['v'] = g.getRightAxis( 1 )
@@ -581,8 +580,7 @@ class HTMLReport extends React.Component {
 				.setColor( colors.voltage )
 				.setUnitDecade( true )
 				.setUnitWrapper("(", ")")
-				.setSpan( 0.5, 0.7 )
-				.forceMin( 0 );
+				.setSpan( 0.5, 0.7 );
 
 
 		axis['jsc'] = g.getRightAxis( 2 )
@@ -593,8 +591,7 @@ class HTMLReport extends React.Component {
 				.setUnitDecade( true )
 				.setColor( colors.jsc )
 				.setUnitWrapper("(", ")")
-				.setSpan( 0.25, 0.45 )
-				.forceMin( 0 );
+				.setSpan( 0.25, 0.45 );
 
 		axis['voc'] = g.getRightAxis( 3 )
 				.setLabel("Open circuit voltage")
@@ -603,8 +600,7 @@ class HTMLReport extends React.Component {
 				.setUnitDecade( true )
 				.setColor( colors.voc )
 				.setUnitWrapper("(", ")")
-				.setSpan( 0.25, 0.45 )
-				.forceMin( 0 );
+				.setSpan( 0.25, 0.45 );
 
 		axis['ff'] = g.getLeftAxis( 2 )
 				.setLabel("Fill factor")
@@ -942,8 +938,10 @@ class HTMLReport extends React.Component {
 		} catch( e ) {
 			console.warn( e );
 		}
-
-		this.data.ff = this.data.power.duplicate().divide( this.data.voc.duplicate().multiply( this.data.jsc ) ).multiply( 100 );
+console.log( this.data );
+		if( this.data.power ) {
+			this.data.ff = this.data.power.duplicate().divide( this.data.voc.duplicate( true ).multiply( this.data.jsc ) ).multiply( 100 );
+		}
 
 		while( this.domJV.firstChild ) {
 			this.domJV.removeChild( this.domJV.firstChild );

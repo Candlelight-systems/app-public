@@ -168,12 +168,15 @@ class DetailedGraphs extends React.PureComponent {
       jvPCE = Graph.newWaveform();
 
     this.props.ivData.forEach(data => {
-      jvJscs.append(data[0], data[2].jsc);
-      jvVocs.append(data[0], data[2].voc);
-      jvPCE.append(data[0], data[2].pce);
-      jvFF.append(data[0], data[2].ff);
-    });
+      if (!isNaN(data[2].isc)) jvJscs.append(data[0], data[2].isc / 1000);
 
+      if (!isNaN(data[2].voc)) jvVocs.append(data[0], data[2].voc);
+
+      if (!isNaN(data[2].pce)) jvPCE.append(data[0], data[2].pce);
+
+      if (!isNaN(data[2].ff)) jvFF.append(data[0], data[2].ff);
+    });
+    console.log(this.props.pce);
     this.setData(this.graphs.pce, [this.props.pce, jvPCE]);
     this.setData(this.graphs.j, [this.props.current, jvJscs, this.props.jscs]);
     this.setData(this.graphs.v, [this.props.voltage, jvVocs, this.props.vocs]);

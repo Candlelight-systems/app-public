@@ -64,14 +64,14 @@ function round(value, digits) {
   return Math.round(value * 10 ** digits) / 10 ** digits;
 }
 
-const zeroSerieTime = (serie, indexTimestamp = 0) => {
-  let date, time, timeRef;
+const zeroSerieTime = (serie, indexTimestamp = 0, timeRef) => {
+  let date, time;
 
   serie.forEach((serieElement, index) => {
     date = new Date(serieElement[indexTimestamp]);
     time = date.getTime();
 
-    if (index == 0) {
+    if (index == 0 && timeRef === undefined) {
       timeRef = time;
       serieElement[indexTimestamp] = 0;
       return;
@@ -718,7 +718,11 @@ class TrackerDevice extends React.Component {
           }
 
           results[3].series[0].values.reverse();
-          zeroSerieTime(results[3].series[0].values);
+          zeroSerieTime(
+            results[3].series[0].values,
+            0,
+            timefrom_date.getTime()
+          );
           populateWaveformWithData(newState.vocs, results[3].series[0].values);
         }
 
@@ -729,11 +733,14 @@ class TrackerDevice extends React.Component {
           }
 
           results[4].series[0].values.reverse();
-          zeroSerieTime(results[4].series[0].values);
+          zeroSerieTime(
+            results[4].series[0].values,
+            0,
+            timefrom_date.getTime()
+          );
           populateWaveformWithData(newState.jscs, results[4].series[0].values);
         }
 
-        console.log(newState.jscs, newState.vocs);
         //console.log( results[ 1 ].series[ 0 ].values[ 0 ][ 1 ] );
         if (
           results[1].series[0].values[0][1] == -1 ||
@@ -748,7 +755,7 @@ class TrackerDevice extends React.Component {
           parameter +
           ') as param, MAX(' +
           parameter +
-          ') as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean, MEAN( pce ) as effMean  FROM "' +
+          ') as maxEff, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN( sun ) as sMean, MEAN( temperature_junction ) as tMean, MEAN( humidity ) as hMean, MEAN( power_mean ) as pMean, MEAN( efficiency ) as effMean  FROM "' +
           encodeURIComponent(serverState.measurementName) +
           '" WHERE time >= \'' +
           timefrom +
@@ -840,6 +847,7 @@ class TrackerDevice extends React.Component {
               }
 
               wave.append(time, value[valueIndex]);
+
               wavePCE.append(time, value[9]);
               waveVoltage.append(time, value[3]);
               waveCurrent.append(time, value[4]);
@@ -893,7 +901,7 @@ class TrackerDevice extends React.Component {
             newState.data_temperature = waveTemperature;
             newState.data_humidity = waveHumidity;
             newState.data_IV = waveIV;
-
+            console.log(wavePCE);
             newState.data_pce = wavePCE;
             newState.data_voltage = waveVoltage;
             newState.data_current = waveCurrent;

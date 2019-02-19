@@ -105,7 +105,7 @@ class LightStatus extends React.Component {
     }
 
     let button_uv_set = null;
-    if( this.state.lightUVSetpoint ) {
+    if( this.state.lightUVSetpoint !== null && ! isNaN( this.state.lightUVSetpoint ) ) {
       button_uv_set = <button className="btn btn-cl btn-default btn-small" onClick= { this.light_controller_setuv } >Apply UV intensity</button>
     }
 

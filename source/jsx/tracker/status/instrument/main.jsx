@@ -45,9 +45,22 @@ class InstrumentStatus extends React.Component {
 		this.restartSoftware = this.restartSoftware.bind( this );
 		this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind( this );
 		this.autoZero = this.autoZero.bind( this );
+
+		this.wsUpdate = this.wsUpdate.bind( this );
 	}
 
+
+  componentWillUnmount() {
+    ipcRenderer.removeListener("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );  
+  }
+
+  wsUpdate( event, data ) {
+    this.setState( data.data );
+  }
+
 	componentDidMount() {
+
+		ipcRenderer.on("group.update." + this.props.instrumentId + "." + this.props.name, this.wsUpdate );
 
 		switch( environment.instrument[ this.props.instrumentId ].ADC.model ) {
 
@@ -78,7 +91,7 @@ class InstrumentStatus extends React.Component {
 		await this.props.update();
 	}
 
-    togglePause() {
+  togglePause() {
 
       let url;
 	    if( this.state.paused ) {
@@ -98,7 +111,6 @@ class InstrumentStatus extends React.Component {
 		if( ! environment.instrument[ this.props.instrumentId ].groups[ this.props.name ] ) {
 			return ( <div className="alert alert-danger">Instrument could not be found in software config. Expecting "{ this.props.name }". Available: { Object.keys( environment.instrument[ this.props.instrumentId ].groups ).join(", ") }.  </div> );
 		}
-
 		return ( 
 
 		<div className="col-lg-2 group-status group-status-instrument">

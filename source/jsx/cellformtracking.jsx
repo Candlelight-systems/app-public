@@ -116,11 +116,11 @@ class CellFormTracking extends React.Component {
 					<label htmlFor="tracking_step" className="col-sm-3">Tracking step</label>
 					<div className="col-sm-9">
 						<select name="tracking_stepsize" id="tracking_stepsize" className="form-control" value={this.props.tracking_step} onChange={this.handleInputChange}>
-								<option key="mv1" value={ LSBVal * 1 }>{ LSB * 1 } mV</option>
-								<option key="mv2" value={ LSBVal * 2 }>{ LSB * 2 } mV</option>
-								<option key="mv3" value={ LSBVal * 3 }>{ LSB * 3 } mV</option>
-								<option key="mv4" value={ LSBVal * 4 }>{ LSB * 4 } mV</option>
-								<option key="mv5" value={ LSBVal * 5 }>{ LSB * 5 } mV</option>
+								<option key="mv1" value={ LSBVal * 1 }>{ Math.round( LSB * 1 * 100 ) / 100 } mV</option>
+								<option key="mv2" value={ LSBVal * 2 }>{ Math.round( LSB * 2 * 100 ) / 100 } mV</option>
+								<option key="mv3" value={ LSBVal * 3 }>{ Math.round( LSB * 3 * 100 ) / 100 } mV</option>
+								<option key="mv4" value={ LSBVal * 4 }>{ Math.round( LSB * 4 * 100 ) / 100 } mV</option>
+								<option key="mv5" value={ LSBVal * 5 }>{ Math.round( LSB * 5 * 100 ) / 100 } mV</option>
 						</select>
 					</div>
 				</div>
