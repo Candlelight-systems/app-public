@@ -104,8 +104,8 @@ class LightStatus extends React.Component {
                   <span className="grey">
                     <em>
                       <small>
-                        <span className="glyphicon glyphicon-danger" />The light
-                        switch is off. Push it to turn the light on.
+                        <span className="glyphicon glyphicon-danger" />
+                        The light switch is off. Push it to turn the light on.
                       </small>
                     </em>
                   </span>
@@ -146,6 +146,18 @@ class LightStatus extends React.Component {
                     ? 0
                     : this.state.lightValue.toPrecision(3)}{' '}
                   sun
+                </div>
+              </div>
+            ) : null}
+
+            {this.state.lightTemperature ? (
+              <div className="row">
+                <div className="col-lg-5">
+                  <span className="grey">LED temperature:</span>
+                </div>
+                <div className="col-lg-4">
+                  {this.state.lightTemperature}
+                  °C
                 </div>
               </div>
             ) : null}
