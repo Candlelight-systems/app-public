@@ -17,6 +17,7 @@ class DownloadForm extends React.Component {
     this.close = this.close.bind(this);
     this.state = {
       dl_format: 'itx',
+      dl_track_nb: 100,
       error_track: false,
       error_vocjs: false,
       error_jv: false
@@ -295,19 +296,24 @@ class DownloadForm extends React.Component {
 
       let timefrom = results[0].series[0].values[0][0],
         timeto = results[1].series[0].values[0][0],
-        timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000,
-        grouping = Math.max(1, Math.round(timeDifference / 1000));
+        timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000;
+
+let query;
+      if( this.state.dl_track_nb == 'all' ) {
+
+        query = `SELECT efficiency, voltage_mean, current_mean, humidity, sun, temperature_junction, efficiency, power_mean, temperature_base FROM
+        "${ encodeURIComponent(this.props.measurementName) }"
+        WHERE time >= '${ timefrom }' and time <= '${ timeto }' ORDER BY time ASC`;
+
+      } else {
+        const grouping = Math.max(1, Math.round(timeDifference / parseInt( this.state.dl_track_nb ) ) );
+        query = `SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM
+        "${ encodeURIComponent(this.props.measurementName) }"
+        WHERE time >= '${ timefrom }' and time <= '${ timeto }' GROUP BY time(${ grouping }s) FILL(none) ORDER BY time ASC`;
+      }
 
       let toReturn = await influxquery(
-        'SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM "' +
-          encodeURIComponent(this.props.measurementName) +
-          '" WHERE time >= \'' +
-          timefrom +
-          "' and time <= '" +
-          timeto +
-          "'  GROUP BY time(" +
-          grouping +
-          's) FILL(none) ORDER BY time ASC;',
+        query,
         db,
         this.props.db
       ).then(results => {
@@ -619,6 +625,7 @@ class DownloadForm extends React.Component {
                 <option value="1000">1000</option>
                 <option value="3000">3000</option>
                 <option value="10000">10000</option>
+                <option value="all">All</option>
               </select>
             </div>
           </div>

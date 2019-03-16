@@ -1088,8 +1088,8 @@ class TrackerDevice extends React.Component {
                 <span className="label">
                   <span className="glyphicon glyphicon-tags" />
                 </span>
-                <span className="value">{this.state.serverState.cellName}</span>{' '}
-                {this.state.serverState.cellArea ? (
+                <span className="value"><span>#{this.props.chanId} :</span> {this.state.serverState.cellName}</span>{' '}
+                 {this.state.serverState.cellArea ? (
                   <span className="cell-area">
                     ( {this.state.serverState.cellArea} cm<sup>2</sup> )
                   </span>
