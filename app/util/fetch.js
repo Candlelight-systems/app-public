@@ -1,4 +1,3 @@
-
 export function postJSON(url, data) {
   // Default options are marked with *
   return fetch(url, {
@@ -6,7 +5,10 @@ export function postJSON(url, data) {
     headers: {
       'content-type': 'application/json'
     },
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-  })
-  .then(response => response.json()) // parses response to JSON
+    method: 'POST' // *GET, POST, PUT, DELETE, etc.
+  }).then(response => response.json()); // parses response to JSON
+}
+
+export function buildTrackerURL(data, method = undefined) {
+  return `http://${data.trackerHost}:${data.trackerPort}/${method || ''}`;
 }

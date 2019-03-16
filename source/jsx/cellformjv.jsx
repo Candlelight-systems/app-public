@@ -1,6 +1,6 @@
 import React from 'react';
 
-class CellFormTracking extends React.Component {
+class CellFormJV extends React.Component {
   constructor(props) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -283,4 +283,4 @@ class CellFormTracking extends React.Component {
   }
 }
 
-export default CellFormTracking;
+export default CellFormJV;

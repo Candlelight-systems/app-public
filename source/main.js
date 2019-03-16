@@ -880,6 +880,7 @@ async function configChannel(event, data) {
     null,
     'cellform',
     {
+      tracker: data,
       instrumentConfig: instrumentConfig,
       groupName: data.groupName,
       channelConfig: channelConfig,
@@ -935,6 +936,7 @@ async function configChannels(event, data) {
     null,
     'cellformall',
     {
+      tracker: data,
       channelState: channelState[data.groupName].channels[data.chanIds[0]],
       channelsState: channelsState[data.groupName].channels,
       groupName: data.groupName,
