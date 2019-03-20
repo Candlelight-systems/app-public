@@ -1039,13 +1039,15 @@ class TrackerDevice extends React.Component {
     const jsc_currentdensity = this.processCurrent(this.state.jsc);
 
     if (
+      !instrumentEnvironment[this.props.instrumentId] ||
       !instrumentEnvironment[this.props.instrumentId].groups[
         this.props.groupName
       ]
     ) {
       return (
         <div className="alert alert-danger">
-          Group could not be found in software config. Expecting "
+          Instrument or Group could not be found in software config. Expecting
+          Instrument "{this.props.instrumentId}" and Group "
           {this.props.groupName}"
         </div>
       );
@@ -1088,8 +1090,11 @@ class TrackerDevice extends React.Component {
                 <span className="label">
                   <span className="glyphicon glyphicon-tags" />
                 </span>
-                <span className="value"><span>#{this.props.chanId} :</span> {this.state.serverState.cellName}</span>{' '}
-                 {this.state.serverState.cellArea ? (
+                <span className="value">
+                  <span>#{this.props.chanId} :</span>{' '}
+                  {this.state.serverState.cellName}
+                </span>{' '}
+                {this.state.serverState.cellArea ? (
                   <span className="cell-area">
                     ( {this.state.serverState.cellArea} cm<sup>2</sup> )
                   </span>

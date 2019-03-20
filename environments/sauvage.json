@@ -4,10 +4,7 @@
 
     "statuses": {
       "light": {
-        "version": "2.0"
-      },
-      "heat": {
-        "version": "ssr_1.0"
+        "version": "readonly"
       }
     },
 
@@ -23,7 +20,7 @@
         "voltageRange": 2.5,
         "autoZero": "instrument",
         "groups": {
-          "Sample holder": {
+          "Top": {
             "resettable": false,
 
             "displayDeviceInformation": {
@@ -36,8 +33,27 @@
               "ff": true,
               "vnow": true,
               "jnow": true,
-              "temperature": true,
-              "humidity": true,
+              "temperature": false,
+              "humidity": false,
+              "kwh_yr": false
+            }
+          },
+
+          "Bottom": {
+            "resettable": false,
+
+            "displayDeviceInformation": {
+              "time_ellapsed": true,
+              "pce": true,
+              "power": false,
+              "sun": true,
+              "voc": true,
+              "jsc": true,
+              "ff": true,
+              "vnow": true,
+              "jnow": true,
+              "temperature": false,
+              "humidity": false,
               "kwh_yr": false
             }
           }
