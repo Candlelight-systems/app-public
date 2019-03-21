@@ -2,7 +2,7 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 import environment from '../../../../../app/environment.json';
 import urllib from 'url-lib';
-import { autoZero } from '../../../../queries';
+import { autoZero, autoZeroMaster } from '../../../../queries';
 
 //import { default as InstrumentStatus_1_0 } from "./instrumentstatus_1.0.jsx"
 
@@ -40,6 +40,7 @@ class InstrumentStatus extends React.Component {
     this.restartSoftware = this.restartSoftware.bind(this);
     this.changeAcquisitionSpeed = this.changeAcquisitionSpeed.bind(this);
     this.autoZero = this.autoZero.bind(this);
+    this.autoZeroMaster = this.autoZeroMaster.bind(this);
 
     this.wsUpdate = this.wsUpdate.bind(this);
   }
@@ -79,6 +80,10 @@ class InstrumentStatus extends React.Component {
 
   async autoZero(event) {
     await autoZero(this.props.config, this.props.instrumentId);
+  }
+
+  async autoZeroMaster(event) {
+    await autoZeroMaster(this.props.config, this.props.instrumentId);
   }
 
   async changeAcquisitionSpeed(event) {
@@ -250,6 +255,12 @@ class InstrumentStatus extends React.Component {
                 className="btn btn-cl btn-default btn-sm"
                 onClick={this.autoZero}>
                 <span>Auto-zero</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-cl btn-default btn-sm"
+                onClick={this.autoZeroMaster}>
+                <span>Master Auto-zero</span>
               </button>
             </div>
             <div className="col-lg-4" />
