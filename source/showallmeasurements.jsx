@@ -125,7 +125,7 @@ async function render() {
     }
 
     jsonArray.sort((a, b) => {
-      return a.startDate - b.startDate;
+      return b.startDate - a.startDate;
     });
 
     let tracking;
