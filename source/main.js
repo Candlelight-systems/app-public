@@ -1,94 +1,99 @@
-const electron = require('electron');
-const { Menu, ipcMain, dialog } = require('electron');
+const electron = require("electron");
+const { Menu, ipcMain, dialog } = require("electron");
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
-const path = require('path');
-const url = require('url');
-const fs = require('fs');
-const request = require('request-promise-native');
-const fix = require('fix-path');
-const fetch = require('node-fetch');
-const WebSocket = require('ws');
-const environment = require('./environment.json');
-const diagnostics = require('./app/scripts/diagnostics');
-const { openForm, sendToForm } = require('./app/util/windows.js');
+const path = require("path");
+const url = require("url");
+const fs = require("fs");
+const request = require("request-promise-native");
+const fix = require("fix-path");
+const fetch = require("node-fetch");
+const WebSocket = require("ws");
+const environment = require("./environment.json");
+const diagnostics = require("./app/scripts/diagnostics");
+const { openForm, sendToForm } = require("./app/util/windows.js");
 fix();
 
 let currentInstrument;
+const { reportError } = require("../app/util/errorhandling");
 
-const configPath = path.join(
-  __dirname.replace('app.asar', 'app.asar.unpacked'),
-  '/config.json'
-);
-let config = JSON.parse(fs.readFileSync(configPath));
+const { config, saveConfig } = require("../app/util/config");
 
 let windows = {};
 
-ipcMain.on('addInstrument', addInstrument);
-ipcMain.on('editInstrument', editInstrument);
-ipcMain.on('removeInstrument', removeInstrument);
-ipcMain.on('loadInstrument', loadInstrument);
+ipcMain.on("addInstrument", addInstrument);
+ipcMain.on("editInstrument", editInstrument);
+ipcMain.on("removeInstrument", removeInstrument);
+ipcMain.on("loadInstrument", loadInstrument);
 
-ipcMain.on('editInfluxDB', editInfluxDB);
-ipcMain.on('updateInfluxDB', updateInfluxDB);
-ipcMain.on('downloadData', downloadData);
-ipcMain.on('htmlReport', htmlReport);
+ipcMain.on("editInfluxDB", editInfluxDB);
+ipcMain.on("updateInfluxDB", updateInfluxDB);
+ipcMain.on("downloadData", downloadData);
+ipcMain.on("htmlReport", htmlReport);
 
-ipcMain.on('configChannel', configChannel);
-ipcMain.on('configChannels', configChannels);
-ipcMain.on('mppt', openMPPT);
-ipcMain.on('bugReport', openBugReport);
-ipcMain.on('calibratePD', openCalibratePD);
-ipcMain.on('calibratePyranometer', openCalibratePyranometer);
-ipcMain.on('scheduleLight', openScheduleLight);
+ipcMain.on("configChannel", configChannel);
+ipcMain.on("configChannels", configChannels);
+ipcMain.on("mppt", openMPPT);
+ipcMain.on("bugReport", openBugReport);
+ipcMain.on("calibratePD", openCalibratePD);
+ipcMain.on("calibratePyranometer", openCalibratePyranometer);
+ipcMain.on("scheduleLight", openScheduleLight);
 
-ipcMain.on('reportError', reportError);
+ipcMain.on("reportError", reportError);
 
-ipcMain.on('get-config', (event, arg) => {
-  event.sender.send('get-config', config);
+ipcMain.on("get-config", (event, arg) => {
+  event.sender.send("get-config", config);
+});
+
+ipcMain.on("set-preference", (event, arg) => {
+  setPreference( arg.name, arg.value );
+});
+
+ipcMain.on("save-config", () => {
+  saveConfig();
 });
 
 function makeInstrumentMenu() {
   return {
-    label: 'Instrument',
+    label: "Instrument",
     submenu: [
       {
-        label: 'Diagnostics',
+        label: "Diagnostics",
         click() {
           diagnostics.openDiagnostics(currentInstrument);
         }
       },
       {
-        label: 'Add a new instrument',
+        label: "Add a new instrument",
         click() {
           addInstrument();
         }
       },
       {
-        label: 'Edit instrument',
+        label: "Edit instrument",
         click() {
           editInstrument(currentInstrument);
         }
       },
       {
-        label: 'Edit database config',
+        label: "Edit database config",
         click() {
           editInfluxDB();
         }
       },
       {
-        label: 'Show all measurements',
+        label: "Show all measurements",
         click() {
           showAllMeasurements(currentInstrument);
         }
       },
-      { type: 'separator' },
-      { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
-      { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
-      { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+      { type: "separator" },
+      { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+      { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+      { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
 
       ...config.instruments.map(instrument => {
         return {
@@ -105,30 +110,30 @@ function makeInstrumentMenu() {
 
 function openSocket(instrumentConfig) {
   const ws = new WebSocket(
-    'ws://' +
+    "ws://" +
       instrumentConfig.trackerHost +
-      ':' +
+      ":" +
       instrumentConfig.trackerPortWS
   );
 
-  ws.on('open', function open() {
-    console.log('Socket is open');
+  ws.on("open", function open() {
+    console.log("Socket is open");
   });
 
-  ws.on('close', function open() {
-    console.log('Socket is closed');
+  ws.on("close", function open() {
+    console.log("Socket is closed");
     setTimeout(() => openSocket(instrumentConfig), 1000);
   });
 
-  ws.on('error', function error(err) {
-    console.log('Socket is in error state: ' + error.code);
+  ws.on("error", function error(err) {
+    console.log("Socket is in error state: " + error.code);
   });
 
-  ws.removeAllListeners('message');
-  ws.on('message', wsIncoming);
+  ws.removeAllListeners("message");
+  ws.on("message", wsIncoming);
 
   ws.isAlive = true;
-  ws.on('pong', () => (ws.isAlive = true));
+  ws.on("pong", () => (ws.isAlive = true));
 
   var socketTimeout = () => {
     let interval = setInterval(() => {
@@ -151,20 +156,20 @@ function openSocket(instrumentConfig) {
 function wsIncoming(data) {
   data = JSON.parse(data);
 
-  if (!data.instrumentId && windows['instrumentMain']) {
-    windows['instrumentMain'].webContents.send(`instrument.log`, data.log);
+  if (!data.instrumentId && windows["instrumentMain"]) {
+    windows["instrumentMain"].webContents.send(`instrument.log`, data.log);
   }
 
-  if (data.instrumentId && windows['instrumentMain']) {
+  if (data.instrumentId && windows["instrumentMain"]) {
     if (data.chanId) {
-      windows['instrumentMain'].webContents.send(
+      windows["instrumentMain"].webContents.send(
         `channel.update.${data.instrumentId}.${data.chanId}`,
         data
       );
     }
 
     if (data.groupName) {
-      windows['instrumentMain'].webContents.send(
+      windows["instrumentMain"].webContents.send(
         `group.update.${data.instrumentId}.${data.groupName}`,
         data
       );
@@ -172,7 +177,7 @@ function wsIncoming(data) {
 
     if (data.log) {
       data.log.time = Date.now();
-      windows['instrumentMain'].webContents.send(
+      windows["instrumentMain"].webContents.send(
         `instrument.log.${data.instrumentId}`,
         data.log
       );
@@ -192,20 +197,20 @@ function doMenu() {
   template.unshift({
     label: app.getName(),
     submenu: [
-      { role: 'about' },
-      { type: 'separator' },
-      { role: 'services', submenu: [] },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      { role: 'quit' }
+      { role: "about" },
+      { type: "separator" },
+      { role: "services", submenu: [] },
+      { type: "separator" },
+      { role: "hide" },
+      { role: "hideothers" },
+      { role: "unhide" },
+      { type: "separator" },
+      { role: "quit" }
     ]
   });
 
-  if (process.env.NODE_ENV == 'development') {
-    template[0].submenu.push({ role: 'toggledevtools' });
+  if (process.env.NODE_ENV == "development") {
+    template[0].submenu.push({ role: "toggledevtools" });
   }
   //}
 
@@ -213,43 +218,29 @@ function doMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-function saveConfig() {
-  return new Promise((resolver, rejecter) => {
-    fs.writeFile(configPath, JSON.stringify(config, undefined, '\t'), error => {
-      if (error) {
-        reportError(error);
-        rejecter(error);
-      } else {
-        config = JSON.parse(fs.readFileSync(configPath));
-        resolver();
-      }
-    });
-  });
-}
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
 function createMainWindow() {
   // Create the browser window.
-  windows['instrumentList'] = new BrowserWindow({
+  windows["instrumentList"] = new BrowserWindow({
     width: 800,
     height: 700,
     resizable: false
   });
 
-  windows['instrumentList'].webContents.once('dom-ready', () => {
-    windows['instrumentList'].webContents.send(
-      'dbInformation',
+  windows["instrumentList"].webContents.once("dom-ready", () => {
+    windows["instrumentList"].webContents.send(
+      "dbInformation",
       config.database
     );
   });
 
   // and load the index.html of the app.
-  windows['instrumentList'].loadURL(
+  windows["instrumentList"].loadURL(
     url.format({
-      pathname: path.join(__dirname, 'app/instrumentlist.html'),
-      protocol: 'file:',
+      pathname: path.join(__dirname, "app/instrumentlist.html"),
+      protocol: "file:",
       slashes: true
     })
   );
@@ -258,11 +249,11 @@ function createMainWindow() {
   // windows[ 'instrumentList' ].webContents.openDevTools()
 
   // Emitted when the window is closed.
-  windows['instrumentList'].on('closed', function() {
+  windows["instrumentList"].on("closed", function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    windows['instrumentList'] = null;
+    windows["instrumentList"] = null;
   });
 
   doMenu();
@@ -271,21 +262,21 @@ function createMainWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createMainWindow);
+app.on("ready", createMainWindow);
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on("window-all-closed", function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.on('activate', function() {
+app.on("activate", function() {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (windows['instrumentList'] === null) {
+  if (windows["instrumentList"] === null) {
     createMainWindow();
   }
 });
@@ -302,7 +293,7 @@ async function downloadData(
       tracker.trackerPort
     }/getMeasurement?measurementName=${measurementName}`,
     {
-      method: 'GET'
+      method: "GET"
     }
   )
     .then(response => response.json())
@@ -314,13 +305,14 @@ async function downloadData(
 
   openForm(
     null,
-    'downloadform',
+    "downloadform",
     {
       measurementName: measurementName,
       db: config.database,
       cellInfo: json.cellInfo,
       chanId: chanId,
-      instrumentId: instrumentId
+      instrumentId: instrumentId,
+      defaultPath = getPreference( "defaultSavePath" )
     },
     {
       width: 850,
@@ -340,37 +332,37 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
   let listenerConfig, listenerSavePDF /*, listenerPrintPDF*/;
 
   ipcMain.on(
-    'htmlReport.config',
+    "htmlReport.config",
     (listenerConfig = (event, data) => {
-      if (!windows['htmlReport']) {
+      if (!windows["htmlReport"]) {
         return;
       }
 
-      windows['htmlReport'].webContents.send('config', data);
+      windows["htmlReport"].webContents.send("config", data);
     })
   );
 
   ipcMain.on(
-    'htmlReport.savePDF',
+    "htmlReport.savePDF",
     (listenerSavePDF = (event, data) => {
-      if (!windows['htmlReport']) {
+      if (!windows["htmlReport"]) {
         return;
       }
 
       dialog.showSaveDialog(
         {
-          message: 'Save the report for device ' + data.cellName,
-          defaultPath: '~/' + data.cellName + '.pdf'
+          message: "Save the report for device " + data.cellName,
+          defaultPath: "~/" + data.cellName + ".pdf"
         },
         fileName => {
           if (!fileName) {
             return;
           }
 
-          windows['htmlReport'].webContents.printToPDF(
+          windows["htmlReport"].webContents.printToPDF(
             {
               marginsType: 1,
-              pageSize: 'A4',
+              pageSize: "A4",
               landscape: true
             },
             (err, data) => {
@@ -410,7 +402,7 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
 */
   openForm(
     null,
-    'htmlreport_control',
+    "htmlreport_control",
     {
       measurementName: measurementName,
       db: config.database,
@@ -426,13 +418,13 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
       resizable: false
     },
     () => {
-      ipcMain.removeListener('htmlReport.config', listenerConfig);
-      ipcMain.removeListener('htmlReport.savePDF', listenerSavePDF);
+      ipcMain.removeListener("htmlReport.config", listenerConfig);
+      ipcMain.removeListener("htmlReport.savePDF", listenerSavePDF);
       //     ipcMain.removeListener( "htmlReport.printPDF", listenerPrintPDF );
     }
   );
 
-  windows['htmlReport'] = new BrowserWindow({
+  windows["htmlReport"] = new BrowserWindow({
     width: 1122,
     height: 795,
     x: 500,
@@ -441,8 +433,8 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
     resizable: false
   });
 
-  windows['htmlReport'].webContents.once('dom-ready', () => {
-    windows['htmlReport'].webContents.send('loadData', {
+  windows["htmlReport"].webContents.once("dom-ready", () => {
+    windows["htmlReport"].webContents.send("loadData", {
       measurementName: measurementName,
       db: config.database,
       cellInfo: cellInfo,
@@ -451,10 +443,10 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
     });
   });
   // and load the index.html of the app.
-  windows['htmlReport'].loadURL(
+  windows["htmlReport"].loadURL(
     url.format({
-      pathname: path.join(__dirname, 'app/htmlreport.html'),
-      protocol: 'file:',
+      pathname: path.join(__dirname, "app/htmlreport.html"),
+      protocol: "file:",
       slashes: true
     })
   );
@@ -463,7 +455,7 @@ function htmlReport(event, cellInfo, chanId, measurementName, instrumentId) {
 function openBugReport(event) {
   openForm(
     null,
-    'bugreport',
+    "bugreport",
     {},
     {
       width: 540,
@@ -474,17 +466,17 @@ function openBugReport(event) {
 }
 
 function openMPPT(keithleyModel) {
-  windows['mppt'] = new BrowserWindow({
+  windows["mppt"] = new BrowserWindow({
     width: 1400,
     height: 1024,
     center: true,
     resizable: false
   });
   // and load the index.html of the app.
-  windows['mppt'].loadURL(
+  windows["mppt"].loadURL(
     url.format({
-      pathname: path.join(__dirname, 'app/mppt.html'),
-      protocol: 'file:',
+      pathname: path.join(__dirname, "app/mppt.html"),
+      protocol: "file:",
       slashes: true
     })
   );
@@ -493,7 +485,7 @@ function openMPPT(keithleyModel) {
 async function openCalibratePD(event, data) {
   openForm(
     null,
-    'calibratepd',
+    "calibratepd",
     {
       instrumentId: data.instrumentId,
       groupName: data.groupName,
@@ -506,15 +498,15 @@ async function openCalibratePD(event, data) {
     },
     async () => {
       var channelConfig = await fetch(
-        'http://' +
+        "http://" +
           data.config.trackerHost +
-          ':' +
+          ":" +
           data.config.trackerPort +
-          '/resetAllChannels?instrumentId=' +
+          "/resetAllChannels?instrumentId=" +
           data.instrumentId +
-          '&groupName=' +
+          "&groupName=" +
           data.groupName,
-        { method: 'GET' }
+        { method: "GET" }
       ).then(response => response.json());
     }
   );
@@ -523,7 +515,7 @@ async function openCalibratePD(event, data) {
 async function openCalibratePyranometer(event, data) {
   openForm(
     null,
-    'calibratepyranometer',
+    "calibratepyranometer",
     {
       instrumentId: data.instrumentId,
       groupName: data.groupName,
@@ -546,15 +538,15 @@ async function openScheduleLight(event, data) {
   // Once the light has been updated, send the information to the main window for update
   let listener;
   ipcMain.on(
-    'light.updated',
+    "light.updated",
     (listener = () => {
-      windows['instrumentMain'].webContents.send('light.updated');
+      windows["instrumentMain"].webContents.send("light.updated");
     })
   );
 
   openForm(
     null,
-    'scheduleLight',
+    "scheduleLight",
     {
       instrumentId: data.instrumentId,
       groupName: data.groupName,
@@ -567,7 +559,7 @@ async function openScheduleLight(event, data) {
     },
     function() {
       // After the window is closed, remove the listener
-      ipcMain.removeListener('light.updated', listener);
+      ipcMain.removeListener("light.updated", listener);
       //  await fetch( "http://" + data.config.trackerHost + ":" + data.config.trackerPort + "/light.resume?instrumentId=" + data.instrumentId, { method: 'GET' } );
     }
   );
@@ -579,12 +571,12 @@ async function openScheduleLight(event, data) {
 function removeInstrument(event, trackerHost) {
   dialog.showMessageBox(
     {
-      type: 'question',
-      message: 'Are you sure that you want to remove this instrument ?',
+      type: "question",
+      message: "Are you sure that you want to remove this instrument ?",
       cancelId: 0,
       defaultId: 0,
-      title: 'Remove the instrument',
-      buttons: ['Cancel', 'Yes']
+      title: "Remove the instrument",
+      buttons: ["Cancel", "Yes"]
     },
     async index => {
       if (index == 1) {
@@ -601,30 +593,15 @@ function removeInstrument(event, trackerHost) {
   );
 }
 
-function reportError(e) {
-  console.log('Error reporting !');
-  dialog.showMessageBox(
-    {
-      type: 'error',
-      message: 'An error has happened: ' + e.toString(),
-      cancelId: 0,
-      defaultId: 0,
-      title: 'Error',
-      buttons: ['Ok']
-    },
-    index => {}
-  );
-}
-
 function reloadInstruments() {
-  windows['instrumentList'].webContents.send('reloadInstruments');
+  windows["instrumentList"].webContents.send("reloadInstruments");
   doMenu();
 }
 
 function addInstrument() {
   openForm(
     null,
-    'instrumentform',
+    "instrumentform",
     {},
     {
       width: 850,
@@ -648,9 +625,9 @@ function loadInstrument(event, tracker) {
   const trackerHost = tracker.host;
   const mode = tracker.mode;
 
-  if (!windows['instrumentMain']) {
+  if (!windows["instrumentMain"]) {
     // Create the browser window.
-    windows['instrumentMain'] = new BrowserWindow({
+    windows["instrumentMain"] = new BrowserWindow({
       width: 1400,
       height: 1024,
       center: true,
@@ -659,21 +636,21 @@ function loadInstrument(event, tracker) {
   }
 
   switch (mode) {
-    case 'ageing':
-      windows['instrumentMain'].loadURL(
+    case "ageing":
+      windows["instrumentMain"].loadURL(
         url.format({
-          pathname: path.join(__dirname, 'app/instrument.html'),
-          protocol: 'file:',
+          pathname: path.join(__dirname, "app/instrument.html"),
+          protocol: "file:",
           slashes: true
         })
       );
       break;
 
-    case 'measurement':
-      windows['instrumentMain'].loadURL(
+    case "measurement":
+      windows["instrumentMain"].loadURL(
         url.format({
-          pathname: path.join(__dirname, 'app/ivmeasurements/index.html'),
-          protocol: 'file:',
+          pathname: path.join(__dirname, "app/ivmeasurements/index.html"),
+          protocol: "file:",
           slashes: true
         })
       );
@@ -681,8 +658,8 @@ function loadInstrument(event, tracker) {
       break;
   }
 
-  if (windows['instrumentList']) {
-    windows['instrumentList'].close();
+  if (windows["instrumentList"]) {
+    windows["instrumentList"].close();
   }
 
   let instrumentConfig;
@@ -696,22 +673,22 @@ function loadInstrument(event, tracker) {
 
   // Global
 
-  if (windows['instrumentMain'].webContents.isLoading()) {
-    windows['instrumentMain'].webContents.once('dom-ready', () => {
-      windows['instrumentMain'].webContents.send('loadInstrument', {
+  if (windows["instrumentMain"].webContents.isLoading()) {
+    windows["instrumentMain"].webContents.once("dom-ready", () => {
+      windows["instrumentMain"].webContents.send("loadInstrument", {
         tracker: instrumentConfig,
         db: config.database
       });
     });
   } else {
-    windows['instrumentMain'].webContents.send('loadInstrument', {
+    windows["instrumentMain"].webContents.send("loadInstrument", {
       tracker: instrumentConfig,
       db: config.database
     });
   }
 
-  windows['instrumentMain'].once('close', () => {
-    windows['instrumentMain'] = null;
+  windows["instrumentMain"].once("close", () => {
+    windows["instrumentMain"] = null;
   });
 
   doMenu();
@@ -729,10 +706,10 @@ function editInstrument(event, trackerHost) {
   });
 
   if (!data) {
-    throw 'Could not find the data corresponding to this instrument';
+    throw "Could not find the data corresponding to this instrument";
   }
 
-  openForm(null, 'instrumentform', data, {
+  openForm(null, "instrumentform", data, {
     width: 600,
     height: 800,
     resizable: false
@@ -741,15 +718,15 @@ function editInstrument(event, trackerHost) {
       Object.assign(data, results);
       await saveConfig();
 
-      if (windows['instrumentMain']) {
-        windows['instrumentMain'].webContents.send('loadInstrument', {
+      if (windows["instrumentMain"]) {
+        windows["instrumentMain"].webContents.send("loadInstrument", {
           tracker: data,
           db: config.database
         });
       }
 
-      if (windows['instrumentList']) {
-        windows['instrumentList'].webContents.send('instrumentUpdated');
+      if (windows["instrumentList"]) {
+        windows["instrumentList"].webContents.send("instrumentUpdated");
       }
 
       reloadInstruments();
@@ -761,7 +738,7 @@ function editInfluxDB(event) {
   let data;
   let influxConfig = config.database;
 
-  openForm(null, 'influxdbform', influxConfig, {
+  openForm(null, "influxdbform", influxConfig, {
     width: 600,
     height: 700,
     resizable: false
@@ -769,34 +746,34 @@ function editInfluxDB(event) {
     .then(async results => {
       config.database = results;
 
-      saveConfig();
+      await saveConfig();
 
-      sendToForm('uploading', {
-        status: 'progress',
-        host: config.instruments.map(i => i.trackerHost).join(', ')
+      sendToForm("uploading", {
+        status: "progress",
+        host: config.instruments.map(i => i.trackerHost).join(", ")
       });
 
       updateInfluxDB()
         .then(() => {
-          sendToForm('uploading', { status: 'done' });
+          sendToForm("uploading", { status: "done" });
         })
         .catch(err => {
-          sendToForm('uploading', {
-            status: 'error',
+          sendToForm("uploading", {
+            status: "error",
             error: err,
             host: err.options.host
           });
         });
 
-      if (windows['instrumentMain']) {
-        windows['instrumentMain'].webContents.send('reloadDB', {
+      if (windows["instrumentMain"]) {
+        windows["instrumentMain"].webContents.send("reloadDB", {
           db: config.database
         });
       }
 
-      if (windows['instrumentList']) {
-        windows['instrumentList'].webContents.send(
-          'dbInformation',
+      if (windows["instrumentList"]) {
+        windows["instrumentList"].webContents.send(
+          "dbInformation",
           config.database
         );
       }
@@ -808,7 +785,7 @@ function showAllMeasurements(instrument) {
   console.log(instrument);
   openForm(
     null,
-    'showallmeasurements',
+    "showallmeasurements",
     { config: instrument, configDB: config.database },
     { width: 600, height: 700, resizable: false }
   )
@@ -821,11 +798,11 @@ function updateInfluxDB() {
     config.instruments.map(instrument => {
       return request.post({
         url:
-          'http://' +
+          "http://" +
           instrument.trackerHost +
-          ':' +
+          ":" +
           instrument.trackerPort +
-          '/setInfluxDB',
+          "/setInfluxDB",
         host: instrument.trackerHost,
         form: config.database,
         timeout: 1000
@@ -838,37 +815,37 @@ async function configChannel(event, data) {
   let influxConfig = config.database;
 
   var channelConfig = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getChannelConfig?instrumentId=' +
+      "/getChannelConfig?instrumentId=" +
       data.instrumentId +
-      '&chanId=' +
+      "&chanId=" +
       data.chanId,
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
 
   var instrumentConfig = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getInstrumentConfig?instrumentId=' +
+      "/getInstrumentConfig?instrumentId=" +
       data.instrumentId,
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
 
   var channelState = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getStatus?instrumentId=' +
+      "/getStatus?instrumentId=" +
       data.instrumentId +
-      '&chanId=' +
+      "&chanId=" +
       data.chanId,
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
 
   //var externalConnection = await fetch( "http://" + data.trackerHost + ":" + data.trackerPort + "/getChannelConfig?instrumentId=" + data.instrumentId + "&chanId=" + data.chanId, { method: 'GET' } ).then( ( response ) => response.json() );
@@ -878,7 +855,7 @@ async function configChannel(event, data) {
 
   return openForm(
     null,
-    'cellform',
+    "cellform",
     {
       tracker: data,
       instrumentConfig: instrumentConfig,
@@ -889,7 +866,7 @@ async function configChannel(event, data) {
     { width: 600, height: 800 }
   )
     .then(results => {
-      event.sender.send('channelConfigured', results);
+      event.sender.send("channelConfigured", results);
       return results;
     })
     .catch(() => {});
@@ -899,42 +876,42 @@ async function configChannels(event, data) {
   let influxConfig = config.database;
 
   var channelsState = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getStatus?instrumentId=' +
+      "/getStatus?instrumentId=" +
       data.instrumentId +
-      '&groupName=' +
+      "&groupName=" +
       data.groupName,
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
   var instrumentConfig = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getInstrumentConfig?instrumentId=' +
+      "/getInstrumentConfig?instrumentId=" +
       data.instrumentId,
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
   var channelState = await fetch(
-    'http://' +
+    "http://" +
       data.trackerHost +
-      ':' +
+      ":" +
       data.trackerPort +
-      '/getStatus?instrumentId=' +
+      "/getStatus?instrumentId=" +
       data.instrumentId +
-      '&chanId=' +
+      "&chanId=" +
       data.chanIds[0],
-    { method: 'GET' }
+    { method: "GET" }
   ).then(response => response.json());
 
   instrumentConfig.instrumentId = data.instrumentId;
 
   return openForm(
     null,
-    'cellformall',
+    "cellformall",
     {
       tracker: data,
       channelState: channelState[data.groupName].channels[data.chanIds[0]],
@@ -946,7 +923,7 @@ async function configChannels(event, data) {
     { width: 600, height: 800 }
   )
     .then(results => {
-      event.sender.send('channelsConfigured', results);
+      event.sender.send("channelsConfigured", results);
       return results;
     })
     .catch(() => {});
