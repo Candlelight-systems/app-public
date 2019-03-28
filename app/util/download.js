@@ -1,4 +1,4 @@
-import { getIVParameters } from "../../app/util/iv";
+import { getIVParameters } from '../../app/util/iv';
 
 export const getJVWaveforms = async (db, props) => {
   const data = getJVData(db, props);
@@ -57,7 +57,7 @@ export const getTrackData = (
       timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000;
 
     let query;
-    if (numberOfPoints == "all") {
+    if (numberOfPoints == 'all') {
       query = `SELECT efficiency, voltage_mean, current_mean, humidity, sun, temperature_junction, efficiency, power_mean, temperature_base FROM "${measurementName}" WHERE time >= '${timefrom}' and time <= '${timeto}' ORDER BY time ASC`;
     } else {
       const grouping = Math.max(
@@ -79,15 +79,15 @@ export const getTrackData = (
         waveTemperature = Graph.newWaveform(),
         waveHumidity = Graph.newWaveform();
 
-      waveEfficiency.setUnit("%");
-      waveEfficiency.setXUnit("h");
-      waveVoltage.setUnit("V");
-      wavePower.setUnit("W");
-      waveCurrent.setUnit("mA cm-2");
+      waveEfficiency.setUnit('%');
+      waveEfficiency.setXUnit('h');
+      waveVoltage.setUnit('V');
+      wavePower.setUnit('W');
+      waveCurrent.setUnit('mA cm-2');
 
-      waveSun.setUnit("-");
-      waveTemperature.setUnit("°C");
-      waveHumidity.setUnit("%");
+      waveSun.setUnit('-');
+      waveTemperature.setUnit('°C');
+      waveHumidity.setUnit('%');
 
       let maxEfficiency = 0;
       let finalEfficiency = 0;
@@ -106,15 +106,15 @@ export const getTrackData = (
         waveDate.append(
           time,
           date.getDate() +
-            "." +
+            '.' +
             date.getMonth() +
-            "." +
+            '.' +
             date.getFullYear() +
-            " " +
+            ' ' +
             date.getHours() +
-            ":" +
+            ':' +
             date.getMinutes() +
-            ":" +
+            ':' +
             date.getSeconds()
         );
         waveEfficiency.append(time, value[1]);
@@ -252,13 +252,13 @@ export const getJVData = (db, measurementName, props) => {
 
       return results.series[0].values.map(value => {
         let date = new Date(value[0]),
-          data = value[1].split(","),
+          data = value[1].split(','),
           wave = Graph.newWaveform();
 
         for (let i = 0; i < data.length - 1; i += 2) {
           wave.append(
-            parseFloat(data[i].replace('"', "")),
-            parseFloat(data[i + 1].replace('"', ""))
+            parseFloat(data[i].replace('"', '')),
+            parseFloat(data[i + 1].replace('"', ''))
           );
         }
 
