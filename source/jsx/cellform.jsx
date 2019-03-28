@@ -1,8 +1,8 @@
-import React from 'react';
-import CellFormTracking from './cellformtracking.jsx';
-import CellFormIV from './cellformjv.jsx';
-import CellFormRecipes from './cellformrecipes.jsx';
-import environment from '../../app/environment.json';
+import React from "react";
+import CellFormTracking from "./cellformtracking.jsx";
+import CellFormIV from "./cellformjv.jsx";
+import CellFormRecipes from "./cellformrecipes.jsx";
+import environment from "../../app/environment.json";
 
 class CellForm extends React.Component {
   constructor(props) {
@@ -12,10 +12,10 @@ class CellForm extends React.Component {
     this.validateConfig = this.validateConfig.bind(this);
     this.state = {
       cellArea: 0,
-      cellName: '',
-      connection: 'group',
-      lightSource: 'pd_pyr',
-      correctionFactor_type: 'factory',
+      cellName: "",
+      connection: "group",
+      lightSource: "pd_pyr",
+      correctionFactor_type: "factory",
       correctionFactor_value: 1,
 
       iv_start: 0,
@@ -40,22 +40,22 @@ class CellForm extends React.Component {
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
     this.setState({ [name]: value });
   }
 
   componentDidMount() {
-    $('a', this.tabs).click(function(e) {
+    $("a", this.tabs).click(function(e) {
       e.preventDefault();
-      $(this).tab('show');
+      $(this).tab("show");
     });
 
     this.setState(this.props.formState);
     if (this.props.formState.lightSource === undefined) {
       this.setState({
         lightSource:
-          this.props.formState.lightRefValue > 0 ? 'manual' : 'pd_pyr'
+          this.props.formState.lightRefValue > 0 ? "manual" : "pd_pyr"
       });
     }
   }
@@ -64,7 +64,7 @@ class CellForm extends React.Component {
     this.setState(nextProps.formState);
     if (this.props.formState.lightSource === undefined) {
       this.setState({
-        lightSource: nextProps.formState.lightRefValue > 0 ? 'manual' : 'pd_pyr'
+        lightSource: nextProps.formState.lightRefValue > 0 ? "manual" : "pd_pyr"
       });
     }
   }
@@ -78,7 +78,7 @@ class CellForm extends React.Component {
       environment.instrument[this.props.instrumentConfig.instrumentId].groups[
         this.props.groupName
       ].manualLightIntensity;
-    let correctionFactor = 'N/A';
+    let correctionFactor = "N/A";
 
     for (var i = 0; i < groups.length; i++) {
       if (groups[i].groupName == this.props.groupName) {
@@ -95,33 +95,36 @@ class CellForm extends React.Component {
         <form onSubmit={this.submit} className="form-horizontal">
           <ul className="nav nav-tabs formTabs" ref={el => (this.tabs = el)}>
             <li role="presentation" className="active">
-              <a data-target={'#cell_' + this.state.unique} data-toggle="tab">
+              <a data-target={"#cell_" + this.state.unique} data-toggle="tab">
                 Cell configuration
               </a>
             </li>
             <li role="presentation">
               <a
-                data-target={'#tracker_' + this.state.unique}
+                data-target={"#tracker_" + this.state.unique}
                 data-toggle="tab">
                 Tracker
               </a>
             </li>
             <li role="presentation">
-              <a data-target={'#iv_' + this.state.unique} data-toggle="tab">
+              <a data-target={"#iv_" + this.state.unique} data-toggle="tab">
                 j(V) curves
               </a>
             </li>
-            <li role="presentation">
-              <a
-                data-target={'#recipes_' + this.state.unique}
-                data-toggle="tab">
-                Recipes
-              </a>
-            </li>
+            {environment.instrument[this.props.instrumentConfig.instrumentId]
+              .recipes && (
+              <li role="presentation">
+                <a
+                  data-target={"#recipes_" + this.state.unique}
+                  data-toggle="tab">
+                  Recipes
+                </a>
+              </li>
+            )}
           </ul>
 
           <div className="tab-content">
-            <div className="tab-pane active" id={'cell_' + this.state.unique}>
+            <div className="tab-pane active" id={"cell_" + this.state.unique}>
               <div className="form-group">
                 <label className="col-sm-3">Device name</label>
                 <div className="col-sm-9">
@@ -187,8 +190,8 @@ class CellForm extends React.Component {
                           name="connection"
                           value="group"
                           onClick={this.handleInputChange}
-                          checked={this.state.connection == 'group'}
-                        />{' '}
+                          checked={this.state.connection == "group"}
+                        />{" "}
                         Cell enclosure
                       </label>
                     </div>
@@ -199,8 +202,8 @@ class CellForm extends React.Component {
                           name="connection"
                           value="external"
                           onClick={this.handleInputChange}
-                          checked={this.state.connection == 'external'}
-                        />{' '}
+                          checked={this.state.connection == "external"}
+                        />{" "}
                         External connection
                       </label>
                     </div>
@@ -221,8 +224,8 @@ class CellForm extends React.Component {
                           name="lightSource"
                           value="pd_pyr"
                           onClick={this.handleInputChange}
-                          checked={this.state.lightSource == 'pd_pyr'}
-                        />{' '}
+                          checked={this.state.lightSource == "pd_pyr"}
+                        />{" "}
                         Photodiode / Pyranometer
                       </label>
                     </div>
@@ -234,8 +237,8 @@ class CellForm extends React.Component {
                           name="lightSource"
                           value="manual"
                           onClick={this.handleInputChange}
-                          checked={this.state.lightSource == 'manual'}
-                        />{' '}
+                          checked={this.state.lightSource == "manual"}
+                        />{" "}
                         Manual value
                       </label>
                     </div>
@@ -243,8 +246,8 @@ class CellForm extends React.Component {
                 </div>
               )}
 
-              {this.state.connection == 'external' ||
-              this.state.lightSource == 'manual' ? (
+              {this.state.connection == "external" ||
+              this.state.lightSource == "manual" ? (
                 <div className="form-group">
                   <label htmlFor="cellarea" className="col-sm-3">
                     Light intensity
@@ -278,9 +281,9 @@ class CellForm extends React.Component {
                           value="factory"
                           onClick={this.handleInputChange}
                           checked={
-                            this.state.correctionFactor_type == 'factory'
+                            this.state.correctionFactor_type == "factory"
                           }
-                        />{' '}
+                        />{" "}
                         Factory settings ({correctionFactor})
                       </label>
                     </div>
@@ -292,14 +295,14 @@ class CellForm extends React.Component {
                           name="correctionFactor_type"
                           value="manual"
                           onChange={this.handleInputChange}
-                          checked={this.state.correctionFactor_type == 'manual'}
-                        />{' '}
-                        Manual value{' '}
+                          checked={this.state.correctionFactor_type == "manual"}
+                        />{" "}
+                        Manual value{" "}
                         <input
                           type="text"
                           className="form-control"
                           disabled={
-                            this.state.correctionFactor_type == 'factory'
+                            this.state.correctionFactor_type == "factory"
                           }
                           name="correctionFactor_value"
                           onChange={this.handleInputChange}
@@ -319,7 +322,7 @@ class CellForm extends React.Component {
               ) : null}
             </div>
 
-            <div className="tab-pane" id={'tracker_' + this.state.unique}>
+            <div className="tab-pane" id={"tracker_" + this.state.unique}>
               <CellFormTracking
                 {...this.props}
                 {...this.state}
@@ -327,17 +330,19 @@ class CellForm extends React.Component {
               />
             </div>
 
-            <div className="tab-pane" id={'iv_' + this.state.unique}>
+            <div className="tab-pane" id={"iv_" + this.state.unique}>
               <CellFormIV {...this.state} onFormChange={this.subFormChanged} />
             </div>
-
-            <div className="tab-pane" id={'recipes_' + this.state.unique}>
-              <CellFormRecipes
-                {...this.state}
-                tracker={this.props.tracker}
-                onFormChange={this.subFormChanged}
-              />
-            </div>
+            {environment.instrument[this.props.instrumentConfig.instrumentId]
+              .recipes && (
+              <div className="tab-pane" id={"recipes_" + this.state.unique}>
+                <CellFormRecipes
+                  {...this.state}
+                  tracker={this.props.tracker}
+                  onFormChange={this.subFormChanged}
+                />
+              </div>
+            )}
           </div>
         </form>
 
