@@ -44,7 +44,7 @@ export const getTrackData = (
 ) => {
   measurementName = encodeURIComponent(measurementName);
   return influxquery(
-    `SELECT time,efficiency FROM "${measurementName}" ORDER BY time ASC limit 1;SELECT time,efficiency FROM "${measurementName}" ORDER BY time DESC limit 1;`,
+    `SELECT time, efficiency FROM "${measurementName}" ORDER BY time ASC limit 1; SELECT time, efficiency FROM "${measurementName}" ORDER BY time DESC limit 1;`,
     db,
     db.db
   ).then(async results => {
@@ -52,23 +52,19 @@ export const getTrackData = (
       throw `No measurement with the name "${measurementName}" or no associated data`;
     }
 
-    let timefrom = results[0].series[0].values[0][0],
+    const timefrom = results[0].series[0].values[0][0],
       timeto = results[1].series[0].values[0][0],
       timeDifference = (new Date(timeto) - new Date(timefrom)) / 1000;
 
     let query;
     if (numberOfPoints == "all") {
-      query = `SELECT efficiency, voltage_mean, current_mean, humidity, sun, temperature_junction, efficiency, power_mean, temperature_base FROM
-        "${measurementName}"
-        WHERE time >= '${timefrom}' and time <= '${timeto}' ORDER BY time ASC`;
+      query = `SELECT efficiency, voltage_mean, current_mean, humidity, sun, temperature_junction, efficiency, power_mean, temperature_base FROM "${measurementName}" WHERE time >= '${timefrom}' and time <= '${timeto}' ORDER BY time ASC`;
     } else {
       const grouping = Math.max(
         1,
         Math.round(timeDifference / parseInt(numberOfPoints))
       );
-      query = `SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM
-        "${measurementName}"
-        WHERE time >= '${timefrom}' and time <= '${timeto}' GROUP BY time(${grouping}s) FILL(none) ORDER BY time ASC`;
+      query = `SELECT MEAN(efficiency) as effMean, MEAN(voltage_mean) as vMean, MEAN(current_mean) as cMean, MEAN(humidity) as hMean, MEAN(sun) as sMean, MEAN(temperature_junction) as tMean, MAX(efficiency) as maxEff, MEAN(power_mean) as pMean, MEAN(temperature_base) as tMean2 FROM "${measurementName}" WHERE time >= '${timefrom}' and time <= '${timeto}' GROUP BY time(${grouping}s) FILL(none) ORDER BY time ASC`;
     }
 
     const returnObject = await influxquery(query, db, db.db).then(results => {

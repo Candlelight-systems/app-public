@@ -1,6 +1,6 @@
 import React from "react";
 const { dialog } = require("electron").remote;
-import fs from "fs";
+import path from "path";
 import { CSVBuilder, ITXBuilder } from "../../app/util/filebuilder";
 import { ipcRenderer } from "electron";
 
@@ -60,12 +60,17 @@ class DownloadForm extends React.Component {
       {
         message:
           'Save the data for the cell "' + this.props.cellInfo.cellName + '"',
-        defaultPath: `~/${this.props.cellInfo.cellName}_${fileappend.join(
-          "_"
-        )}.${this.state.dl_format}`
+        defaultPath: `${this.props.defaultPath || "~"}/${
+          this.props.cellInfo.cellName
+        }_${fileappend.join("_")}.${this.state.dl_format}`
       },
       fileName => {
-        fs.writeFileSync(fileName, outputfile.build());
+        const filePath = path.parse(filename);
+        path.fs.writeFileSync(fileName, outputfile.build());
+        ipcRenderer.send("set-preference", {
+          name: "defaultSavePath",
+          value: filePath.dir
+        });
       }
     );
   }
