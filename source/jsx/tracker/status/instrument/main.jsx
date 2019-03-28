@@ -256,12 +256,13 @@ class InstrumentStatus extends React.Component {
                 onClick={this.autoZero}>
                 <span>Auto-zero</span>
               </button>
+              { environment.instrument[this.props.instrumentId].autoZeroMaster && 
               <button
                 type="button"
                 className="btn btn-cl btn-default btn-sm"
                 onClick={this.autoZeroMaster}>
                 <span>Master Auto-zero</span>
-              </button>
+              </button> }
             </div>
             <div className="col-lg-4" />
           </div>
