@@ -18,14 +18,14 @@ const { openForm, sendToForm } = require('./app/util/windows.js');
 fix();
 
 let currentInstrument;
-const { reportError } = require('../app/util/errorhandling');
+const { reportError } = require('../source/util/errorhandling');
 
 const {
   config,
   saveConfig,
   getPreference,
   setPreference
-} = require('../app/util/config');
+} = require('../source/util/config');
 
 let windows = {};
 

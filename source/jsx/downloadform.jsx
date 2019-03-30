@@ -4,11 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { CSVBuilder, ITXBuilder } from '../../app/util/filebuilder';
 import { ipcRenderer } from 'electron';
-import {
-  getTrackData,
-  getVocJscData,
-  getJVWaveforms
-} from '../../app/util/download';
+import { getTrackData, getVocJscData, getJVWaveforms } from '../util/download';
 
 class DownloadForm extends React.Component {
   constructor(props) {

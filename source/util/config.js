@@ -4,7 +4,7 @@ const { reportError } = require('./errorhandling');
 
 const configPath = path.join(
   __dirname.replace('app.asar', 'app.asar.unpacked'),
-  '/../config.json'
+  '/../../app/config.json'
 );
 
 let config = JSON.parse(fs.readFileSync(configPath));
