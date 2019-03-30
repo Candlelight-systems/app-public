@@ -14,18 +14,18 @@ const fetch = require('node-fetch');
 const WebSocket = require('ws');
 const environment = require('./environment.json');
 const diagnostics = require('./app/scripts/diagnostics');
-const { openForm, sendToForm } = require('./app/util/windows.js');
+const { openForm, sendToForm } = require('./app/util/windows');
 fix();
 
 let currentInstrument;
-const { reportError } = require('../source/util/errorhandling');
+const { reportError } = require('./app/scripts/errorhandling');
 
 const {
   config,
   saveConfig,
   getPreference,
   setPreference
-} = require('../source/util/config');
+} = require('./app/scripts/config');
 
 let windows = {};
 

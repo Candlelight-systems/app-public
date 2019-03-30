@@ -1,5 +1,5 @@
-import { getIVParameters } from '../../app/util/iv';
-import { query } from '../influx';
+import { getIVParameters } from '../../../app/util/iv';
+import { query } from '../../influx';
 import Graph from 'node-jsgraph/dist/jsgraph-es6';
 
 export const getJVWaveforms = async (db, measurementName, props) => {
