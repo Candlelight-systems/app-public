@@ -1,8 +1,14 @@
-import React from "react";
-const { dialog } = require("electron").remote;
-import path from "path";
-import { CSVBuilder, ITXBuilder } from "../../app/util/filebuilder";
-import { ipcRenderer } from "electron";
+import React from 'react';
+const { dialog } = require('electron').remote;
+import fs from 'fs';
+import path from 'path';
+import { CSVBuilder, ITXBuilder } from '../../app/util/filebuilder';
+import { ipcRenderer } from 'electron';
+import {
+  getTrackData,
+  getVocJscData,
+  getJVWaveforms
+} from '../../app/util/download';
 
 class DownloadForm extends React.Component {
   constructor(props) {
@@ -12,10 +18,10 @@ class DownloadForm extends React.Component {
     this.downloadPDF = this.downloadPDF.bind(this);
     this.close = this.close.bind(this);
     this.state = {
-      dl_format: "csv",
+      dl_format: 'csv',
       dl_track_nb: 3000,
       error_track: false,
-      error_vocjs: false,
+      error_vocjsc: false,
       error_jv: false
     };
   }
@@ -26,7 +32,7 @@ class DownloadForm extends React.Component {
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     this.setState({ [name]: value });
   }
@@ -34,7 +40,7 @@ class DownloadForm extends React.Component {
   async makeDownload(track = true, jv = true, vocjsc = true) {
     let outputfile;
 
-    if (this.state.dl_format == "itx") {
+    if (this.state.dl_format == 'itx') {
       outputfile = new ITXBuilder();
     } else {
       outputfile = new CSVBuilder();
@@ -43,32 +49,32 @@ class DownloadForm extends React.Component {
     let fileappend = [];
     if (track) {
       await this.downloadTrack(outputfile);
-      fileappend.push("track");
+      fileappend.push('track');
     }
 
     if (vocjsc) {
       await this.downloadVocJsc(outputfile);
-      fileappend.push("vocjsc");
+      fileappend.push('vocjsc');
     }
 
     if (jv) {
       await this.downloadIV(outputfile);
-      fileappend.push("jv");
+      fileappend.push('jv');
     }
 
     dialog.showSaveDialog(
       {
         message:
           'Save the data for the cell "' + this.props.cellInfo.cellName + '"',
-        defaultPath: `${this.props.defaultPath || "~"}/${
+        defaultPath: `${this.props.defaultPath || '~'}/${
           this.props.cellInfo.cellName
-        }_${fileappend.join("_")}.${this.state.dl_format}`
+        }_${fileappend.join('_')}.${this.state.dl_format}`
       },
       fileName => {
-        const filePath = path.parse(filename);
-        path.fs.writeFileSync(fileName, outputfile.build());
-        ipcRenderer.send("set-preference", {
-          name: "defaultSavePath",
+        const filePath = path.parse(fileName);
+        fs.writeFileSync(fileName, outputfile.build());
+        ipcRenderer.send('set-preference', {
+          name: 'defaultSavePath',
           value: filePath.dir
         });
       }
@@ -91,41 +97,41 @@ class DownloadForm extends React.Component {
     }
 
     outputfile.addWaveform(data.date, {
-      waveName: "Date"
+      waveName: 'Date'
     });
 
     outputfile.addWaveform(data.efficiency, {
-      waveName: "Efficiency",
-      waveNameX: "Time_MPP_h"
+      waveName: 'Efficiency',
+      waveNameX: 'Time_MPP_h'
     });
 
     outputfile.addWaveform(data.power, {
-      waveName: "Power",
+      waveName: 'Power',
       noXWave: true
     });
 
     outputfile.addWaveform(data.voltage, {
-      waveName: "Voltage",
+      waveName: 'Voltage',
       noXWave: true
     });
 
     outputfile.addWaveform(data.current, {
-      waveName: "Current",
+      waveName: 'Current',
       noXWave: true
     });
 
     outputfile.addWaveform(data.temperature, {
-      waveName: "Temperature",
+      waveName: 'Temperature',
       noXWave: true
     });
 
     outputfile.addWaveform(data.sun, {
-      waveName: "Sun",
+      waveName: 'Sun',
       noXWave: true
     });
 
     outputfile.addWaveform(data.humidity, {
-      waveName: "Humidity",
+      waveName: 'Humidity',
       noXWave: true
     });
   }
@@ -140,19 +146,19 @@ class DownloadForm extends React.Component {
         this.props.cellInfo
       );
     } catch (e) {
-      this.setState({ error_vocjs: true });
+      this.setState({ error_vocjsc: true });
       console.error(e);
       return;
     }
 
     outputfile.addWaveform(data.waveVoc, {
-      waveName: "Voc",
-      waveNameX: "Time_voc_h"
+      waveName: 'Voc',
+      waveNameX: 'Time_voc_h'
     });
 
     outputfile.addWaveform(data.waveJsc, {
-      waveName: "Jsx",
-      waveNameX: "Time_jsc_h"
+      waveName: 'Jsx',
+      waveNameX: 'Time_jsc_h'
     });
   }
 
@@ -172,35 +178,35 @@ class DownloadForm extends React.Component {
 
     waveforms.jv.forEach(data => {
       outputfile.addWaveform(data.wave, {
-        waveName: "Current_" + data.time_h + "h",
-        waveNameX: "Voltage_" + data.time_h + "h"
+        waveName: 'Current_' + data.time_h + 'h',
+        waveNameX: 'Voltage_' + data.time_h + 'h'
       });
     });
 
     outputfile.addWaveform(waveforms.vocs, {
-      waveName: "Voc JV (V)",
-      waveNameX: "Time_JV (h)"
+      waveName: 'Voc JV (V)',
+      waveNameX: 'Time_JV (h)'
     });
 
     outputfile.addWaveform(waveforms.jscs, {
-      waveName: "Jsc JV (A)",
+      waveName: 'Jsc JV (A)',
       noXWave: true
     });
 
     outputfile.addWaveform(waveforms.ffs, {
-      waveName: "FF JV (%)",
+      waveName: 'FF JV (%)',
       noXWave: true
     });
 
     outputfile.addWaveform(waveforms.pces, {
-      waveName: "PCE JV (%)",
+      waveName: 'PCE JV (%)',
       noXWave: true
     });
   }
 
   async downloadPDF() {
     ipcRenderer.send(
-      "htmlReport",
+      'htmlReport',
       this.props.cellInfo,
       this.props.chanId,
       this.props.measurementName,
@@ -213,7 +219,7 @@ class DownloadForm extends React.Component {
       <div className="container-fluid">
         <form onSubmit={this.submit} className="form-horizontal">
           <h4>
-            Download data for device "{this.props.cellInfo.cellName}"{" "}
+            Download data for device "{this.props.cellInfo.cellName}"{' '}
             {this.props.chanId && <span>( channel {this.props.chanId} )</span>}
           </h4>
 
@@ -221,7 +227,7 @@ class DownloadForm extends React.Component {
             <div className="alert alert-warning">
               <strong>
                 <span className="glyphicon glyphicon-warning" />
-              </strong>{" "}
+              </strong>{' '}
               Could not download tracking data. It could be that no data exists
               in the database.
             </div>
@@ -230,7 +236,7 @@ class DownloadForm extends React.Component {
             <div className="alert alert-warning">
               <strong>
                 <span className="glyphicon glyphicon-warning" />
-              </strong>{" "}
+              </strong>{' '}
               Could not download IV data. It could be that no data exists in the
               database.
             </div>
@@ -239,7 +245,7 @@ class DownloadForm extends React.Component {
             <div className="alert alert-warning">
               <strong>
                 <span className="glyphicon glyphicon-warning" />
-              </strong>{" "}
+              </strong>{' '}
               Could not download Voc/Jsc data. It could be that no data exists
               in the database.
             </div>
