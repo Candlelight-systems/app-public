@@ -3,6 +3,7 @@ import CellFormTracking from "./cellformtracking.jsx";
 import CellFormIV from "./cellformjv.jsx";
 import CellForm from "./cellform.jsx";
 import CellFormRecipes from "./cellformrecipes.jsx";
+import environment from "../../app/environment.json";
 
 class CellFormAll extends CellForm {
   handleInputChange(event) {
