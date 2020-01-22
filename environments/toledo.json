@@ -1,35 +1,33 @@
 {
   "environment": {
     "ageing": true,
-    "ivmeasurement": true,
 
     "statuses": {
       "light": {
-        "version": "2.0",
-        "readonly": false,
-        "temperature": true
+        "version": "2.0"
       },
       "heat": {
-        "version": "ssr_1.0",
-        "fans": true
+        "version": "ssr_1.0"
       }
     },
 
     "instrument": {
-      "Bottom port": {
+      "Small cells": {
         "ADC": {
           "model": "ADS1259"
         },
         "changeSpeed": false,
         "fsr": 30,
-        "LSB": 1.22,
+        "LSB": 1.2,
         "LSBValue": 1,
         "voltageRange": 2.5,
         "autoZero": "instrument",
-
+        "autoZeroMaster": true,
+        "recipes": true,
         "groups": {
           "Sample holder": {
             "resettable": false,
+
             "displayDeviceInformation": {
               "time_ellapsed": true,
               "pce": true,
@@ -51,13 +49,15 @@
   },
 
   "development": true,
+
   "defaultConfig": {
     "instruments": [
       {
         "trackerHost": "192.168.0.103",
         "trackerName": "Main Instrument",
         "trackerPort": 8080,
-        "trackerPortWS": 8081
+        "trackerPortWS": 8081,
+        "trackerPortDiagnosis": 8082
       }
     ],
     "database": {

@@ -1,13 +1,14 @@
-import React from "react";
-import CellFormTracking from "./cellformtracking.jsx";
-import CellFormIV from "./cellformjv.jsx";
-import CellForm from "./cellform.jsx";
-import CellFormRecipes from "./cellformrecipes.jsx";
+import React from 'react';
+import CellFormTracking from './cellformtracking.jsx';
+import CellFormIV from './cellformjv.jsx';
+import CellForm from './cellform.jsx';
+import CellFormRecipes from './cellformrecipes.jsx';
+import environment from '../../app/environment.json';
 
 class CellFormAll extends CellForm {
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     this.setState({ [name]: value });
   }
@@ -28,8 +29,8 @@ class CellFormAll extends CellForm {
     props.channelIds.forEach(chanId => {
       for (var i in props.allStatuses) {
         if (props.allStatuses[i].chanId == chanId) {
-          stateObj["__cellName_" + chanId] = props.allStatuses[i].cellName;
-          stateObj["__cellActive_" + chanId] =
+          stateObj['__cellName_' + chanId] = props.allStatuses[i].cellName;
+          stateObj['__cellActive_' + chanId] =
             !!props.allStatuses[i].enable &&
             props.allStatuses[i].tracking_mode > 0;
           break;
@@ -45,7 +46,7 @@ class CellFormAll extends CellForm {
   }
 
   render() {
-    var unique = "";
+    var unique = '';
     let relayController = !!this.props.instrumentConfig.relayController;
 
     return (
@@ -53,17 +54,17 @@ class CellFormAll extends CellForm {
         <form onSubmit={this.submit} className="form-horizontal">
           <ul className="nav nav-tabs formTabs" ref={el => (this.tabs = el)}>
             <li role="presentation" className="active">
-              <a data-target={"#cell_" + unique} data-toggle="tab">
+              <a data-target={'#cell_' + unique} data-toggle="tab">
                 Cell configuration
               </a>
             </li>
             <li role="presentation">
-              <a data-target={"#tracker_" + unique} data-toggle="tab">
+              <a data-target={'#tracker_' + unique} data-toggle="tab">
                 Tracker
               </a>
             </li>
             <li role="presentation">
-              <a data-target={"#iv_" + unique} data-toggle="tab">
+              <a data-target={'#iv_' + unique} data-toggle="tab">
                 j(V) curves
               </a>
             </li>
@@ -72,7 +73,7 @@ class CellFormAll extends CellForm {
               .recipes && (
               <li role="presentation">
                 <a
-                  data-target={"#recipes_" + this.state.unique}
+                  data-target={'#recipes_' + this.state.unique}
                   data-toggle="tab">
                   Recipes
                 </a>
@@ -81,7 +82,7 @@ class CellFormAll extends CellForm {
           </ul>
 
           <div className="tab-content">
-            <div className="tab-pane active" id={"cell_" + unique}>
+            <div className="tab-pane active" id={'cell_' + unique}>
               <h3>Cell name</h3>
 
               {this.props.channelIds.map(chanId => (
@@ -90,12 +91,12 @@ class CellFormAll extends CellForm {
                   <div className="col-sm-9">
                     <input
                       type="text"
-                      name={"__cellName_" + chanId}
-                      id={"__cellName_" + chanId}
+                      name={'__cellName_' + chanId}
+                      id={'__cellName_' + chanId}
                       className="form-control"
                       placeholder="Device name"
-                      disabled={this.state["__cellActive_" + chanId]}
-                      value={this.state["__cellName_" + chanId]}
+                      disabled={this.state['__cellActive_' + chanId]}
+                      value={this.state['__cellName_' + chanId]}
                       onChange={this.handleInputChange}
                     />
                   </div>
@@ -138,8 +139,8 @@ class CellFormAll extends CellForm {
                           type="radio"
                           name="connection"
                           value="group"
-                          checked={this.state.connection == "group"}
-                        />{" "}
+                          checked={this.state.connection == 'group'}
+                        />{' '}
                         Cell enclosure
                       </label>
                     </div>
@@ -150,8 +151,8 @@ class CellFormAll extends CellForm {
                           type="radio"
                           name="connection"
                           value="external"
-                          checked={this.state.connection == "external"}
-                        />{" "}
+                          checked={this.state.connection == 'external'}
+                        />{' '}
                         External connection
                       </label>
                     </div>
@@ -159,7 +160,7 @@ class CellFormAll extends CellForm {
                 </div>
               )}
 
-              {this.state.connection == "external" && (
+              {this.state.connection == 'external' && (
                 <div className="form-group">
                   <label htmlFor="cellarea" className="col-sm-3">
                     Light intensity
@@ -182,7 +183,7 @@ class CellFormAll extends CellForm {
               )}
             </div>
 
-            <div className="tab-pane" id={"tracker_" + unique}>
+            <div className="tab-pane" id={'tracker_' + unique}>
               <CellFormTracking
                 {...this.state}
                 {...this.props}
@@ -190,7 +191,7 @@ class CellFormAll extends CellForm {
               />
             </div>
 
-            <div className="tab-pane" id={"iv_" + unique}>
+            <div className="tab-pane" id={'iv_' + unique}>
               <CellFormIV
                 {...this.state}
                 photodiodeRefs={this.props.photodiodeRefs}
@@ -200,7 +201,7 @@ class CellFormAll extends CellForm {
 
             {environment.instrument[this.props.instrumentConfig.instrumentId]
               .recipes && (
-              <div className="tab-pane" id={"recipes_" + this.state.unique}>
+              <div className="tab-pane" id={'recipes_' + this.state.unique}>
                 <CellFormRecipes
                   {...this.state}
                   tracker={this.props.tracker}

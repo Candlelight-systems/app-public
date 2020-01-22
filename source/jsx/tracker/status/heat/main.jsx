@@ -27,8 +27,6 @@ class HeatStatus extends React.Component {
   wsUpdate( event, data ) {
 
     // Update directly the state
-
-    
     this.setState( data.data );
 
     /*if( data.state.hasOwnProperty( 'paused' ) ) {
