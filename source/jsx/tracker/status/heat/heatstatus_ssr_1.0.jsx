@@ -210,6 +210,36 @@ class HeatStatus extends React.Component {
         });
     }
 
+    if (this.buttonFans && !this.transformed) {
+      $(this.buttonFans)
+        .bootstrapToggle({
+          on: 'On',
+          off: 'Off'
+        })
+        .change(() => {
+          $(this.buttonFans).bootstrapToggle('disable');
+
+          fetch(
+            `http://${this.props.config.trackerHost}:${
+              this.props.config.trackerPort
+            }/heat.${
+              this.buttonFans.checked ? 'fansOn' : 'fansOff'
+            }?instrumentId=${this.props.instrumentId}&groupName=${
+              this.props.name
+            }`,
+            {
+              method: 'GET'
+            }
+          )
+            .then(response => {
+              $(this.buttonFans).bootstrapToggle('enable');
+            })
+            .catch(() => {
+              ipcRenderer.send('reportError', 'Unable to switch the fans');
+            });
+        });
+    }
+
     if (this.buttonMode && !this.transformed) {
       $(this.buttonMode)
         .bootstrapToggle({
@@ -246,6 +276,11 @@ class HeatStatus extends React.Component {
     if (!this.transformed) {
       this.transformed = true;
     }
+    if (this.buttonFans) {
+      $(this.buttonFans)
+        .data('bs.toggle')
+        [this.state.fanswitch ? 'on' : 'off'](true);
+    }
     if (this.buttonHeatCool) {
       $(this.buttonHeatCool)
         .data('bs.toggle')
@@ -274,6 +309,24 @@ class HeatStatus extends React.Component {
             </div>
 
             <h4>Control</h4>
+
+            {environment.statuses.heat.fanswitch !== false && (
+              <div className="row">
+                <div className="col-lg-5">Sample holder fans</div>
+                <div className="col-lg-4">
+                  <label>
+                    <input
+                      data-toggle="toggle"
+                      type="checkbox"
+                      ref={el => (this.buttonFans = el)}
+                      checked={this.state.fanswitch}
+                      data-width="100"
+                      data-height="25"
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
 
             {environment.statuses.heat.switch !== false && (
               <div className="row">

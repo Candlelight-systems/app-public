@@ -608,8 +608,6 @@ class TrackerDevice extends React.Component {
       `SELECT jsc FROM "${tableName}_jsc" ORDER BY time DESC`
     ];
 
-    let newIvCurves = false;
-
     influxquery(queries.join(';'), db, this.props.configDB)
       .then(results => {
         if (results[2].series && results[2].series[0]) {

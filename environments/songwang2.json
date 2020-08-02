@@ -8,12 +8,13 @@
         "readonly": false
       },
       "heat": {
-        "version": "ssr_1.0"
+        "version": "ssr_1.0",
+        "switch": false
       }
     },
 
     "instrument": {
-      "Top port": {
+      "Small cells": {
         "ADC": {
           "model": "ADS1259"
         },
@@ -22,11 +23,9 @@
         "LSB": 1.22,
         "LSBValue": 1,
         "voltageRange": 2.5,
-        "autoZero": "instrument",
-        "recipes": true,
-
+        "autoZero": "device",
         "groups": {
-          "Sample holder": {
+          "Slot Left": {
             "resettable": false,
             "displayDeviceInformation": {
               "time_ellapsed": true,
@@ -42,25 +41,8 @@
               "humidity": true,
               "kwh_yr": false
             }
-          }
-        }
-      },
-
-      "Bottom port": {
-        "ADC": {
-          "model": "ADS1259"
-        },
-        "changeSpeed": false,
-        "fsr": 30,
-
-        "LSB": 1.22,
-        "LSBValue": 1,
-        "voltageRange": 2.5,
-        "autoZero": "instrument",
-        "recipes": true,
-
-        "groups": {
-          "Sample holder": {
+          },
+          "Slot Right": {
             "resettable": false,
             "displayDeviceInformation": {
               "time_ellapsed": true,
@@ -86,35 +68,18 @@
   "defaultConfig": {
     "instruments": [
       {
-        "trackerHost": "192.168.1.36",
-        "trackerName": "Instrument 2 (Module, UV)",
+        "trackerHost": "192.168.0.110",
+        "trackerName": "Small cells",
         "trackerPort": 8080,
-        "trackerPortWS": 8081,
-        "trackerPortDiagnosis": 8082
-      },
-
-      {
-        "trackerHost": "192.168.1.37",
-        "trackerName": "Instrument 2 (Module, UV)",
-        "trackerPort": 8080,
-        "trackerPortWS": 8081,
-        "trackerPortDiagnosis": 8082
-      },
-
-      {
-        "trackerHost": "192.168.1.38",
-        "trackerName": "Instrument 3",
-        "trackerPort": 8080,
-        "trackerPortWS": 8081,
-        "trackerPortDiagnosis": 8082
+        "trackerPortWS": 8081
       }
     ],
     "database": {
-      "host": "isicgesrv10.epfl.ch",
-      "username": "GMF",
-      "password": "Jd8h38dh_1.",
+      "host": "192.168.0.110",
+      "username": "",
+      "password": "",
       "port": 8086,
-      "db": "GMF"
+      "db": "matahari"
     },
 
     "githubtokens": {
