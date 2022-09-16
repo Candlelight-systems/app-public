@@ -14,7 +14,7 @@
     "babel-preset-minify": "^0.4.3",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "electron-builder": "^19.19.1",
     "grunt-babel": "^7.0.0",
     "grunt-contrib-copy": "^1.0.0",
